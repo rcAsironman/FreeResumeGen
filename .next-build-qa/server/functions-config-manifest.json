@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "functions": {
+    "/api/current-resume": {},
+    "/api/export/docx": {},
+    "/api/export/pdf": {},
+    "/api/master-resume": {}
+  }
+}

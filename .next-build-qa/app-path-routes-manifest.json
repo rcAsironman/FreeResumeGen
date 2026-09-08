@@ -1,0 +1,14 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/current-resume/route": "/api/current-resume",
+  "/api/export/docx/route": "/api/export/docx",
+  "/api/export/pdf/route": "/api/export/pdf",
+  "/api/master-resume/route": "/api/master-resume",
+  "/api/validate-analysis/route": "/api/validate-analysis",
+  "/editor/page": "/editor",
+  "/favicon.ico/route": "/favicon.ico",
+  "/page": "/",
+  "/pdf-render/page": "/pdf-render",
+  "/preview/page": "/preview"
+}

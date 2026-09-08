@@ -1,0 +1,261 @@
+.resume {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #000000;
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-size: 10.5pt;
+  line-height: 1.18;
+  box-sizing: border-box;
+}
+
+.resume,
+.resume * {
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+}
+
+.header {
+  margin: 0 0 8px;
+  padding: 0;
+  color: #000000;
+}
+
+.name {
+  margin: 0;
+  padding: 0;
+  color: #000000;
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-size: 18pt;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.title {
+  margin: 2px 0 0;
+  padding: 0;
+  color: #000000;
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-size: 11.5pt;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.contactLine,
+.linkedIn {
+  margin: 2px 0 0;
+  padding: 0;
+  color: #000000;
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-size: 10pt;
+  line-height: 1.15;
+}
+
+.separator {
+  margin: 0 3px;
+}
+
+.section {
+  margin: 9px 0 0;
+  padding: 0;
+  color: #000000;
+}
+
+.sectionHeading {
+  display: block;
+  width: 100%;
+  margin: 0 0 6px;
+  padding: 3px 9px;
+  box-sizing: border-box;
+  border: 1px solid #000000;
+  background: #d3d3d3;
+  color: #000000;
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-size: 11pt;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+
+  break-after: avoid-page;
+  page-break-after: avoid;
+}
+
+.bulletList {
+  margin: 0;
+  padding: 0 0 0 25px;
+  color: #000000;
+  list-style-position: outside;
+  list-style-type: disc;
+}
+
+.bulletList li {
+  display: list-item;
+  margin: 0 0 3px;
+  padding: 0 0 0 3px;
+  color: #000000;
+  text-align: left;
+
+  break-inside: avoid;
+  page-break-inside: avoid;
+  orphans: 2;
+  widows: 2;
+}
+
+.bulletList li::marker {
+  color: #000000;
+  font-size: 9pt;
+}
+
+.skills {
+  display: block;
+  margin: 0;
+  padding: 0;
+  color: #000000;
+}
+
+.skillRow {
+  margin: 0 0 3px;
+  padding: 0;
+  color: #000000;
+
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.experienceList {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+.experience {
+  margin: 0 0 8px;
+  padding: 0;
+  color: #000000;
+}
+
+.clientRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 2px;
+  padding: 0;
+  color: #000000;
+
+  break-after: avoid-page;
+  page-break-after: avoid;
+}
+
+.dates {
+  flex-shrink: 0;
+  color: #000000;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.role {
+  margin: 0 0 2px;
+  padding: 0;
+  color: #000000;
+
+  break-after: avoid-page;
+  page-break-after: avoid;
+}
+
+.responsibilitiesLabel {
+  margin: 0 0 3px;
+  padding: 0;
+  color: #000000;
+
+  break-after: avoid-page;
+  page-break-after: avoid;
+}
+
+.environment {
+  margin: 4px 0 0;
+  padding: 0;
+  color: #000000;
+
+  break-inside: avoid;
+  page-break-inside: avoid;
+  orphans: 2;
+  widows: 2;
+}
+
+.resume strong {
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-weight: 700;
+}
+
+@media screen {
+  .resume {
+    background: #ffffff;
+  }
+}
+
+@media print {
+  .resume {
+    width: 100%;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none;
+  }
+
+  .resume,
+  .resume * {
+    font-family:
+      var(--resume-font, "Times New Roman", Times, serif) !important;
+  }
+
+  .header,
+  .section,
+  .skills,
+  .experienceList,
+  .experience,
+  .clientRow,
+  .role,
+  .responsibilitiesLabel,
+  .environment {
+    color: #000000 !important;
+    background: transparent;
+  }
+
+  .sectionHeading {
+    background: #d3d3d3 !important;
+    color: #000000 !important;
+    border: 1px solid #000000;
+
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .bulletList li,
+  .skillRow,
+  .environment {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .clientRow,
+  .role,
+  .responsibilitiesLabel {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .experience {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+}

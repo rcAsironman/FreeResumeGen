@@ -1,0 +1,14 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/current-resume/route": "app/api/current-resume/route.js",
+  "/api/export/docx/route": "app/api/export/docx/route.js",
+  "/api/export/pdf/route": "app/api/export/pdf/route.js",
+  "/api/master-resume/route": "app/api/master-resume/route.js",
+  "/api/validate-analysis/route": "app/api/validate-analysis/route.js",
+  "/editor/page": "app/editor/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/page": "app/page.js",
+  "/pdf-render/page": "app/pdf-render/page.js",
+  "/preview/page": "app/preview/page.js"
+}

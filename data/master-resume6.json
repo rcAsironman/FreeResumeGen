@@ -1,0 +1,399 @@
+{
+    "personalInfo": {
+        "fullName": "Karthik Mangineni",
+        "professionalTitle": "Senior Java Full Stack Developer",
+        "email": "karthikmangineni77@gmail.com",
+        "phone": "+1(314)814-6677",
+        "location": "",
+        "linkedIn": ""
+    },
+    "professionalSummary": {
+        "bullets": [
+            "Over 6 years of professional experience across all phases of the Software Development Life Cycle (SDLC), including requirements gathering, analysis, design, development, testing, deployment, production support, maintenance, application modernization, and enterprise software delivery using Agile methodologies.",
+            "Extensive experience designing, developing, and maintaining scalable enterprise applications using Java 8/11/17, J2EE, Spring Framework, Spring Boot, Spring MVC, Spring Security, Spring Data JPA, Hibernate ORM, JDBC, and Object-Oriented Design (OOD) principles.",
+            "Strong proficiency in Core Java, including Multithreading, Concurrency, Executor Framework, Collections Framework, Java Streams API, Lambda Expressions, Functional Programming, JVM memory management, performance tuning, debugging, troubleshooting, SOLID Principles, and Design Patterns.",
+            "Hands-on experience designing and developing RESTful APIs, Spring Boot Microservices, reusable backend services, and distributed enterprise applications using event-driven and cloud-native architecture patterns.",
+            "Experience developing responsive web applications using React, Angular, TypeScript, JavaScript, HTML5, and CSS3 while integrating frontend applications with secure RESTful APIs and backend services.",
+            "Hands-on experience designing, deploying, and supporting cloud-native applications on AWS and Microsoft Azure using EC2, Lambda, S3, RDS, IAM, API Gateway, CloudWatch, Azure Virtual Machines, Azure App Service, Azure Storage, Azure SQL Database, Docker, and Kubernetes.",
+            "Strong experience developing asynchronous and event-driven integrations using Apache Kafka for reliable messaging, real-time data processing, and communication between distributed Microservices.",
+            "Strong experience with PostgreSQL, MySQL, Oracle, MongoDB, SQL query optimization, indexing, stored procedures, transaction management, data modeling, and database performance tuning.",
+            "Experience implementing authentication, authorization, and API security using Spring Security, OAuth 2.0, JWT Authentication, secure coding practices, and vulnerability remediation.",
+            "Extensive experience using Git, GitHub, GitLab, Maven, Gradle, Jenkins, Docker, Kubernetes, and CI/CD pipelines to automate application builds, testing, deployments, and release management.",
+            "Experience implementing Unit Testing, Integration Testing, Test-Driven Development (TDD), API validation, and performance testing using JUnit 5, Mockito, Postman, SoapUI, Swagger/OpenAPI, and Apache JMeter.",
+            "Hands-on experience monitoring and supporting production applications using Splunk, DataDog, AWS CloudWatch, Azure Monitor, log analysis, dashboard development, alerting, incident management, and Root Cause Analysis (RCA).",
+            "Strong analytical, debugging, and troubleshooting skills with experience resolving production defects, optimizing application and database performance, remediating vulnerabilities, and improving platform reliability.",
+            "Experience collaborating with Product Owners, Business Analysts, QA Engineers, DevOps Engineers, Solution Architects, UX teams, and cross-functional stakeholders while participating in Agile ceremonies, technical design discussions, and peer code reviews."
+        ]
+    },
+    "technicalSkills": {
+        "categories": [
+            {
+                "name": "Programming Languages",
+                "skills": [
+                    "Java 8/11/17",
+                    "Core Java",
+                    "Python",
+                    "SQL",
+                    "PL/SQL",
+                    "TypeScript",
+                    "JavaScript"
+                ]
+            },
+            {
+                "name": "Java/J2EE Technologies",
+                "skills": [
+                    "J2EE",
+                    "JDBC",
+                    "JSP",
+                    "Servlets",
+                    "Spring Framework",
+                    "Spring Boot",
+                    "Spring MVC",
+                    "Spring Security",
+                    "Spring Data JPA",
+                    "Hibernate ORM",
+                    "JPA"
+                ]
+            },
+            {
+                "name": "Messaging & Streaming",
+                "skills": [
+                    "Apache Kafka",
+                    "Event-Driven Architecture"
+                ]
+            },
+            {
+                "name": "Core Java & Backend Development",
+                "skills": [
+                    "Core Java",
+                    "Multithreading",
+                    "Concurrency",
+                    "Executor Framework",
+                    "Java Collections Framework",
+                    "Java Streams API",
+                    "Lambda Expressions",
+                    "Functional Programming",
+                    "JVM Performance Tuning",
+                    "Memory Management",
+                    "Object-Oriented Design (OOD)",
+                    "SOLID Principles",
+                    "Design Patterns",
+                    "Spring Boot Microservices",
+                    "REST API Development",
+                    "Distributed Systems"
+                ]
+            },
+            {
+                "name": "Frontend Technologies",
+                "skills": [
+                    "React",
+                    "Angular",
+                    "TypeScript",
+                    "JavaScript",
+                    "HTML5",
+                    "CSS3"
+                ]
+            },
+            {
+                "name": "Web Services & APIs",
+                "skills": [
+                    "RESTful APIs",
+                    "SOAP Web Services",
+                    "JSON",
+                    "XML",
+                    "OpenAPI (Swagger)",
+                    "Swagger UI",
+                    "Postman",
+                    "SoapUI"
+                ]
+            },
+            {
+                "name": "Databases",
+                "skills": [
+                    "PostgreSQL",
+                    "MySQL",
+                    "Oracle",
+                    "MongoDB",
+                    "SQL Query Optimization",
+                    "Data Modeling",
+                    "Stored Procedures",
+                    "Indexing",
+                    "Transaction Management",
+                    "Database Performance Tuning"
+                ]
+            },
+            {
+                "name": "Cloud Platforms",
+                "skills": [
+                    "AWS EC2",
+                    "AWS Lambda",
+                    "Amazon S3",
+                    "Amazon RDS",
+                    "API Gateway",
+                    "IAM",
+                    "CloudWatch",
+                    "Microsoft Azure",
+                    "Azure Virtual Machines",
+                    "Azure App Service",
+                    "Azure Storage",
+                    "Azure SQL Database",
+                    "Azure Monitor",
+                    "Azure Active Directory (Microsoft Entra ID)",
+                    "Docker",
+                    "Kubernetes"
+                ]
+            },
+            {
+                "name": "Monitoring & Observability",
+                "skills": [
+                    "Splunk",
+                    "DataDog",
+                    "AWS CloudWatch",
+                    "Log Analysis",
+                    "Dashboard Development",
+                    "Alerting",
+                    "Application Monitoring",
+                    "Production Monitoring",
+                    "Root Cause Analysis (RCA)"
+                ]
+            },
+            {
+                "name": "Testing Frameworks",
+                "skills": [
+                    "JUnit 5",
+                    "Mockito",
+                    "Unit Testing",
+                    "Integration Testing",
+                    "Test-Driven Development (TDD)",
+                    "API Testing",
+                    "Apache JMeter",
+                    "Test Automation"
+                ]
+            },
+            {
+                "name": "Build & DevOps",
+                "skills": [
+                    "Git",
+                    "GitHub",
+                    "GitLab",
+                    "Maven",
+                    "Gradle",
+                    "Jenkins",
+                    "CI/CD Pipelines",
+                    "Docker",
+                    "Kubernetes"
+                ]
+            },
+            {
+                "name": "Security",
+                "skills": [
+                    "Spring Security",
+                    "OAuth 2.0",
+                    "JWT Authentication",
+                    "Secure Coding",
+                    "Vulnerability Remediation",
+                    "Encryption & Decryption Concepts"
+                ]
+            },
+            {
+                "name": "Development Tools",
+                "skills": [
+                    "IntelliJ IDEA",
+                    "Eclipse",
+                    "Visual Studio Code",
+                    "Jira",
+                    "Confluence",
+                    "Swagger UI",
+                    "Postman",
+                    "SoapUI",
+                    "Apache JMeter"
+                ]
+            },
+            {
+                "name": "Operating Systems",
+                "skills": [
+                    "Linux",
+                    "Unix",
+                    "Windows"
+                ]
+            },
+            {
+                "name": "Methodologies",
+                "skills": [
+                    "Agile Scrum",
+                    "SDLC",
+                    "Continuous Integration (CI)",
+                    "Continuous Delivery (CD)",
+                    "Code Reviews",
+                    "Production Support",
+                    "Application Monitoring",
+                    "Incident Management"
+                ]
+            }
+        ]
+    },
+    "experience": [
+        {
+            "id": "citi-bank",
+            "company": "Citi Bank",
+            "role": "Senior Java Full Stack Developer",
+            "location": "Washington Blvd, Jersey City, NJ",
+            "startDate": "Dec 2023",
+            "endDate": "Present",
+            "responsibilities": [
+                "Engineered Java 17 and Spring Boot Microservices for digital banking, payments, account servicing, transaction processing, and customer workflow applications using Spring MVC, Spring Data JPA, Hibernate ORM, JDBC, and RESTful API design patterns.",
+                "Developed responsive React and TypeScript modules with reusable components, form validation, state management, and secure API integrations, improving usability for internal operations and customer-facing financial workflows.",
+                "Implemented secure RESTful APIs using Spring Security, OAuth 2.0, JWT Authentication, role-based authorization, encryption concepts, and API security controls for protected service-to-service communication across financial platforms.",
+                "Integrated Apache Kafka event streams for asynchronous payment events, transaction notifications, account updates, and audit processing, improving workflow decoupling and reducing downstream processing delays by approximately 25%.",
+                "Deployed cloud-native services on AWS using EC2, Lambda, S3, RDS, IAM, API Gateway, and CloudWatch, with Docker containers orchestrated through Kubernetes for scalable and resilient application delivery.",
+                "Optimized PostgreSQL and Oracle queries through indexing, execution-plan analysis, stored procedure tuning, and transaction optimization, reducing average response time by approximately 30% for high-volume financial workflows.",
+                "Built CI/CD pipelines using Git, GitLab, Maven, Gradle, Jenkins, Docker, and Kubernetes to automate builds, tests, deployments, environment promotion, and release management across development and production environments.",
+                "Created unit, integration, and API validation tests using JUnit 5, Mockito, Postman, Swagger/OpenAPI, SoapUI, and Apache JMeter to improve release quality, service-contract validation, and regression coverage.",
+                "Monitored production services using Splunk, DataDog, and AWS CloudWatch, building dashboards and alerts to accelerate incident triage, Root Cause Analysis (RCA), and defect remediation.",
+                "Modernized legacy Java and J2EE services by upgrading Spring dependencies, replacing deprecated libraries, refactoring tightly coupled modules, and remediating vulnerabilities to improve maintainability, security, and platform stability.",
+                "Troubleshot production defects, JVM memory issues, API latency, database bottlenecks, Kafka processing failures, and unsuccessful deployments, reducing repeat incidents through log analysis, code fixes, and operational runbooks.",
+                "Applied Core Java concepts including Multithreading, Concurrency, Executor Framework, Collections Framework, Streams API, Lambda Expressions, SOLID Principles, and Design Patterns to build scalable and maintainable backend components.",
+                "Collaborated with Product Owners, QA Engineers, DevOps teams, cybersecurity teams, Solution Architects, and business stakeholders during Agile Scrum ceremonies, technical design reviews, sprint planning, and peer code reviews."
+            ],
+            "environment": [
+                "Java 11/17",
+                "Core Java",
+                "J2EE",
+                "Spring Framework",
+                "Spring Boot",
+                "Spring MVC",
+                "Spring Security",
+                "Spring Data JPA",
+                "Hibernate ORM",
+                "JPA",
+                "JDBC",
+                "Microservices",
+                "RESTful APIs",
+                "API Gateway",
+                "OAuth 2.0",
+                "JWT Authentication",
+                "Apache Kafka",
+                "Event-Driven Architecture",
+                "React",
+                "TypeScript",
+                "JavaScript",
+                "HTML5",
+                "CSS3",
+                "PostgreSQL",
+                "Oracle",
+                "MongoDB",
+                "SQL",
+                "AWS (EC2, Lambda, S3, RDS, IAM, API Gateway, CloudWatch)",
+                "Docker",
+                "Kubernetes",
+                "Splunk",
+                "DataDog",
+                "Git",
+                "GitLab",
+                "Maven",
+                "Gradle",
+                "Jenkins",
+                "CI/CD Pipelines",
+                "JUnit 5",
+                "Mockito",
+                "Postman",
+                "SoapUI",
+                "Apache JMeter",
+                "Swagger (OpenAPI)",
+                "JSON",
+                "XML",
+                "Linux",
+                "Jira",
+                "Confluence",
+                "Agile Scrum"
+            ]
+        },
+        {
+            "id": "servicenow",
+            "company": "ServiceNow",
+            "role": "Java Full Stack Developer",
+            "location": "Santa Clara, CA",
+            "startDate": "Aug 2020",
+            "endDate": "Nov 2023",
+            "responsibilities": [
+                "Designed, developed, and maintained scalable enterprise workflow and cloud platform applications using Java 8/11, Spring Framework, Spring Boot, Spring MVC, Hibernate ORM, Angular, React, and Object-Oriented Design (OOD) principles.",
+                "Developed reusable Spring Boot Microservices, backend services, and RESTful APIs supporting digital workflows, service management processes, platform integrations, user administration, and enterprise automation capabilities.",
+                "Built responsive frontend modules using Angular, React, TypeScript, JavaScript, HTML5, and CSS3 while integrating user interfaces with secure RESTful APIs and reusable backend services.",
+                "Developed high-performance backend components using Core Java, Multithreading, Concurrency, Executor Framework, Collections Framework, Java Streams API, Lambda Expressions, SOLID Principles, and Design Patterns.",
+                "Implemented Apache Kafka-based event-driven integrations to support asynchronous processing, platform notifications, audit events, reliable messaging, and communication between distributed Microservices.",
+                "Designed and maintained cloud-native services on Microsoft Azure using Azure Virtual Machines, Azure App Service, Azure Storage, Azure SQL Database, Azure Monitor, and Microsoft Entra ID while deploying containerized applications using Docker and Kubernetes.",
+                "Integrated enterprise applications with internal platforms and third-party systems using RESTful APIs, SOAP Web Services, JSON, XML, OAuth 2.0, JWT Authentication, and secure API communication mechanisms.",
+                "Designed and optimized PostgreSQL, MySQL, and Oracle databases through data modeling, SQL query tuning, indexing, stored procedures, transaction management, and database performance optimization.",
+                "Implemented Spring Security, OAuth 2.0, JWT Authentication, role-based authorization, secure coding practices, dependency management, and vulnerability remediation across enterprise applications.",
+                "Created Unit and Integration tests using JUnit and Mockito and validated REST and SOAP integrations using Postman, SoapUI, Swagger/OpenAPI, and automated API testing practices.",
+                "Developed and maintained CI/CD pipelines using Git, GitLab, Maven, Jenkins, Docker, and Kubernetes to automate application builds, testing, deployments, and release management across development, QA, and production environments.",
+                "Monitored application health and production performance using Splunk and Azure Monitor, analyzed logs and metrics, configured alerts, performed Root Cause Analysis (RCA), and resolved production incidents.",
+                "Modernized legacy Java and J2EE applications by upgrading framework dependencies, migrating modules to Spring Boot, replacing deprecated components, addressing security vulnerabilities, and improving maintainability.",
+                "Worked extensively in Linux and Unix environments for application deployment, shell scripting, process monitoring, log analysis, troubleshooting, and production support.",
+                "Collaborated with Product Owners, Business Analysts, QA Engineers, DevOps teams, Architects, and distributed engineering teams while participating in Agile Scrum ceremonies, sprint planning, technical design reviews, and peer code reviews."
+            ],
+            "environment": [
+                "Java 8/11",
+                "Core Java",
+                "J2EE",
+                "Spring Framework",
+                "Spring Boot",
+                "Spring MVC",
+                "Spring Security",
+                "Spring Data JPA",
+                "Hibernate ORM",
+                "JPA",
+                "JDBC",
+                "Microservices",
+                "RESTful APIs",
+                "SOAP Web Services",
+                "Apache Kafka",
+                "Event-Driven Architecture",
+                "Angular",
+                "React",
+                "TypeScript",
+                "JavaScript",
+                "HTML5",
+                "CSS3",
+                "JSON",
+                "XML",
+                "PostgreSQL",
+                "MySQL",
+                "Oracle",
+                "SQL",
+                "Microsoft Azure (Virtual Machines, App Service, Storage, SQL Database, Monitor, Microsoft Entra ID)",
+                "Docker",
+                "Kubernetes",
+                "Splunk",
+                "Git",
+                "GitLab",
+                "Maven",
+                "Jenkins",
+                "CI/CD Pipelines",
+                "JUnit",
+                "Mockito",
+                "Postman",
+                "SoapUI",
+                "Swagger (OpenAPI)",
+                "OAuth 2.0",
+                "JWT Authentication",
+                "Linux",
+                "Unix",
+                "Jira",
+                "Confluence",
+                "Agile Scrum"
+            ]
+        }
+    ],
+    "projects": [],
+    "education": [
+        {
+            "id": "slu-ms",
+            "institution": "Saint Louis University",
+            "degree": "Master's in Computer Science",
+            "location": "St. Louis, Missouri, USA",
+            "graduationDate": "2025"
+        }
+    ],
+    "certifications": []
+}
