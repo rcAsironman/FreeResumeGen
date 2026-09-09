@@ -30,10 +30,10 @@ export function FixedResumeTemplate({
   }
 
   const contactItems = [
-    plainContactValue(resume.personalInfo.email),
-    resume.personalInfo.phone,
-    resume.personalInfo.location,
-  ].filter(Boolean);
+    { field: "email", value: plainContactValue(resume.personalInfo.email) },
+    { field: "phone", value: resume.personalInfo.phone },
+    { field: "location", value: resume.personalInfo.location },
+  ].filter((item) => Boolean(item.value));
 
   const allResumeSkills =
     resume.technicalSkills.categories.flatMap(
@@ -50,23 +50,23 @@ export function FixedResumeTemplate({
       style={resumeStyle}
     >
       <header className={styles.header}>
-        <h1 className={styles.name}>
+        <h1 className={styles.name} data-resume-field="fullName">
           {resume.personalInfo.fullName}
         </h1>
 
-        <div className={styles.title}>
+        <div className={styles.title} data-resume-field="professionalTitle">
           {resume.personalInfo.professionalTitle}
         </div>
 
         {contactItems.length > 0 && (
           <div className={styles.contactLine}>
             {contactItems.map((item, index) => (
-              <span key={item}>
+              <span key={item.field} data-contact-field={item.field}>
                 {index > 0 && (
                   <span className={styles.separator}> | </span>
                 )}
 
-                {item}
+                {item.value}
               </span>
             ))}
           </div>
@@ -75,7 +75,7 @@ export function FixedResumeTemplate({
         {resume.personalInfo.linkedIn && (
           <div className={styles.linkedIn}>
             <strong>LinkedIn:</strong>{" "}
-            {plainContactValue(resume.personalInfo.linkedIn)}
+            <span data-resume-field="linkedIn">{plainContactValue(resume.personalInfo.linkedIn)}</span>
           </div>
         )}
       </header>
@@ -88,7 +88,7 @@ export function FixedResumeTemplate({
         <ul className={styles.bulletList}>
           {resume.professionalSummary.bullets.map(
             (bullet, index) => (
-              <li key={`summary-${index}`}>
+              <li key={`summary-${index}`} data-summary-index={index}>
                 <BoldSkillsText
                   text={bullet}
                   skills={technicalSkills}
@@ -113,11 +113,12 @@ export function FixedResumeTemplate({
               <p
                 className={styles.skillRow}
                 key={category.name}
+                data-skill-category-index={resume.technicalSkills.categories.indexOf(category)}
               >
-                <strong>{category.name}:</strong>{" "}
+                <strong data-skill-category-name>{category.name}:</strong>{" "}
 
                 {category.skills.map((skill, index) => (
-                  <span key={`${category.name}-${skill}`}>
+                  <span key={`${category.name}-${skill}`} data-skill-index={index}>
                     {index > 0 && ", "}
 
                     <BoldSkillsText
@@ -143,15 +144,11 @@ export function FixedResumeTemplate({
 
           <ul className={styles.bulletList}>
             {resume.education.map((education) => (
-              <li key={education.id}>
-                {education.degree} from{" "}
-                {education.institution}
-                {education.location
-                  ? `, ${education.location}`
-                  : ""}
-                {education.graduationDate
-                  ? ` in ${education.graduationDate}`
-                  : ""}
+              <li key={education.id} data-education-index={resume.education.indexOf(education)}>
+                <span data-education-field="degree">{education.degree}</span> from{" "}
+                <span data-education-field="institution">{education.institution}</span>
+                {education.location ? <>, <span data-education-field="location">{education.location}</span></> : ""}
+                {education.graduationDate ? <> in <span data-education-field="graduationDate">{education.graduationDate}</span></> : ""}
                 .
               </li>
             ))}
@@ -169,25 +166,24 @@ export function FixedResumeTemplate({
             <section
               className={styles.experience}
               key={experience.id}
+              data-experience-index={resume.experience.indexOf(experience)}
             >
               <div className={styles.clientRow}>
                 <div>
                   <strong>Client:-</strong>{" "}
-                  {experience.company}
-                  {experience.location
-                    ? `, ${experience.location}`
-                    : ""}
+                  <span data-experience-field="company">{experience.company}</span>
+                  {experience.location ? <>, <span data-experience-field="location">{experience.location}</span></> : ""}
                 </div>
 
                 <div className={styles.dates}>
-                  {experience.startDate} –{" "}
-                  {experience.endDate}
+                  <span data-experience-field="startDate">{experience.startDate}</span> –{" "}
+                  <span data-experience-field="endDate">{experience.endDate}</span>
                 </div>
               </div>
 
               <div className={styles.role}>
                 <strong>Role:-</strong>{" "}
-                {experience.role}
+                <span data-experience-field="role">{experience.role}</span>
               </div>
 
               <div className={styles.responsibilitiesLabel}>
@@ -199,6 +195,7 @@ export function FixedResumeTemplate({
                   (responsibility, index) => (
                     <li
                       key={`${experience.id}-responsibility-${index}`}
+                      data-responsibility-index={index}
                     >
                       <BoldSkillsText
                         text={responsibility}
@@ -220,6 +217,7 @@ export function FixedResumeTemplate({
                     (technology, index) => (
                       <span
                         key={`${experience.id}-environment-${technology}`}
+                        data-environment-index={index}
                       >
                         {index > 0 && ", "}
 

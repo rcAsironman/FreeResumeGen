@@ -1,5 +1,4 @@
 import { z } from "zod";
-import HTMLtoDOCX from "html-to-docx";
 
 import { createResumeDocx } from "@/engine/export-engine/create-resume-docx";
 import { masterResumeSchema } from "@/engine/validation/resume.schema";
@@ -19,8 +18,6 @@ const requestSchema = z.object({
   selectedSections: z.array(
     z.string(),
   ),
-
-  documentHtml: z.string().max(2_000_000).optional(),
 
   fontFamily: z
     .enum([
@@ -59,7 +56,6 @@ export async function POST(
       technicalSkills,
       selectedSections,
       fontFamily,
-      documentHtml,
     } = requestSchema.parse(body);
 
     /*
@@ -67,13 +63,7 @@ export async function POST(
      * user-selected font.
      */
 
-    const docxBuffer = documentHtml
-      ? Buffer.from(await HTMLtoDOCX(
-        `<!doctype html><html><head><meta charset="utf-8"></head><body>${documentHtml}</body></html>`,
-        undefined,
-        { pageSize: { width: 12240, height: 15840 }, margins: { top: 605, right: 720, bottom: 605, left: 720 } },
-      ))
-      : await createResumeDocx({
+    const docxBuffer = await createResumeDocx({
         resume,
         technicalSkills,
         selectedSections,

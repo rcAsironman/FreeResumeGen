@@ -1,0 +1,5 @@
+{
+  "/api/current-resume/route": "app/api/current-resume/route.js",
+  "/api/export/docx/route": "app/api/export/docx/route.js",
+  "/editor/page": "app/editor/page.js"
+}

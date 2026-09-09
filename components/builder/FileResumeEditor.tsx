@@ -78,13 +78,50 @@ export function FileResumeEditor() {
     setDownloading(format); setError("");
     try {
       const documentHtml = serializeEditedDocument();
-      const response = await fetch(`/api/export/${format}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ resume, technicalSkills, selectedSections, fontFamily: font, documentHtml }) });
+      const editedResume = readDirectTextEdits();
+      const response = await fetch(`/api/export/${format}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ resume: editedResume, technicalSkills, selectedSections, fontFamily: font, documentHtml: format === "pdf" ? documentHtml : undefined }) });
       if (!response.ok) throw new Error(`Unable to generate ${format.toUpperCase()}.`);
       const url = URL.createObjectURL(await response.blob());
       const link = document.createElement("a"); link.href = url; link.download = downloadName(resume, format); link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Download failed."); }
     finally { setDownloading(""); }
+  }
+
+  function readDirectTextEdits(): MasterResume {
+    const root = editorRef.current;
+    const next = structuredClone(resume!);
+    if (!root) return next;
+    const text = (element: Element | null) => (element as HTMLElement | null)?.innerText.replace(/\s+/g, " ").trim() ?? "";
+
+    next.personalInfo.fullName = text(root.querySelector('[data-resume-field="fullName"]'));
+    next.personalInfo.professionalTitle = text(root.querySelector('[data-resume-field="professionalTitle"]'));
+    next.personalInfo.email = text(root.querySelector('[data-contact-field="email"]')).replace(/^\|\s*/, "");
+    next.personalInfo.phone = text(root.querySelector('[data-contact-field="phone"]')).replace(/^\|\s*/, "");
+    next.personalInfo.location = text(root.querySelector('[data-contact-field="location"]')).replace(/^\|\s*/, "");
+    next.personalInfo.linkedIn = text(root.querySelector('[data-resume-field="linkedIn"]'));
+
+    next.professionalSummary.bullets = Array.from(root.querySelectorAll("[data-summary-index]"))
+      .map((element) => text(element)).filter(Boolean);
+
+    next.technicalSkills.categories = Array.from(root.querySelectorAll("[data-skill-category-index]"))
+      .map((categoryElement) => ({
+        name: text(categoryElement.querySelector("[data-skill-category-name]")).replace(/:\s*$/, ""),
+        skills: Array.from(categoryElement.querySelectorAll("[data-skill-index]")).map((element) => text(element).replace(/^,\s*/, "")).filter(Boolean),
+      })).filter((category) => category.name && category.skills.length);
+
+    next.education = Array.from(root.querySelectorAll("[data-education-index]")).map((element) => {
+      const index = Number(element.getAttribute("data-education-index"));
+      return { ...next.education[index], degree: text(element.querySelector('[data-education-field="degree"]')), institution: text(element.querySelector('[data-education-field="institution"]')), location: text(element.querySelector('[data-education-field="location"]')) || undefined, graduationDate: text(element.querySelector('[data-education-field="graduationDate"]')) || undefined };
+    }).filter((item) => item?.degree && item?.institution);
+
+    next.experience = Array.from(root.querySelectorAll("[data-experience-index]")).map((element) => {
+      const index = Number(element.getAttribute("data-experience-index"));
+      const original = next.experience[index];
+      return { ...original, company: text(element.querySelector('[data-experience-field="company"]')), location: text(element.querySelector('[data-experience-field="location"]')), startDate: text(element.querySelector('[data-experience-field="startDate"]')), endDate: text(element.querySelector('[data-experience-field="endDate"]')), role: text(element.querySelector('[data-experience-field="role"]')), responsibilities: Array.from(element.querySelectorAll("[data-responsibility-index]")).map((item) => text(item)).filter(Boolean), environment: Array.from(element.querySelectorAll("[data-environment-index]")).map((item) => text(item).replace(/^,\s*/, "")).filter(Boolean) };
+    }).filter((item) => item?.company && item?.role);
+
+    return next;
   }
 
   function serializeEditedDocument() {
@@ -98,7 +135,12 @@ export function FileResumeEditor() {
       const target = cloneNodes[index];
       if (!target) return;
       const computed = window.getComputedStyle(node);
-      for (const property of properties) target.style.setProperty(property, computed.getPropertyValue(property));
+      for (const property of properties) {
+        let value = computed.getPropertyValue(property);
+        if (property === "font-family") value = value.replace(/["']/g, "").split(",")[0]?.trim() ?? value;
+        if (property === "background-color" && (value === "rgba(0, 0, 0, 0)" || value === "transparent")) continue;
+        target.style.setProperty(property, value);
+      }
       target.removeAttribute("contenteditable");
     });
     return clone.outerHTML;

@@ -1,10 +1,10 @@
 [
   {
     "route": "/editor",
-    "firstLoadUncompressedJsBytes": 539802,
+    "firstLoadUncompressedJsBytes": 543505,
     "firstLoadChunkPaths": [
       ".next-build-qa\\static\\chunks\\158myu8e_yme3.js",
-      ".next-build-qa\\static\\chunks\\06aaiz_qxml32.js",
+      ".next-build-qa\\static\\chunks\\1qy58nl7a-zat.js",
       ".next-build-qa\\static\\chunks\\1jq4o6yq14o4c.js",
       ".next-build-qa\\static\\chunks\\07-hzktxqjvzd.js",
       ".next-build-qa\\static\\chunks\\3rxl-jt3pdxgx.js",
@@ -27,10 +27,10 @@
   },
   {
     "route": "/pdf-render",
-    "firstLoadUncompressedJsBytes": 521793,
+    "firstLoadUncompressedJsBytes": 523008,
     "firstLoadChunkPaths": [
       ".next-build-qa\\static\\chunks\\158myu8e_yme3.js",
-      ".next-build-qa\\static\\chunks\\3bl5bv52sm58p.js",
+      ".next-build-qa\\static\\chunks\\2ij6rm0tl_efo.js",
       ".next-build-qa\\static\\chunks\\1jq4o6yq14o4c.js",
       ".next-build-qa\\static\\chunks\\07-hzktxqjvzd.js",
       ".next-build-qa\\static\\chunks\\3rxl-jt3pdxgx.js",
