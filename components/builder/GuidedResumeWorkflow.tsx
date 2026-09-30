@@ -5,6 +5,7 @@ import { Clipboard, FileJson, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { SectionSelector, type HighlightSection } from "@/components/builder/SectionSelector";
+import { ActionToast } from "@/components/shared/ActionToast";
 import type { JobAnalysis } from "@/types/job-analysis";
 import type { MasterResume } from "@/types/resume";
 
@@ -116,8 +117,15 @@ export function GuidedResumeWorkflow() {
   const promptOne = useMemo(() => analysisPrompt(jd), [jd]);
   const promptTwo = useMemo(() => analysis && master ? generationPrompt(jd, analysis, master, sections) : "", [jd, analysis, master, sections]);
 
-  async function copy(text: string, message: string) { await navigator.clipboard.writeText(text); setNotice(message); setError(""); }
-  async function upload(event: ChangeEvent<HTMLInputElement>, setter: (text: string) => void) { const file = event.target.files?.[0]; if (file) setter(await file.text()); event.target.value = ""; }
+  async function copy(text: string, message: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setNotice(message); setError("");
+    } catch {
+      setError("Unable to copy to the clipboard. Check browser clipboard permission and try again.");
+    }
+  }
+  async function upload(event: ChangeEvent<HTMLInputElement>, setter: (text: string) => void) { const file = event.target.files?.[0]; if (file) { setter(await file.text()); setNotice(`${file.name} loaded successfully.`); setError(""); } event.target.value = ""; }
 
   async function validateAnalysis() {
     try {
@@ -141,15 +149,28 @@ export function GuidedResumeWorkflow() {
   }
 
   return <div className="mx-auto max-w-7xl p-4 sm:p-6">
+    {error ? <ActionToast message={error} type="error" onDismiss={() => setError("")} /> : notice ? <ActionToast message={notice} onDismiss={() => setNotice("")} /> : null}
     <header className="rounded-3xl border border-violet-200 bg-[#fffaf0] p-5 shadow-lg sm:p-7"><p className="text-xs font-bold uppercase tracking-[.18em] text-violet-600">Guided ChatGPT workflow · No API key</p><h1 className="mt-1 text-3xl font-bold text-violet-950">JD to tailored resume</h1><p className="mt-2 text-stone-600">The app prepares two prompts. You use ChatGPT in your browser and paste its JSON responses back here.</p></header>
-    {error && <p className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-red-700">{error}</p>}{notice && <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-800">{notice}</p>}
-    <section className="mt-5 grid gap-5 lg:grid-cols-2">
-      <StepCard number="1" title="Extract skills in ChatGPT"><label className="text-sm font-semibold" htmlFor="jd">Job description</label><textarea id="jd" value={jd} onChange={(event) => setJd(event.target.value)} placeholder="Paste the complete job description…" className="mt-2 h-64 w-full rounded-xl border border-violet-200 p-3 text-sm"/><button disabled={jd.trim().length < 40} onClick={() => void copy(promptOne, "Prompt 1 copied. Paste it into ChatGPT, then paste the returned analysis JSON below.")} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><Clipboard size={17}/> Copy Prompt 1</button></StepCard>
-      <StepCard number="2" title="Paste analysis JSON"><JsonInput value={analysisText} setValue={setAnalysisText} onUpload={(event) => void upload(event, setAnalysisText)} placeholder="Paste ChatGPT analysis JSON…"/><button disabled={!analysisText.trim()} onClick={() => void validateAnalysis()} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><FileJson size={17}/> Validate analysis</button>{analysis && <div className="mt-4 rounded-xl bg-violet-50 p-3"><p className="font-bold text-violet-900">{analysis.targetRole || "Target role"}</p><div className="mt-2 flex max-h-32 flex-wrap gap-1 overflow-auto">{analysis.allTechnicalSkills.map((skill) => <span key={skill} className="rounded-full bg-white px-2 py-1 text-xs text-violet-800">{skill}</span>)}</div></div>}</StepCard>
+    <section className="mt-5">
+      <StepCard number="1" title="Analyze the job description">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <div>
+            <label className="text-sm font-semibold" htmlFor="jd">Job description</label>
+            <textarea id="jd" value={jd} onChange={(event) => setJd(event.target.value)} placeholder="Paste the complete job description…" className="mt-2 h-56 w-full rounded-xl border border-violet-200 p-3 text-sm"/>
+            <button disabled={jd.trim().length < 40} onClick={() => void copy(promptOne, "Prompt 1 copied. Paste it into ChatGPT, then paste the returned analysis JSON here.")} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><Clipboard size={17}/> Copy analysis prompt</button>
+          </div>
+          <div>
+            <p className="mb-2 text-sm font-semibold">ChatGPT analysis JSON</p>
+            <JsonInput value={analysisText} setValue={setAnalysisText} onUpload={(event) => void upload(event, setAnalysisText)} placeholder="Paste ChatGPT analysis JSON…" compact/>
+            <button disabled={!analysisText.trim()} onClick={() => void validateAnalysis()} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><FileJson size={17}/> Validate analysis</button>
+          </div>
+        </div>
+        {analysis && <div className="mt-4 rounded-xl bg-violet-50 p-3"><p className="font-bold text-violet-900">{analysis.targetRole || "Target role"}</p><div className="mt-2 flex max-h-28 flex-wrap gap-1 overflow-auto">{analysis.allTechnicalSkills.map((skill) => <span key={skill} className="rounded-full bg-white px-2 py-1 text-xs text-violet-800">{skill}</span>)}</div></div>}
+      </StepCard>
     </section>
-    {analysis && <section className="mt-5 grid gap-5 lg:grid-cols-2"><StepCard number="3" title="Choose skill highlighting"><SectionSelector selectedSections={sections} onChange={setSections}/><button disabled={!sections.length || !master} onClick={() => void copy(promptTwo, "Prompt 2 copied. Paste it into ChatGPT, then paste the generated resume JSON into Step 4.")} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><Clipboard size={17}/> Copy Prompt 2</button></StepCard><StepCard number="4" title="Paste generated resume JSON"><JsonInput value={resumeText} setValue={setResumeText} onUpload={(event) => void upload(event, setResumeText)} placeholder="Paste ChatGPT generated resume JSON…"/><button disabled={!resumeText.trim()} onClick={() => void openEditor()} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><FileJson size={17}/> Validate, edit and preview</button></StepCard></section>}
+    {analysis && <section className="mt-5"><StepCard number="2" title="Generate and open the resume"><div className="grid gap-5 lg:grid-cols-2"><div><SectionSelector selectedSections={sections} onChange={setSections}/><button disabled={!sections.length || !master} onClick={() => void copy(promptTwo, "Resume prompt copied. Paste it into ChatGPT, then paste the generated resume JSON here.")} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><Clipboard size={17}/> Copy resume prompt</button></div><div><p className="mb-2 text-sm font-semibold">Generated resume JSON</p><JsonInput value={resumeText} setValue={setResumeText} onUpload={(event) => void upload(event, setResumeText)} placeholder="Paste ChatGPT generated resume JSON…" compact/><button disabled={!resumeText.trim()} onClick={() => void openEditor()} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><FileJson size={17}/> Validate, edit and preview</button></div></div></StepCard></section>}
   </div>;
 }
 
 function StepCard({ number, title, children }: { number: string; title: string; children: React.ReactNode }) { return <article className="rounded-2xl border border-violet-200 bg-white p-5 shadow-md"><p className="text-xs font-bold uppercase tracking-[.16em] text-violet-600">Step {number}</p><h2 className="mb-4 text-xl font-bold">{title}</h2>{children}</article>; }
-function JsonInput({ value, setValue, onUpload, placeholder }: { value: string; setValue: (value: string) => void; onUpload: (event: ChangeEvent<HTMLInputElement>) => void; placeholder: string }) { return <><textarea value={value} onChange={(event) => setValue(event.target.value)} placeholder={placeholder} spellCheck={false} className="h-64 w-full rounded-xl bg-stone-950 p-3 font-mono text-xs leading-5 text-emerald-100"/><label className="mt-2 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-violet-300 px-3 py-2 text-sm font-semibold text-violet-700"><Upload size={15}/> Upload JSON<input type="file" accept=".json,application/json" onChange={onUpload} className="hidden"/></label></>; }
+function JsonInput({ value, setValue, onUpload, placeholder, compact = false }: { value: string; setValue: (value: string) => void; onUpload: (event: ChangeEvent<HTMLInputElement>) => void; placeholder: string; compact?: boolean }) { return <><textarea value={value} onChange={(event) => setValue(event.target.value)} placeholder={placeholder} spellCheck={false} className={`${compact ? "h-48" : "h-64"} w-full rounded-xl bg-stone-950 p-3 font-mono text-xs leading-5 text-emerald-100`}/><label className="mt-2 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-violet-300 px-3 py-2 text-sm font-semibold text-violet-700"><Upload size={15}/> Upload JSON<input type="file" accept=".json,application/json" onChange={onUpload} className="hidden"/></label></>; }

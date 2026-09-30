@@ -7,6 +7,7 @@ import { Download, Eye, FileText, Plus, RefreshCw, Trash2, X } from "lucide-reac
 import { FixedResumeTemplate } from "@/templates/fixed-resume/FixedResumeTemplate";
 import { SectionSelector, type HighlightSection } from "@/components/builder/SectionSelector";
 import { RichTextToolbar } from "@/components/builder/RichTextToolbar";
+import { ActionToast } from "@/components/shared/ActionToast";
 import type { MasterResume } from "@/types/resume";
 import { DEFAULT_RESUME_FONT, RESUME_FONT_OPTIONS, type ResumeFont } from "@/types/resume-font";
 
@@ -69,8 +70,13 @@ export function FileResumeEditor() {
   }
 
   async function copyJson() {
-    await navigator.clipboard.writeText(jsonText);
-    setNotice("Updated JSON copied. Paste it into data/generated-resume.json in VS Code and save.");
+    try {
+      await navigator.clipboard.writeText(jsonText);
+      setNotice("Updated JSON copied. Paste it into data/generated-resume.json in VS Code and save.");
+      setError("");
+    } catch {
+      setError("Unable to copy to the clipboard. Check browser clipboard permission and try again.");
+    }
   }
 
   async function download(format: "pdf" | "docx") {
@@ -84,6 +90,7 @@ export function FileResumeEditor() {
       const url = URL.createObjectURL(await response.blob());
       const link = document.createElement("a"); link.href = url; link.download = downloadName(resume, format); link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setNotice(`${format.toUpperCase()} download created successfully.`);
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Download failed."); }
     finally { setDownloading(""); }
   }
@@ -154,8 +161,8 @@ export function FileResumeEditor() {
   if (!resume) return <div className="mx-auto max-w-4xl p-6"><div className="rounded-2xl border border-violet-200 bg-white p-6">{error ? <><h1 className="text-2xl font-bold text-red-700">Resume file error</h1><p className="mt-3 text-red-700">{error}</p><p className="mt-3 text-sm text-stone-600">Fix <code>data/generated-resume.json</code>, save it, then reload.</p><button onClick={() => void loadFile()} className="mt-4 rounded-xl bg-violet-600 px-4 py-2 font-semibold text-white">Try again</button></> : "Loading data/generated-resume.json…"}</div></div>;
 
   return <div className="mx-auto max-w-7xl p-4 sm:p-6">
+    {error ? <ActionToast message={error} type="error" onDismiss={() => setError("")} /> : notice ? <ActionToast message={notice} onDismiss={() => setNotice("")} /> : null}
     <header className="rounded-3xl border border-violet-200 bg-[#fffaf0] p-5 shadow-lg"><p className="text-xs font-bold uppercase tracking-[.18em] text-violet-600">File-driven · No AI key</p><h1 className="mt-1 text-3xl font-bold text-violet-950">Resume from generated-resume.json</h1><p className="mt-2 text-stone-600">Replace or edit <code>data/generated-resume.json</code> in VS Code, restart the app, and this page loads it automatically.</p><div className="mt-4 flex flex-wrap gap-2"><button onClick={() => void loadFile()} className="inline-flex items-center gap-2 rounded-xl border border-violet-300 bg-white px-4 py-2 font-semibold text-violet-700"><RefreshCw size={16}/> Reload file</button><select value={font} onChange={(event) => setFont(event.target.value as ResumeFont)} className="rounded-xl border border-violet-300 bg-white px-3 py-2">{RESUME_FONT_OPTIONS.map((item) => <option key={item}>{item}</option>)}</select><button onClick={() => void download("pdf")} disabled={Boolean(downloading)} className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 font-semibold text-white disabled:opacity-50"><Download size={16}/>{downloading === "pdf" ? "Creating…" : "Download PDF"}</button><button onClick={() => void download("docx")} disabled={Boolean(downloading)} className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 font-semibold text-white disabled:opacity-50"><FileText size={16}/>{downloading === "docx" ? "Creating…" : "Download DOCX"}</button></div></header>
-    {error && <p className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-red-700">{error}</p>}{notice && <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-800">{notice}</p>}
     <SectionSelector selectedSections={selectedSections} onChange={setSelectedSections}/>
     <section className="mt-5 grid gap-5 lg:grid-cols-[.72fr_1.28fr]">
       <article className="rounded-2xl border border-violet-200 bg-white p-4 shadow-md"><div className="flex flex-wrap items-center justify-between gap-2"><div><h2 className="text-xl font-bold">Edit JSON and content</h2><p className="text-sm text-stone-600">All fields can be changed here. Validate before previewing.</p></div><button onClick={() => void copyJson()} className="rounded-lg border border-violet-300 px-3 py-2 text-sm font-semibold text-violet-700">Copy updated JSON</button></div><textarea value={jsonText} onChange={(event) => setJsonText(event.target.value)} spellCheck={false} className="mt-4 h-[540px] w-full rounded-xl bg-stone-950 p-4 font-mono text-xs leading-5 text-emerald-100"/><button onClick={() => void applyJson()} className="mt-3 w-full rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white">Validate edits and update preview</button>
