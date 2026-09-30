@@ -47,7 +47,11 @@ REQUIRED JD SKILLS THAT ARE MISSING
 - Add only the smallest technically coherent set of direct dependencies or companion skills.
 - Prefer additions that naturally extend the candidate's Java, backend, full-stack, cloud, DevOps, data, or distributed-systems background.
 - Do not add a technology as an isolated keyword. Demonstrate important additions in believable context across the Professional Summary, Technical Skills, recent Responsibilities, and Environment.
-- Use restrained wording such as "integrated," "implemented," "applied," "used," or "exposure to" when expert ownership is not supported.
+- NEVER add proficiency labels such as "Exposure," "Familiar," "Familiarity," "Basic," "Beginner," or "Working Knowledge" anywhere in the resume, whether parenthesized, bracketed, or written as a suffix.
+- For newly added JD skills, calibrate claim strength exclusively through responsibility wording.
+- Keep standard technology names clean in Technical Skills and Environment, for example "Angular," "Azure Kubernetes Service (AKS)," and "GenAI."
+- In experience bullets, use defensible verbs such as "used," "integrated," "supported," "applied," or "worked with" according to the available evidence.
+- Do not fabricate project experience or imply deep expertise where it is unsupported.
 - Do not claim certifications, years of experience, deep expertise, or production scale for newly introduced skills.
 - For AI-assisted-development roles, include only tools and practices explicitly required or strongly implied by the JD, such as Cursor AI, GitHub Copilot, AI pair programming, code generation, debugging, refactoring, test scaffolding, and code-review assistance. Do not add an unrelated AI ecosystem.
 
@@ -58,6 +62,7 @@ ${javaRelated ? `- Preserve existing skill categories and supported skills.
 - Preserve version groups exactly when relevant, for example "Java 8/11/17" rather than splitting or truncating them.` : `- Rebuild categories for the target profession when necessary.
 - Remove irrelevant Java-heavy categories and organize relevant JD, dependency, testing, deployment, security, and monitoring skills clearly.`}
 - Remove duplicates and empty categories. Do not repeat the same skill across categories without a real reason.
+- Technology names must always remain clean. Never append, prepend, or otherwise attach proficiency qualifiers to them.
 
 PROFESSIONAL EXPERIENCE
 - For every experience preserve exactly: id, company, location, startDate, and endDate.
@@ -84,7 +89,7 @@ FINAL REVIEW
 - Ensure contact values contain no Markdown or mailto syntax.
 - Verify required JD terms are represented in realistic context.
 - Remove duplicate bullets, generic AI-style filler, and unnecessary technology repetition.
-- Keep all additions conservative and interview-defensible. If an added skill is only adjacent exposure, say so rather than claiming mastery.
+- Keep additions conservative and interview-defensible. Proficiency labels are prohibited everywhere in the resume. Express claim strength only through contextual wording in Professional Summary and Professional Experience.
 
 JOB DESCRIPTION:
 ${jd.trim()}

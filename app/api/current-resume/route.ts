@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { z } from "zod";
 
+import { removeProficiencyLabels } from "@/engine/resume-generator/remove-proficiency-labels";
 import { masterResumeSchema } from "@/engine/validation/resume.schema";
 
 export const runtime = "nodejs";
@@ -12,7 +13,7 @@ export async function GET() {
   try {
     const filePath = path.join(process.cwd(), "data", "generated-resume.json");
     const text = await readFile(filePath, "utf8");
-    const resume = masterResumeSchema.parse(JSON.parse(text));
+    const resume = masterResumeSchema.parse(removeProficiencyLabels(JSON.parse(text)));
     return Response.json({ success: true, resume }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     const detail = error instanceof z.ZodError
@@ -26,7 +27,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const resume = masterResumeSchema.parse(await request.json());
+    const resume = masterResumeSchema.parse(removeProficiencyLabels(await request.json()));
     return Response.json({ success: true, resume });
   } catch (error) {
     const detail = error instanceof z.ZodError
