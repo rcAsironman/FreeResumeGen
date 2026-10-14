@@ -8,32 +8,39 @@ import { SectionSelector, type HighlightSection } from "@/components/builder/Sec
 import { ActionToast } from "@/components/shared/ActionToast";
 import type { JobAnalysis } from "@/types/job-analysis";
 import type { MasterResume } from "@/types/resume";
+import { parsePastedJson } from "@/utils/parse-pasted-json";
 
 const DEFAULT_SECTIONS: HighlightSection[] = ["professionalSummary", "experience"];
 
 function analysisPrompt(jd: string) {
-  return `Analyze the job description below and return ONLY valid JSON with this exact structure. Do not use markdown fences. Use an empty array when a category is not present. Deduplicate skills and put every extracted technical term in allTechnicalSkills.\n\n${JSON.stringify({ targetRole: "", programmingLanguages: [], backendTechnologies: [], frontendTechnologies: [], frameworks: [], libraries: [], cloudPlatforms: [], cloudServices: [], databases: [], dataTechnologies: [], messagingTechnologies: [], devOpsTools: [], cicdTools: [], containerTechnologies: [], infrastructureTools: [], testingTools: [], monitoringTools: [], securityTechnologies: [], operatingSystems: [], developmentTools: [], architectureConcepts: [], architecturalPatterns: [], designPatterns: [], allTechnicalSkills: [] }, null, 2)}\n\nJOB DESCRIPTION:\n${jd.trim()}`;
+  return `Analyze the job description below and return ONLY valid JSON with this exact structure. Do not use markdown fences. Use an empty array when a category is not present. Extract targetRole from the actual JD title, retaining core specialization and supported seniority. Never default to Java or a previous role. For other domains include relevant professional skills, tools, methods, and standards in the closest categories and allTechnicalSkills. Deduplicate skills and put every extracted technical term in allTechnicalSkills.\n\n${JSON.stringify({ targetRole: "", programmingLanguages: [], backendTechnologies: [], frontendTechnologies: [], frameworks: [], libraries: [], cloudPlatforms: [], cloudServices: [], databases: [], dataTechnologies: [], messagingTechnologies: [], devOpsTools: [], cicdTools: [], containerTechnologies: [], infrastructureTools: [], testingTools: [], monitoringTools: [], securityTechnologies: [], operatingSystems: [], developmentTools: [], architectureConcepts: [], architecturalPatterns: [], designPatterns: [], allTechnicalSkills: [] }, null, 2)}\n\nJOB DESCRIPTION:\n${jd.trim()}`;
 }
 
 function generationPrompt(jd: string, analysis: JobAnalysis, master: MasterResume, sections: HighlightSection[]) {
-  const javaRelated = /java|spring boot|spring developer/i.test(analysis.targetRole);
+  const promptMaster = { ...master, personalInfo: { ...master.personalInfo } };
+  delete promptMaster.personalInfo.linkedIn;
   return `You are an expert ATS resume transformation specialist. Create a complete resume tailored to the supplied target role and job description. Return ONLY valid JSON with no Markdown fences, commentary, ATS score, or explanation.
 
 TARGET ROLE:
 ${analysis.targetRole}
 
-ROLE MODE:
-${javaRelated ? "JAVA_RELATED_ROLE" : "COMPLETELY_DIFFERENT_ROLE"}
+TARGETING PRIORITY
+- The current JOB DESCRIPTION is authoritative for the profession, role name, skills, duties, and deliverables. Correct stale or conflicting analysis using the JD.
+- Tailor aggressively across domains. Do not default to Java/backend/full-stack just because it dominates the master resume.
+- Rewrite all editable sections for the target profession, not just a few keywords. Preserve section order, experience order, and the exact number of summary and responsibility bullets.
+- Internally map mandatory and preferred JD requirements to source evidence and transferable work before writing. Factual accuracy takes precedence: never turn unsupported JD requirements into invented past experience.
 
 GLOBAL RULES
+- Use valid JSON escaping: never put a backslash before punctuation such as &, _, or %. Encode literal backslashes as two backslashes and quotes inside strings as escaped quotes.
 - Preserve the exact JSON structure and every required property from MASTER RESUME JSON.
 - Preserve full name, email, phone, location, employer names, employer locations, employment dates, education, certifications, project history, and stable IDs.
-- Keep email, LinkedIn, and other contact fields as plain text. Never output Markdown links or mailto syntax.
+- Omit personalInfo.linkedIn entirely. Never include LinkedIn labels, URLs, or links anywhere in the resume. Keep other contact fields as plain text without Markdown or mailto syntax.
+- Copy the source email exactly as a plain email address. Never add forward slashes, backslashes, Markdown escapes, or link wrappers to email values.
 - Keep the resume internally consistent, technically believable, recruiter-readable, and ATS-friendly.
 - Never invent employers, dates, education, certifications, revenue, financial savings, user counts, transaction volumes, or absolute scale claims.
 
 PROFESSIONAL TITLE
-- Produce a clean 2–6 word professional title representing the core profession and supported seniority.
+- Set personalInfo.professionalTitle to the current JD role name, retaining the core profession and specialization and only supported seniority. Never substitute the master title for a different target role.
 - Do not copy marketing language, locations, contract details, requisition codes, client names, parenthetical phrases, or a list of technologies into the title.
 
 PROFESSIONAL SUMMARY
@@ -44,9 +51,9 @@ PROFESSIONAL SUMMARY
 
 REQUIRED JD SKILLS THAT ARE MISSING
 - Treat the JD as the primary targeting source and the extracted skill list as an aid.
-- Add explicitly required JD skills even when they are absent from the master resume, matching the behavior of the main resume-generator prompt.
+- Prioritize explicitly required JD skills supported by the source or equivalent transferable work. Do not present unsupported skills as established experience.
 - Add only the smallest technically coherent set of direct dependencies or companion skills.
-- Prefer additions that naturally extend the candidate's Java, backend, full-stack, cloud, DevOps, data, or distributed-systems background.
+- Select skills for the target profession, including domain tools, methods, and standards; remove unrelated legacy-stack emphasis.
 - Do not add a technology as an isolated keyword. Demonstrate important additions in believable context across the Professional Summary, Technical Skills, recent Responsibilities, and Environment.
 - NEVER add proficiency labels such as "Exposure," "Familiar," "Familiarity," "Basic," "Beginner," or "Working Knowledge" anywhere in the resume, whether parenthesized, bracketed, or written as a suffix.
 - For newly added JD skills, calibrate claim strength exclusively through responsibility wording.
@@ -57,17 +64,16 @@ REQUIRED JD SKILLS THAT ARE MISSING
 - For AI-assisted-development roles, include only tools and practices explicitly required or strongly implied by the JD, such as Cursor AI, GitHub Copilot, AI pair programming, code generation, debugging, refactoring, test scaffolding, and code-review assistance. Do not add an unrelated AI ecosystem.
 
 TECHNICAL SKILLS
-${javaRelated ? `- Preserve existing skill categories and supported skills.
-- Reorder the most relevant JD skills toward the beginning of the appropriate category.
-- Add required JD technologies and a limited number of direct dependencies to the best category.
-- Preserve version groups exactly when relevant, for example "Java 8/11/17" rather than splitting or truncating them.` : `- Rebuild categories for the target profession when necessary.
-- Remove irrelevant Java-heavy categories and organize relevant JD, dependency, testing, deployment, security, and monitoring skills clearly.`}
+- Rebuild categories around the target profession. Remove irrelevant legacy categories and prioritize supported mandatory JD skills, then preferred and supporting skills.
+- Include relevant domain tools, methods, standards, and transferable skills for non-software roles.
+- Preserve relevant version groups exactly, for example "Java 8/11/17".
 - Remove duplicates and empty categories. Do not repeat the same skill across categories without a real reason.
 - Technology names must always remain clean. Never append, prepend, or otherwise attach proficiency qualifiers to them.
 
 PROFESSIONAL EXPERIENCE
 - For every experience preserve exactly: id, company, location, startDate, and endDate.
-- Rewrite role, responsibilities, and environment for relevance while keeping employer domain and time period realistic.
+- Align role wording with the target profession only when accurate for the source duties; never falsify historical titles. Rewrite every responsibility and environment for relevance while keeping employer domain and time period realistic.
+- Use JD duty vocabulary to show the task, tool or method, deliverable, and supported outcome. Remove unrelated stack emphasis; never claim unsupported duties were performed.
 - Give the strongest JD alignment to the most recent and most relevant experience.
 - Demonstrate added JD skills through plausible implementation context; do not make every employer use the same stack.
 - Start bullets with varied action verbs and communicate Action + Technical Implementation + Engineering or Business Outcome.
@@ -75,9 +81,7 @@ PROFESSIONAL EXPERIENCE
 - Do not repeat nearly identical responsibilities across employers.
 
 MEASURABLE IMPACT
-- Retain source metrics. Where a measurable technical outcome naturally follows, you may add a small number of conservative, explicitly estimated improvements such as "approximately 20%" or "approximately 30%."
-- Use estimates selectively: approximately 1–3 in recent relevant experience, 1–2 in mid-career experience, and 0–1 in older experience.
-- Connect every estimate to a concrete technical change. Never use suspicious precision or unverifiable business figures.
+- Retain only source-supported metrics and outcomes. Never invent estimated percentages, improvements, or other achievements.
 
 ATS KEYWORD DISTRIBUTION
 - Use exact standard names for the highest-priority JD requirements.
@@ -90,7 +94,8 @@ FINAL REVIEW
 - Ensure contact values contain no Markdown or mailto syntax.
 - Verify required JD terms are represented in realistic context.
 - Remove duplicate bullets, generic AI-style filler, and unnecessary technology repetition.
-- Keep additions conservative and interview-defensible. Proficiency labels are prohibited everywhere in the resume. Express claim strength only through contextual wording in Professional Summary and Professional Experience.
+- Verify the professional title matches the current JD role and summary, categories, responsibilities, and environment consistently target that profession. Verify original structure and bullet counts, and remove all LinkedIn content.
+- Keep factual claims interview-defensible. Proficiency labels are prohibited everywhere in the resume. Express claim strength only through contextual wording in Professional Summary and Professional Experience.
 
 JOB DESCRIPTION:
 ${jd.trim()}
@@ -99,12 +104,16 @@ JOB ANALYSIS JSON:
 ${JSON.stringify(analysis, null, 2)}
 
 MASTER RESUME JSON:
-${JSON.stringify(master, null, 2)}`;
+${JSON.stringify(promptMaster, null, 2)}`;
 }
 
 export function GuidedResumeWorkflow() {
   const router = useRouter();
   const [master, setMaster] = useState<MasterResume | null>(null);
+  const [masterFiles, setMasterFiles] = useState<string[]>([]);
+  const [masterFile, setMasterFile] = useState("");
+  const [masterError, setMasterError] = useState("");
+  const [masterLoading, setMasterLoading] = useState(true);
   const [jd, setJd] = useState("");
   const [analysisText, setAnalysisText] = useState("");
   const [analysis, setAnalysis] = useState<JobAnalysis | null>(null);
@@ -113,7 +122,23 @@ export function GuidedResumeWorkflow() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
-  useEffect(() => { fetch("/api/master-resume", { cache: "no-store" }).then((response) => response.json()).then((result: { resume?: MasterResume; error?: string }) => { if (!result.resume) throw new Error(result.error); setMaster(result.resume); }).catch((caught) => setError(caught instanceof Error ? caught.message : "Unable to load master resume.")); }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`/api/master-resume${masterFile ? `?file=${encodeURIComponent(masterFile)}` : ""}`, { cache: "no-store", signal: controller.signal })
+      .then((response) => response.json())
+      .then((result: { resume?: MasterResume; files?: string[]; error?: string }) => {
+        setMasterFiles(result.files ?? []);
+        setMaster(result.resume ?? null);
+        setMasterError(result.resume ? "" : result.error ?? "Unable to load master resume.");
+        setMasterLoading(false);
+      })
+      .catch((caught) => {
+        if (controller.signal.aborted) return;
+        setMasterError(caught instanceof Error ? caught.message : "Unable to load master resume.");
+        setMasterLoading(false);
+      });
+    return () => controller.abort();
+  }, [masterFile]);
   const promptOne = useMemo(() => analysisPrompt(jd), [jd]);
   const promptTwo = useMemo(() => analysis && master ? generationPrompt(jd, analysis, master, sections) : "", [jd, analysis, master, sections]);
 
@@ -129,7 +154,7 @@ export function GuidedResumeWorkflow() {
 
   async function validateAnalysis() {
     try {
-      const parsed = JSON.parse(analysisText) as unknown;
+      const parsed = parsePastedJson(analysisText);
       const response = await fetch("/api/validate-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(parsed) });
       const result = await response.json() as { analysis?: JobAnalysis; error?: string };
       if (!response.ok || !result.analysis) throw new Error(result.error ?? "Invalid analysis JSON.");
@@ -139,7 +164,7 @@ export function GuidedResumeWorkflow() {
 
   async function openEditor() {
     try {
-      const parsed = JSON.parse(resumeText) as unknown;
+      const parsed = parsePastedJson(resumeText);
       const response = await fetch("/api/current-resume", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(parsed) });
       const result = await response.json() as { resume?: MasterResume; error?: string };
       if (!response.ok || !result.resume || !analysis) throw new Error(result.error ?? "Invalid generated resume JSON.");
@@ -151,12 +176,20 @@ export function GuidedResumeWorkflow() {
   return <div className="mx-auto max-w-7xl p-4 sm:p-6">
     {error ? <ActionToast message={error} type="error" onDismiss={() => setError("")} /> : notice ? <ActionToast message={notice} onDismiss={() => setNotice("")} /> : null}
     <header className="rounded-3xl border border-violet-200 bg-[#fffaf0] p-5 shadow-lg sm:p-7"><p className="text-xs font-bold uppercase tracking-[.18em] text-violet-600">Guided ChatGPT workflow · No API key</p><h1 className="mt-1 text-3xl font-bold text-violet-950">JD to tailored resume</h1><p className="mt-2 text-stone-600">The app prepares two prompts. You use ChatGPT in your browser and paste its JSON responses back here.</p></header>
+    <section className="mt-5 rounded-2xl border border-violet-200 bg-white p-5">
+      <label htmlFor="master-resume-file" className="text-sm font-semibold">Master resume</label>
+      <select id="master-resume-file" value={masterFile || (master ? "master-resume.json" : "")} onChange={(event) => { setMaster(null); setMasterLoading(true); setMasterError(""); setMasterFile(event.target.value); }} className="mt-2 block w-full rounded-xl border border-violet-200 p-3">
+        <option value="" disabled>Choose your source resume…</option>
+        {masterFiles.map((file) => <option key={file} value={file}>{file}</option>)}
+      </select>
+      <p role="status" className="mt-2 text-sm text-stone-600">{masterLoading ? "Loading master resume…" : masterError || "Master resume ready. Bolding selections are optional."}</p>
+    </section>
     <section className="mt-5">
       <StepCard number="1" title="Analyze the job description">
         <div className="grid gap-5 lg:grid-cols-2">
           <div>
             <label className="text-sm font-semibold" htmlFor="jd">Job description</label>
-            <textarea id="jd" value={jd} onChange={(event) => setJd(event.target.value)} placeholder="Paste the complete job description…" className="mt-2 h-56 w-full rounded-xl border border-violet-200 p-3 text-sm"/>
+            <textarea id="jd" value={jd} onChange={(event) => { setJd(event.target.value); setAnalysis(null); }} placeholder="Paste the complete job description…" className="mt-2 h-56 w-full rounded-xl border border-violet-200 p-3 text-sm"/>
             <button disabled={jd.trim().length < 40} onClick={() => void copy(promptOne, "Prompt 1 copied. Paste it into ChatGPT, then paste the returned analysis JSON here.")} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><Clipboard size={17}/> Copy analysis prompt</button>
           </div>
           <div>
@@ -168,7 +201,7 @@ export function GuidedResumeWorkflow() {
         {analysis && <div className="mt-4 rounded-xl bg-violet-50 p-3"><p className="font-bold text-violet-900">{analysis.targetRole || "Target role"}</p><div className="mt-2 flex max-h-28 flex-wrap gap-1 overflow-auto">{analysis.allTechnicalSkills.map((skill) => <span key={skill} className="rounded-full bg-white px-2 py-1 text-xs text-violet-800">{skill}</span>)}</div></div>}
       </StepCard>
     </section>
-    {analysis && <section className="mt-5"><StepCard number="2" title="Generate and open the resume"><div className="grid gap-5 lg:grid-cols-2"><div><SectionSelector selectedSections={sections} onChange={setSections}/><button disabled={!sections.length || !master} onClick={() => void copy(promptTwo, "Resume prompt copied. Paste it into ChatGPT, then paste the generated resume JSON here.")} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><Clipboard size={17}/> Copy resume prompt</button></div><div><p className="mb-2 text-sm font-semibold">Generated resume JSON</p><JsonInput value={resumeText} setValue={setResumeText} onUpload={(event) => void upload(event, setResumeText)} placeholder="Paste ChatGPT generated resume JSON…" compact/><button disabled={!resumeText.trim()} onClick={() => void openEditor()} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><FileJson size={17}/> Validate, edit and preview</button></div></div></StepCard></section>}
+    {analysis && <section className="mt-5"><StepCard number="2" title="Generate and open the resume"><div className="grid gap-5 lg:grid-cols-2"><div><SectionSelector selectedSections={sections} onChange={setSections}/><button disabled={masterLoading || !master || !promptTwo} onClick={() => void copy(promptTwo, "Resume prompt copied. Paste it into ChatGPT, then paste the generated resume JSON here.")} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><Clipboard size={17}/> Copy resume prompt</button></div><div><p className="mb-2 text-sm font-semibold">Generated resume JSON</p><JsonInput value={resumeText} setValue={setResumeText} onUpload={(event) => void upload(event, setResumeText)} placeholder="Paste ChatGPT generated resume JSON…" compact/><button disabled={!resumeText.trim()} onClick={() => void openEditor()} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white disabled:opacity-50"><FileJson size={17}/> Validate, edit and preview</button></div></div></StepCard></section>}
   </div>;
 }
 

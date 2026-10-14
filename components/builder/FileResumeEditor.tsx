@@ -9,6 +9,7 @@ import { SectionSelector, type HighlightSection } from "@/components/builder/Sec
 import { RichTextToolbar } from "@/components/builder/RichTextToolbar";
 import { ActionToast } from "@/components/shared/ActionToast";
 import type { MasterResume } from "@/types/resume";
+import { parsePastedJson } from "@/utils/parse-pasted-json";
 import { DEFAULT_RESUME_FONT, RESUME_FONT_OPTIONS, type ResumeFont } from "@/types/resume-font";
 
 const DEFAULT_SECTIONS: HighlightSection[] = ["professionalSummary", "experience"];
@@ -61,7 +62,7 @@ export function FileResumeEditor() {
 
   async function applyJson() {
     try {
-      const parsed = JSON.parse(jsonText) as unknown;
+      const parsed = parsePastedJson(jsonText);
       const response = await fetch("/api/current-resume", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(parsed) });
       const result = await response.json() as { success: boolean; resume?: MasterResume; error?: string };
       if (!response.ok || !result.resume) throw new Error(result.error ?? "Invalid resume JSON.");

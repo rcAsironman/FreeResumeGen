@@ -1,6 +1,6 @@
 import { BoldSkillsText } from "@/components/preview/BoldSkillsText";
 import type { MasterResume } from "@/types/resume";
-import { plainContactValue } from "@/utils/resume-text";
+import { plainEmailValue } from "@/utils/resume-text";
 
 import styles from "./fixed-resume.module.css";
 
@@ -30,7 +30,7 @@ export function FixedResumeTemplate({
   }
 
   const contactItems = [
-    { field: "email", value: plainContactValue(resume.personalInfo.email) },
+    { field: "email", value: plainEmailValue(resume.personalInfo.email) },
     { field: "phone", value: resume.personalInfo.phone },
     { field: "location", value: resume.personalInfo.location },
   ].filter((item) => Boolean(item.value));
@@ -72,12 +72,7 @@ export function FixedResumeTemplate({
           </div>
         )}
 
-        {resume.personalInfo.linkedIn && (
-          <div className={styles.linkedIn}>
-            <strong>LinkedIn:</strong>{" "}
-            <span data-resume-field="linkedIn">{plainContactValue(resume.personalInfo.linkedIn)}</span>
-          </div>
-        )}
+
       </header>
 
       <section className={styles.section}>

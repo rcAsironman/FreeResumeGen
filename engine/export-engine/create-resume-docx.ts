@@ -9,7 +9,7 @@ import {
 } from "docx";
 
 import type { MasterResume } from "@/types/resume";
-import { plainContactValue } from "@/utils/resume-text";
+import { plainEmailValue } from "@/utils/resume-text";
 import {
   DEFAULT_RESUME_FONT,
   type ResumeFont,
@@ -237,7 +237,7 @@ export async function createResumeDocx({
   );
 
   const contactItems = [
-    plainContactValue(resume.personalInfo.email),
+    plainEmailValue(resume.personalInfo.email),
     resume.personalInfo.phone,
     resume.personalInfo.location,
   ].filter(Boolean);
@@ -256,30 +256,6 @@ export async function createResumeDocx({
     );
   }
 
-  if (resume.personalInfo.linkedIn) {
-    children.push(
-      new Paragraph({
-        children: [
-          new TextRun({
-            text: "LinkedIn: ",
-            bold: true,
-            font: fontFamily,
-            size: 20,
-          }),
-
-          new TextRun({
-            text: plainContactValue(resume.personalInfo.linkedIn),
-            font: fontFamily,
-            size: 20,
-          }),
-        ],
-
-        spacing: {
-          after: 80,
-        },
-      }),
-    );
-  }
 
   /*
    * ============================================================

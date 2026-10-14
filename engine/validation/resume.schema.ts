@@ -1,12 +1,13 @@
 import { z } from "zod";
 
+import { plainEmailValue } from "@/utils/resume-text";
+
 export const personalInfoSchema = z.object({
   fullName: z.string().min(1),
   professionalTitle: z.string().min(1),
-  email: z.string(),
+  email: z.string().transform(plainEmailValue),
   phone: z.string(),
   location: z.string(),
-  linkedIn: z.string().optional(),
   portfolio: z.string().optional(),
 });
 
