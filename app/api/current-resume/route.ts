@@ -1,3 +1,4 @@
+import { reviewResumeContent } from "@/engine/resume-review/content-review";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -28,7 +29,10 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const resume = masterResumeSchema.parse(removeProficiencyLabels(await request.json()));
-    return Response.json({ success: true, resume });
+    const issues = reviewResumeContent(resume);
+    const errors = issues.filter(issue => issue.severity === "error");
+    if (errors.length) return Response.json({ success: false, error: errors.map(issue => issue.message).join(" "), issues }, { status: 400 });
+    return Response.json({ success: true, resume, issues });
   } catch (error) {
     const detail = error instanceof z.ZodError
       ? error.issues.map((issue) => `${issue.path.join(".") || "resume"}: ${issue.message}`).join("; ")

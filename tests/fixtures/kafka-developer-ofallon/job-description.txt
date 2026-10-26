@@ -1,0 +1,13 @@
+Role: Kafka Developer
+Location: Ofallon, MO-ONSITE
+Contract/Fulltime
+Apply SRE principles to improve reliability, availability, and performance.
+Drive DevOps and automation initiatives to reduce toil and manual operations.
+Build and enhance automation using Ansible, scripts, and CI/CD pipelines.
+Perform incident management, RCA, capacity planning, and operational readiness.
+Collaborate closely with application and platform engineering teams.
+Contribute to Java-based tooling and platform enhancements.
+3–6 years of experience working with Kafka / messaging systems.
+Strong understanding of Kafka architecture (brokers, topics, partitions, replication).
+Hands-on SRE / DevOps; Ansible, scripting, CI/CD; Java debugging and platform tooling.
+Linux, distributed systems, monitoring and alerting; incident response and production support.

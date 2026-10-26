@@ -15,14 +15,15 @@ export const professionalSummarySchema = z.object({
   bullets: z.array(z.string().min(1)).min(1),
 });
 
-export const technicalSkillsSchema = z.object({
-  categories: z.array(
-    z.object({
-      name: z.string().min(1),
-      skills: z.array(z.string().min(1)),
-    }),
-  ),
-});
+export const skillCategorySchema = z.preprocess((value) => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return value;
+  const row = value as Record<string, unknown>;
+  // Normalize the common model alias only when the canonical property is absent.
+  if (row.name === undefined && typeof row.category === "string") return { ...row, name: row.category };
+  return value;
+}, z.object({ name: z.string().min(1), skills: z.array(z.string().min(1)) }));
+
+export const technicalSkillsSchema = z.object({ categories: z.array(skillCategorySchema) });
 
 export const experienceSchema = z.array(
   z.object({
@@ -32,6 +33,9 @@ export const experienceSchema = z.array(
     location: z.string(),
     startDate: z.string().min(1),
     endDate: z.string().min(1),
+    description: z.string().optional(),
+    projectName: z.string().optional(),
+    responsibilityGroups: z.array(z.object({ heading: z.string(), startIndex: z.number().int().nonnegative() })).optional(),
     responsibilities: z.array(z.string().min(1)),
     environment: z.array(z.string().min(1)),
   }),

@@ -1,6 +1,8 @@
+import { architectResumeTemplateConfig } from "@/templates/architect-resume/config";
 import { fixedResumeTemplateConfig } from "@/templates/fixed-resume/config";
 
 export const templateRegistry = {
+  "architect-resume": architectResumeTemplateConfig,
   "fixed-resume": fixedResumeTemplateConfig,
 } as const;
 

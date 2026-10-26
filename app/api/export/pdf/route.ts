@@ -1,3 +1,6 @@
+import { reviewResumeContent } from "@/engine/resume-review/content-review";
+import { assertLocalResumeSave, saveDailyResume } from "@/engine/export-engine/save-daily-resume";
+import { RESUME_LAYOUTS, DEFAULT_RESUME_LAYOUT } from "@/types/resume-layout";
 import { chromium } from "playwright";
 import { z } from "zod";
 
@@ -10,6 +13,8 @@ export const runtime = "nodejs";
 
 const requestSchema = z.object({
   resume: masterResumeSchema,
+  saveToFolder: z.boolean().optional().default(false),
+  templateId: z.enum(RESUME_LAYOUTS).optional().default(DEFAULT_RESUME_LAYOUT),
 
   technicalSkills: z.array(
     z.string(),
@@ -44,11 +49,17 @@ export async function POST(
 
     const {
       resume,
+      saveToFolder,
+      templateId,
       technicalSkills,
       selectedSections,
       fontFamily,
       documentHtml,
     } = requestSchema.parse(body);
+
+    const contentErrors = reviewResumeContent(resume).filter(issue => issue.severity === "error");
+    if (contentErrors.length) return Response.json({ success: false, error: contentErrors.map(issue => issue.message).join(" ") }, { status: 400 });
+    if (saveToFolder) assertLocalResumeSave(request);
 
     const baseUrl =
       process.env.APP_BASE_URL ??
@@ -88,6 +99,7 @@ export async function POST(
       },
       {
         resume,
+        templateId,
         technicalSkills,
         selectedSections,
         fontFamily,
@@ -133,6 +145,9 @@ export async function POST(
      * US Letter PDF.
      */
 
+    if (templateId === "architect-resume") {
+      await page.addStyleTag({ content: "@page { size: Letter; margin: 0in 0.132639in 0in 0.197222in; }" });
+    }
     const pdf = await page.pdf({
       format: "Letter",
 
@@ -145,10 +160,10 @@ export async function POST(
       preferCSSPageSize: false,
 
       margin: {
-        top: "0.42in",
-        right: "0.5in",
-        bottom: "0.42in",
-        left: "0.5in",
+        top: templateId === "architect-resume" ? "0in" : "0.42in",
+        right: templateId === "architect-resume" ? "0.132639in" : "0.5in",
+        bottom: templateId === "architect-resume" ? "0in" : "0.42in",
+        left: templateId === "architect-resume" ? "0.197222in" : "0.5in",
       },
     });
 
@@ -156,6 +171,11 @@ export async function POST(
      * Convert Node Buffer into
      * a Response-compatible body.
      */
+
+    if (saveToFolder) {
+      const saved = await saveDailyResume(pdf, resume.personalInfo.fullName, "pdf");
+      return Response.json(saved, { headers: { "Cache-Control": "no-store" } });
+    }
 
     const pdfBytes =
       new Uint8Array(pdf);

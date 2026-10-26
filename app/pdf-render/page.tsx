@@ -3,7 +3,8 @@
 
 import { useEffect, useState } from "react";
 
-import { FixedResumeTemplate } from "@/templates/fixed-resume/FixedResumeTemplate";
+import { ResumeTemplate } from "@/templates/ResumeTemplate";
+import type { ResumeLayout } from "@/types/resume-layout";
 import type { MasterResume } from "@/types/resume";
 import {
   DEFAULT_RESUME_FONT,
@@ -12,6 +13,7 @@ import {
 
 interface PdfResumeData {
   resume: MasterResume;
+  templateId?: ResumeLayout;
   technicalSkills: string[];
   selectedSections: string[];
   fontFamily?: ResumeFont;
@@ -71,7 +73,8 @@ export default function PdfRenderPage() {
     >
       {data.documentHtml ? (
         <div dangerouslySetInnerHTML={{ __html: data.documentHtml }} />
-      ) : <FixedResumeTemplate
+      ) : <ResumeTemplate
+        templateId={data.templateId}
         resume={data.resume}
         technicalSkills={
           data.technicalSkills

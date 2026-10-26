@@ -1,3 +1,7 @@
+import { reviewResumeContent } from "@/engine/resume-review/content-review";
+import { assertLocalResumeSave, saveDailyResume } from "@/engine/export-engine/save-daily-resume";
+import { createArchitectResumeDocx } from "@/templates/architect-resume/docx-renderer";
+import { RESUME_LAYOUTS, DEFAULT_RESUME_LAYOUT } from "@/types/resume-layout";
 import { z } from "zod";
 
 import { createResumeDocx } from "@/engine/export-engine/create-resume-docx";
@@ -10,6 +14,8 @@ export const runtime = "nodejs";
 
 const requestSchema = z.object({
   resume: masterResumeSchema,
+  saveToFolder: z.boolean().optional().default(false),
+  templateId: z.enum(RESUME_LAYOUTS).optional().default(DEFAULT_RESUME_LAYOUT),
 
   technicalSkills: z.array(
     z.string(),
@@ -53,17 +59,23 @@ export async function POST(
 
     const {
       resume,
+      saveToFolder,
+      templateId,
       technicalSkills,
       selectedSections,
       fontFamily,
     } = requestSchema.parse(body);
+
+    const contentErrors = reviewResumeContent(resume).filter(issue => issue.severity === "error");
+    if (contentErrors.length) return Response.json({ success: false, error: contentErrors.map(issue => issue.message).join(" ") }, { status: 400 });
+    if (saveToFolder) assertLocalResumeSave(request);
 
     /*
      * Generate the DOCX using the
      * user-selected font.
      */
 
-    const docxBuffer = await createResumeDocx({
+    const docxBuffer = await (templateId === "architect-resume" ? createArchitectResumeDocx : createResumeDocx)({
         resume,
         technicalSkills,
         selectedSections,
@@ -74,6 +86,11 @@ export async function POST(
      * Convert the Node.js Buffer into
      * a web-compatible Uint8Array.
      */
+
+    if (saveToFolder) {
+      const saved = await saveDailyResume(docxBuffer, resume.personalInfo.fullName, "docx");
+      return Response.json(saved, { headers: { "Cache-Control": "no-store" } });
+    }
 
     const docxBytes =
       new Uint8Array(docxBuffer);

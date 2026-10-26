@@ -76,35 +76,35 @@ export function SectionSelector({
   }
 
   return (
-    <section className="mt-4 rounded-2xl border border-violet-200 bg-white/90 p-4 shadow-sm">
+    <section className="mt-4 rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] p-4 shadow-sm">
       <div className="mb-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-600">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]">
           Skill Emphasis
         </p>
 
-        <h3 className="mt-1 text-lg font-bold text-stone-900">
+        <h3 className="mt-1 text-lg font-bold text-[var(--foreground)]">
           Select sections for bolding skills
         </h3>
 
-        <p className="mt-1 text-sm text-stone-600">
+        <p className="mt-1 text-sm text-[var(--app-muted)]">
           Matching skills extracted from the job description will be bolded
           only in the selected sections.
         </p>
       </div>
 
-      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-violet-200 bg-violet-50/80 p-3 transition hover:border-violet-400 hover:bg-violet-100/80">
+      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-[var(--app-border)] bg-[var(--app-accent-soft)] p-3 transition hover:border-[var(--app-accent)] hover:bg-[var(--app-accent-soft)]">
         <input
           ref={selectAllRef}
           type="checkbox"
           checked={allSelected}
           onChange={handleSelectAll}
-          className="h-5 w-5 cursor-pointer rounded border-violet-300 accent-violet-600"
+          className="h-5 w-5 cursor-pointer rounded border-[var(--app-border)] accent-[var(--app-accent)]"
         />
 
         <div>
-          <div className="font-semibold text-violet-900">Select All</div>
+          <div className="font-semibold text-[var(--foreground)]">Select All</div>
 
-          <div className="text-xs text-violet-700">
+          <div className="text-xs text-[var(--app-accent)]">
             Apply bold skill formatting to every supported section.
           </div>
         </div>
@@ -119,23 +119,23 @@ export function SectionSelector({
               key={section.id}
               className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${
                 checked
-                  ? "border-violet-400 bg-violet-50 shadow-sm"
-                  : "border-stone-200 bg-[#fffdf8] hover:border-violet-300"
+                  ? "border-[var(--app-accent)] bg-[var(--app-accent-soft)] shadow-sm"
+                  : "border-[var(--app-border)] bg-[var(--app-surface-raised)] hover:border-[var(--app-border)]"
               }`}
             >
               <input
                 type="checkbox"
                 checked={checked}
                 onChange={() => handleSectionChange(section.id)}
-                className="mt-0.5 h-5 w-5 cursor-pointer rounded border-violet-300 accent-violet-600"
+                className="mt-0.5 h-5 w-5 cursor-pointer rounded border-[var(--app-border)] accent-[var(--app-accent)]"
               />
 
               <div>
-                <div className="font-semibold text-stone-900">
+                <div className="font-semibold text-[var(--foreground)]">
                   {section.label}
                 </div>
 
-                <div className="mt-1 text-xs leading-5 text-stone-600">
+                <div className="mt-1 text-xs leading-5 text-[var(--app-muted)]">
                   {section.description}
                 </div>
               </div>
@@ -144,7 +144,7 @@ export function SectionSelector({
         })}
       </div>
 
-      <div className="mt-4 rounded-xl border border-violet-100 bg-[#fffaf0] px-4 py-3 text-sm text-stone-600">
+      <div className="mt-4 rounded-xl border border-[var(--app-border)] bg-[var(--app-surface)] px-4 py-3 text-sm text-[var(--app-muted)]">
         {selectedSections.length === 0
           ? "No sections selected."
           : `${selectedSections.length} of ${sections.length} sections selected.`}

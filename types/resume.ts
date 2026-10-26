@@ -28,6 +28,9 @@ export interface ExperienceItem {
   location: string;
   startDate: string;
   endDate: string;
+  description?: string;
+  projectName?: string;
+  responsibilityGroups?: { heading: string; startIndex: number }[];
   responsibilities: string[];
   environment: string[];
 }

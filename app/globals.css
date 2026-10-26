@@ -1,8 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f0df;
-  --foreground: #1c1917;
+  color-scheme: dark;
+  --background: #17212b;
+  --foreground: #dce5ed;
+  --app-surface: #202c37;
+  --app-surface-raised: #273642;
+  --app-input: #19242e;
+  --app-preview: #131d26;
+  --app-border: #3b4d5c;
+  --app-muted: #b2beca;
+  --app-accent: #9ccbbf;
+  --app-accent-soft: #2b423f;
+  --app-primary: #345e56;
+  --app-code: #c1d8ce;
+  --app-error: #efb7bb;
+  --app-error-bg: #45313a;
+  --app-error-border: #94646f;
 }
 
 * {
@@ -46,7 +60,7 @@ button:disabled {
 
 textarea {
   scrollbar-width: thin;
-  scrollbar-color: #a78bfa #f5f3ff;
+  scrollbar-color: var(--app-border) var(--app-input);
 }
 
 textarea::-webkit-scrollbar {
@@ -55,22 +69,22 @@ textarea::-webkit-scrollbar {
 
 textarea::-webkit-scrollbar-track {
   border-radius: 999px;
-  background: #f5f3ff;
+  background: var(--app-input);
 }
 
 textarea::-webkit-scrollbar-thumb {
-  border: 2px solid #f5f3ff;
+  border: 2px solid var(--app-input);
   border-radius: 999px;
-  background: #a78bfa;
+  background: var(--app-border);
 }
 
 textarea::-webkit-scrollbar-thumb:hover {
-  background: #8b5cf6;
+  background: var(--app-accent);
 }
 
 .resume-scroll-area {
   scrollbar-width: thin;
-  scrollbar-color: #a78bfa #f5f3ff;
+  scrollbar-color: var(--app-border) var(--app-input);
 }
 
 .resume-scroll-area::-webkit-scrollbar {
@@ -79,22 +93,22 @@ textarea::-webkit-scrollbar-thumb:hover {
 
 .resume-scroll-area::-webkit-scrollbar-track {
   border-radius: 999px;
-  background: #f5f3ff;
+  background: var(--app-input);
 }
 
 .resume-scroll-area::-webkit-scrollbar-thumb {
-  border: 2px solid #f5f3ff;
+  border: 2px solid var(--app-input);
   border-radius: 999px;
-  background: #a78bfa;
+  background: var(--app-border);
 }
 
 .resume-scroll-area::-webkit-scrollbar-thumb:hover {
-  background: #8b5cf6;
+  background: var(--app-accent);
 }
 
 ::selection {
-  background: #ddd6fe;
-  color: #3b0764;
+  background: #38564e;
+  color: #edf5f0;
 }
 
 @media print {
@@ -161,3 +175,17 @@ textarea::-webkit-scrollbar-thumb:hover {
   from { opacity: 0; transform: translateX(1.5rem); }
   to { opacity: 1; transform: translateX(0); }
 }
+
+/* The interface is muted; document colors remain independent of the app theme. */
+input:not([type="color"]):not([type="checkbox"]), textarea, select {
+  background-color: var(--app-input);
+  color: var(--foreground);
+}
+textarea::placeholder, input::placeholder { color: #9caebc; opacity: 1; }
+button, a, select, textarea, input { transition: background-color 140ms ease, border-color 140ms ease; }
+button:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+@media print { :root { color-scheme: light; } [data-resume-paper] { filter: none !important; } }

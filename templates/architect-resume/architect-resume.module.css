@@ -1,0 +1,20 @@
+.resume { width: 100%; font-family: var(--resume-font, "Times New Roman", Times, serif); font-size: 10pt; line-height: 1.314; color: #1a1a1a; background: white; }
+.resume * { font-family: inherit; box-sizing: border-box; }
+.header { text-align: center; padding-top: .7pt; }
+.header h1 { margin: 0 0 2pt; font-size: 12pt; font-weight: bold; color: #404040; letter-spacing: 1.5pt; text-transform: uppercase; line-height: normal; }
+.title { white-space: pre-wrap; margin: 0 0 1.5pt; font-size: 12pt; color: #595959; line-height: normal; }
+.contact { white-space: pre-wrap; margin: 0 0 3pt; font-size: 12pt; line-height: normal; }
+.resume h2 { margin: 10pt 0 4.5pt; padding: 0 0 2pt; font-size: 11pt; font-weight: bold; letter-spacing: 1pt; color: #404040; border-bottom: .75pt solid #bfbfbf; line-height: normal; break-after: avoid; }
+.summary { margin: 0 0 2pt; text-align: justify; }
+.resume ul { margin: 0; padding: 0 0 0 15pt; list-style: disc outside; }
+.resume li { margin: 0 0 3.5pt; padding: 0; break-inside: avoid; }
+.skill { margin: 0 0 2.5pt; break-inside: avoid; }
+.experience { margin: 10pt 0 0; }
+.experience:first-of-type { margin-top: 3pt; }
+.roleRow { line-height: normal; display: flex; justify-content: space-between; gap: 8pt; width: 511.2pt; max-width: 100%; font-size: 11pt; color: #404040; margin: 0 0 .5pt; break-after: avoid; }
+.dates { white-space: nowrap; }
+.company { line-height: normal; white-space: pre-wrap; margin: 0 0 3pt; font-size: 11pt; break-after: avoid; }
+.description { margin: 0 0 3.5pt; break-after: avoid; }
+.resume h3 { line-height: normal; font-size: 10pt; font-weight: bold; color: #404040; margin: 3pt 0 2pt; break-after: avoid; }
+.education { line-height: normal; display: flex; justify-content: space-between; gap: 12pt; width: 484pt; max-width: 100%; margin: 0; }
+@media print { .resume h2, .roleRow, .company, .resume h3 { page-break-after: avoid; } }
