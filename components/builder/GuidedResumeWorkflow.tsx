@@ -16,6 +16,7 @@ import { javaGenerationPrompt } from "@/prompts/java-resume";
 import { kafkaGenerationPrompt } from "@/prompts/kafka-resume";
 import { generalGenerationPrompt } from "@/prompts/general-resume";
 import { PROFILE_DEFAULT_FILES, PROFILE_LABELS, type ResumeProfile } from "@/types/resume-profile";
+import { EMPLOYMENT_TYPE_STORAGE_DEFAULT, FULL_TIME_MASTER_FILES, isEmploymentType, type EmploymentType } from "@/types/employment-type";
 
 const PROFILE_STORAGE_KEY = "resume-profile-selection-v1";
 
@@ -26,6 +27,7 @@ export function GuidedResumeWorkflow() {
   const router = useRouter();
   const workflowRevision = useRef(0);
   const [profile, setProfile] = useState<ResumeProfile>("java");
+  const [employmentType, setEmploymentType] = useState<EmploymentType>(EMPLOYMENT_TYPE_STORAGE_DEFAULT);
   const [selectionReady, setSelectionReady] = useState(false);
   const [rememberedFiles, setRememberedFiles] = useState<Record<ResumeProfile, string>>(PROFILE_DEFAULT_FILES);
   const [master, setMaster] = useState<MasterResume | null>(null);
@@ -46,13 +48,15 @@ export function GuidedResumeWorkflow() {
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem(PROFILE_STORAGE_KEY) ?? "null") as { profile?: unknown; files?: Partial<Record<ResumeProfile, unknown>> } | null;
+      const saved = JSON.parse(localStorage.getItem(PROFILE_STORAGE_KEY) ?? "null") as { profile?: unknown; files?: Partial<Record<ResumeProfile, unknown>>; employmentType?: unknown } | null;
       const nextProfile = saved?.profile === "general" ? "general" : saved?.profile === "kafka" ? "kafka" : "java";
+      const nextEmploymentType = isEmploymentType(saved?.employmentType) ? saved.employmentType : EMPLOYMENT_TYPE_STORAGE_DEFAULT;
       const files = { ...PROFILE_DEFAULT_FILES };
       for (const key of ["java", "kafka", "general"] as const) {
         if (typeof saved?.files?.[key] === "string") files[key] = saved.files[key] as string;
       }
-      setProfile(nextProfile); setRememberedFiles(files); setMasterFile(files[nextProfile]);
+      setProfile(nextProfile); setRememberedFiles(files); setEmploymentType(nextEmploymentType);
+      setMasterFile(nextEmploymentType === "full-time" ? FULL_TIME_MASTER_FILES[nextProfile] ?? files[nextProfile] : files[nextProfile]);
     } catch { setMasterFile(PROFILE_DEFAULT_FILES.java); }
     setSelectionReady(true);
   }, []);
@@ -60,13 +64,28 @@ export function GuidedResumeWorkflow() {
 
   useEffect(() => {
     if (!selectionReady) return;
-    try { localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify({ profile, files: rememberedFiles })); } catch { /* Selection still works when browser storage is unavailable. */ }
-  }, [profile, rememberedFiles, selectionReady]);
+    try { localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify({ profile, files: rememberedFiles, employmentType })); } catch { /* Selection still works when browser storage is unavailable. */ }
+  }, [profile, rememberedFiles, employmentType, selectionReady]);
 
   function changeProfile(next: ResumeProfile) {
     workflowRevision.current++;
-    setProfile(next); setMasterFile(rememberedFiles[next]); setMasterFiles([]); setMaster(null); setMasterLoading(true); setMasterError("");
+    const nextFile = employmentType === "full-time" ? FULL_TIME_MASTER_FILES[next] ?? rememberedFiles[next] : rememberedFiles[next];
+    setProfile(next); setMasterFile(nextFile); setMasterFiles([]); setMaster(null); setMasterLoading(true); setMasterError("");
     setAnalysis(null); setAnalysisText(""); setResumeText(""); setNotice(""); setError("");
+  }
+
+  function changeEmploymentType(next: EmploymentType) {
+    workflowRevision.current++;
+    const nextFile = next === "full-time" ? FULL_TIME_MASTER_FILES[profile] ?? rememberedFiles[profile] : rememberedFiles[profile];
+    setEmploymentType(next); setResumeText(""); setNotice(""); setError("");
+    if (nextFile !== masterFile) {
+      setMasterFile(nextFile); setMasterFiles([]); setMaster(null); setMasterLoading(true); setMasterError("");
+    }
+    if (next === "full-time" && !FULL_TIME_MASTER_FILES[profile]) {
+      setNotice("No Fidelity/Pine Labs master source is configured for Kafka. Your selected Kafka source remains active.");
+    } else {
+      setNotice(`${next === "full-time" ? "Full-time" : "C2C"} preference saved${next === "full-time" && FULL_TIME_MASTER_FILES[profile] ? "; the Fidelity/Pine Labs source was selected" : ""}.`);
+    }
   }
 
   function changeMasterFile(file: string) {
@@ -102,7 +121,7 @@ export function GuidedResumeWorkflow() {
   }, [masterFile, profile, selectionReady, masterLoadAttempt]);
   const sourceCoverage = useMemo(() => analysis && master && profile === "general" ? keywordCoverage(resumeScoringText(master), analysis.allTechnicalSkills) : null, [analysis, master, profile]);
   const promptOne = useMemo(() => analysisPrompt(jd, profile), [jd, profile]);
-  const promptTwo = useMemo(() => analysis && master ? (profile === "general" ? generalGenerationPrompt(jd, analysis, master, sections) : (profile === "kafka" ? kafkaGenerationPrompt : javaGenerationPrompt)(jd, analysis, master, sections)) : "", [jd, analysis, master, sections, profile]);
+  const promptTwo = useMemo(() => analysis && master ? (profile === "general" ? generalGenerationPrompt(jd, analysis, master, sections, employmentType) : (profile === "kafka" ? kafkaGenerationPrompt : javaGenerationPrompt)(jd, analysis, master, sections, employmentType)) : "", [jd, analysis, master, sections, profile, employmentType]);
 
   async function copy(text: string, message: string) {
     try {
@@ -134,7 +153,7 @@ export function GuidedResumeWorkflow() {
       const result = await response.json() as { resume?: MasterResume; error?: string };
       if (revision !== workflowRevision.current) return;
       if (!response.ok || !result.resume || !analysis) throw new Error(result.error ?? "Invalid generated resume JSON.");
-      sessionStorage.setItem("guidedResumeData", JSON.stringify({ resume: result.resume, technicalSkills: analysis.allTechnicalSkills, selectedSections: sections, targetRole: analysis.targetRole, jobDescription: jd, sourceResume: master, profile }));
+      sessionStorage.setItem("guidedResumeData", JSON.stringify({ resume: result.resume, technicalSkills: analysis.allTechnicalSkills, selectedSections: sections, targetRole: analysis.targetRole, jobDescription: jd, sourceResume: master, profile, employmentType }));
       router.push("/editor");
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Invalid generated resume JSON."); }
   }
@@ -143,7 +162,7 @@ export function GuidedResumeWorkflow() {
     {error ? <ActionToast message={error} type="error" onDismiss={() => setError("")} /> : notice ? <ActionToast message={notice} onDismiss={() => setNotice("")} /> : null}
     <header className="rounded-3xl border border-[var(--app-border)] bg-[var(--app-surface)] p-5 shadow-lg sm:p-7"><p className="text-xs font-bold uppercase tracking-[.18em] text-[var(--app-accent)]">Guided ChatGPT workflow · No API key</p><h1 className="mt-1 text-3xl font-bold text-[var(--foreground)]">JD to tailored resume</h1><p className="mt-2 text-[var(--app-muted)]">Choose your profile, paste a job description, and build your tailored resume with ChatGPT.</p></header>
     <section aria-label="Resume setup" className="mt-5 rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] p-5">
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
       <div className="min-w-0">
       <label htmlFor="resume-profile" className="text-sm font-semibold">Resume profile</label>
       <select id="resume-profile" value={profile} disabled={!selectionReady} onChange={(event) => changeProfile(event.target.value as ResumeProfile)} className="mt-2 block h-12 w-full min-w-0 rounded-xl border border-[var(--app-border)] px-3 text-sm">
@@ -154,13 +173,20 @@ export function GuidedResumeWorkflow() {
       </div>
       <div className="min-w-0">
       <label htmlFor="master-resume-file" className="text-sm font-semibold">Master resume</label>
-      <select id="master-resume-file" value={masterFiles.includes(masterFile) ? masterFile : ""} disabled={!selectionReady} onChange={(event) => changeMasterFile(event.target.value)} className="mt-2 block h-12 w-full min-w-0 rounded-xl border border-[var(--app-border)] px-3 text-sm">
+      <select id="master-resume-file" value={masterFiles.includes(masterFile) ? masterFile : ""} disabled={!selectionReady || (employmentType === "full-time" && Boolean(FULL_TIME_MASTER_FILES[profile]))} onChange={(event) => changeMasterFile(event.target.value)} className="mt-2 block h-12 w-full min-w-0 rounded-xl border border-[var(--app-border)] px-3 text-sm">
         <option value="" disabled>Choose your source resume…</option>
         {masterFiles.map((file) => <option key={file} value={file}>{file}</option>)}
       </select>
       </div>
+      <fieldset className="min-w-0">
+      <legend className="text-sm font-semibold">Employment type</legend>
+      <div className="mt-2 grid h-12 grid-cols-2 rounded-xl border border-[var(--app-border)] bg-[var(--app-input)] p-1" role="group" aria-label="Employment type">
+        {(["full-time", "c2c"] as const).map((type) => <button key={type} type="button" aria-pressed={employmentType === type} onClick={() => changeEmploymentType(type)} className={`rounded-lg px-2 text-sm font-semibold transition-colors ${employmentType === type ? "bg-[var(--app-primary)] text-white shadow-sm" : "text-[var(--app-muted)] hover:text-[var(--foreground)]"}`}>{type === "full-time" ? "Full-time" : "C2C"}</button>)}
       </div>
-      <p role="status" className="mt-4 border-t border-[var(--app-border)] pt-3 text-xs text-[var(--app-muted)]">{masterLoading ? "Loading master resume…" : masterError || `${PROFILE_LABELS[profile]} source ready. Your selection is saved automatically.`}</p>
+      <p className="mt-2 text-xs text-[var(--app-muted)]">Full-time auto-selects Fidelity/Pine Labs for Java and general. C2C restores your saved source.</p>
+      </fieldset>
+      </div>
+      <p role="status" className="mt-4 border-t border-[var(--app-border)] pt-3 text-xs text-[var(--app-muted)]">{masterLoading ? "Loading master resume…" : masterError || `${PROFILE_LABELS[profile]} source ready. Your profile, source, and ${employmentType === "full-time" ? "full-time" : "C2C"} preference are saved automatically. Employer history stays tied to the selected source.`}</p>
       {<button type="button" disabled={masterLoading} onClick={() => { setMasterLoading(true); setMasterError(""); setMasterLoadAttempt((attempt) => attempt + 1); }} className="mt-3 rounded-lg border border-[var(--app-border)] px-3 py-2 text-sm font-semibold text-[var(--app-accent)]">{masterError ? "Retry loading resumes" : "Reload master resume"}</button>}
     </section>
     <section className="mt-5">

@@ -1,10 +1,11 @@
 import { careerDuration } from "@/engine/resume-review/content-review";
 import { JD_TARGETING_RULES } from "@/prompts/jd-targeting";
+import { employmentTypePrompt } from "@/prompts/employment-type";
 import type { JobAnalysis } from "@/types/job-analysis";
 import type { MasterResume } from "@/types/resume";
 import type { HighlightSection } from "@/components/builder/SectionSelector";
 
-export function javaGenerationPrompt(jd: string, analysis: JobAnalysis, master: MasterResume, sections: HighlightSection[]) {
+export function javaGenerationPrompt(jd: string, analysis: JobAnalysis, master: MasterResume, sections: HighlightSection[], employmentType: "full-time" | "c2c" = "full-time") {
   const promptMaster = { ...master, personalInfo: { ...master.personalInfo } };
   delete promptMaster.personalInfo.linkedIn;
   return `You are a senior Java engineering recruiter and technical resume writer specializing in Java backend and full-stack hiring. Use only the supplied Java source resume as candidate evidence. Create a complete resume tailored to the supplied target role and job description. Return ONLY valid JSON with no Markdown fences, commentary, ATS score, or explanation.
@@ -13,6 +14,8 @@ TARGET ROLE:
 ${analysis.targetRole}
 
 ${JD_TARGETING_RULES}
+
+${employmentTypePrompt(employmentType)}
 
 TOTAL CAREER TIMELINE CONTEXT:
 ${JSON.stringify({ asOfChicagoDate: new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()), duration: careerDuration(master.experience) })}
@@ -40,7 +43,7 @@ PROFESSIONAL TITLE
 PROFESSIONAL SUMMARY
 - Retain detailed summary coverage from the master, using distinct relevant evidence rather than enforcing an exact count.
 - Rewrite all bullets for the target role, eliminate repetition, and distribute high-value JD terminology naturally.
-- Match the candidate's overall years and career level.
+- Keep seniority consistent with the source. Do not force the total career-duration figure into the opening summary when the JD seeks substantially fewer years; never imply total career years are years with a particular technology.
 - Emphasize transferable experience and use realistic enterprise language.
 
 REQUIRED JD SKILLS THAT ARE MISSING

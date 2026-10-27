@@ -1,10 +1,11 @@
 import { careerDuration } from "@/engine/resume-review/content-review";
 import { JD_TARGETING_RULES } from "@/prompts/jd-targeting";
+import { employmentTypePrompt } from "@/prompts/employment-type";
 import type { JobAnalysis } from "@/types/job-analysis";
 import type { MasterResume } from "@/types/resume";
 import type { HighlightSection } from "@/components/builder/SectionSelector";
 
-export function kafkaGenerationPrompt(jd: string, analysis: JobAnalysis, master: MasterResume, sections: HighlightSection[]) {
+export function kafkaGenerationPrompt(jd: string, analysis: JobAnalysis, master: MasterResume, sections: HighlightSection[], employmentType: "full-time" | "c2c" = "full-time") {
   // Evaluate only this JD, never the extracted analysis or previous examples.
   const javaMentioned = /\b(?:java|jvm)\b/i.test(jd);
   const sqlMentioned = /\b(?:sql|pl\/sql|postgresql|mysql|oracle|jdbc)\b/i.test(jd);
@@ -23,6 +24,8 @@ export function kafkaGenerationPrompt(jd: string, analysis: JobAnalysis, master:
   return `Act as a senior Kafka infrastructure recruiter and Kafka platform hiring manager reviewing a candidate for a production platform role. Write a compelling, precise, interview-defensible resume that demonstrates operational ownership and matches the supplied Kafka JD. Return ONLY the complete valid resume JSON; no Markdown fences, recruiting commentary, match scores, or extra fields.
 
 ${JD_TARGETING_RULES}
+
+${employmentTypePrompt(employmentType)}
 
 TOTAL CAREER TIMELINE CONTEXT:
 ${JSON.stringify({ asOfChicagoDate: new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()), duration: careerDuration(master.experience) })}

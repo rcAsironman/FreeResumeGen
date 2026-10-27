@@ -68,6 +68,8 @@ Changes made in the browser are temporary. Use **Copy updated JSON**, paste it b
 
 The home page has separate Java and Kafka profiles. Each uses an independent generation prompt and source resume. The browser remembers the active profile and each profile's last selected source for the same site address.
 
+The setup panel remembers a Full-time or C2C preference. Full-time automatically selects the Fidelity Investments/Pine Labs source for Java and general profiles; switching to C2C restores the source you last selected for that profile. Both the preference and source selection persist. Kafka currently has no Fidelity/Pine Labs source file, so its selected Kafka source remains active.
+
 - Java defaults to `data/java/master-resume-java.json`, seeded from `master-resume9.json`, and uses `prompts/java-resume.ts`.
 - Kafka defaults to `data/kafka/master-resume-kafka.json`, seeded from `master-resume-k10.json` with a curated Kafka skills section, and uses `prompts/kafka-resume.ts`.
 - Original experience variants remain available in their respective folders. Add a valid resume JSON file to `data/java/` or `data/kafka/` and refresh to see it under that profile. Profile and saved filename selections continue working after the folder move.

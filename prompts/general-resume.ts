@@ -1,5 +1,6 @@
 import { careerDuration } from "@/engine/resume-review/content-review";
 import { JD_QUALITY_RULES } from "@/prompts/jd-quality";
+import { employmentTypePrompt } from "@/prompts/employment-type";
 import type { JobAnalysis } from "@/types/job-analysis";
 import type { MasterResume } from "@/types/resume";
 import type { HighlightSection } from "@/components/builder/SectionSelector";
@@ -37,12 +38,14 @@ export function generalDraftSource(master: MasterResume): MasterResume {
   };
 }
 
-export function generalGenerationPrompt(jd: string, analysis: JobAnalysis, master: MasterResume, sections: HighlightSection[]) {
+export function generalGenerationPrompt(jd: string, analysis: JobAnalysis, master: MasterResume, sections: HighlightSection[], employmentType: "full-time" | "c2c" = "full-time") {
   const source = generalDraftSource(master);
   const calculatedDuration = careerDuration(master.experience);
   const documentedTooling = master.experience.map(e => ({ id: e.id, tools: e.environment.filter(tool => /^(?:Git(?:Hub|Lab)?|Bitbucket|Jenkins|Azure DevOps|TeamCity|Bamboo|Visual Studio(?: Code)?|SonarQube|Jira|Confluence|Linux)$/i.test(tool.trim())) })).filter(e => e.tools.length);
   const careerFacts = { totalCareerDuration: calculatedDuration, asOfChicagoDate: new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()), timelineIsAuthoritative: true, seniorityProgression: master.experience.map(e => ({ id: e.id, level: /\blead\b/i.test(e.role) ? "lead" : /\bsenior|\bsr\b/i.test(e.role) ? "senior" : /\bjunior|\bjr\b/i.test(e.role) ? "junior" : "individual contributor" })) };
-  return `JD DRAFT PROMPT v10 — NEUTRAL MASTER INPUT\nYou are an experienced technical resume writer drafting a complete resume for the profession in the CURRENT JOB DESCRIPTION. This is GENERATE ANY RESUME FROM JD mode, not preservation of the master resume's original profession. Return only complete valid resume JSON.
+  return `JD DRAFT PROMPT v11 — NEUTRAL MASTER INPUT\nYou are an experienced technical resume writer drafting a complete resume for the profession in the CURRENT JOB DESCRIPTION. This is GENERATE ANY RESUME FROM JD mode, not preservation of the master resume's original profession. Return only complete valid resume JSON.
+
+${employmentTypePrompt(employmentType)}
 
 ${JD_DRAFT_RULES}
 
@@ -64,6 +67,7 @@ OUTPUT VOICE AND COVERAGE GATE
 - Write direct capability statements, not repeated “focus”, “emphasis”, or “draft scope” constructions. Start summary points with varied concrete capabilities and avoid repeating responsibility bullets verbatim.
 - Deduplicate skills globally: each named skill belongs in one best-fit category. Consolidate synonyms such as peer code reviews/code reviews. Environments may repeat skills relevant to that employer.
 - If a skill such as on-call support or mentoring is claimed, demonstrate the corresponding duty in responsibilities under the selected draft-mode rules. Never add aviation, hardware instrumentation, GPA, onsite availability or a certification merely to fill a JD gap.
+- Read the JD required-experience range separately from the candidate timeline. If the JD asks for substantially fewer years than the total chronology, do not automatically lead with 10+ years or copy the JD minimum as candidate tenure. Preserve all source employers and dates; foreground relevant experience and state role-specific years only when the source establishes them.
 - Prefer the calculated non-overlapping totalCareerDuration above to an outdated master summary. It is total employment duration only, not years in a particular tool. If duration is null, omit exact years rather than guess. Never present a target “1+ year” requirement as the candidate’s entire career.
 - Retain the current title-generation rules; do not change role labels solely to fix writing quality.
 - Make each employer distinct through task scope and existing project context; do not infer confidential business workflows solely from the employer name. Use technology versions appropriate to dates.
