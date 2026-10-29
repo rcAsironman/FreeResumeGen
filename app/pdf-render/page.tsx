@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { ResumeTemplate } from "@/templates/ResumeTemplate";
 import type { ResumeLayout } from "@/types/resume-layout";
 import type { MasterResume } from "@/types/resume";
+import type { CertificationBadgeId } from "@/engine/certification-badges";
+import type { CertificationBadgePosition } from "@/engine/certification-badges";
 import {
   DEFAULT_RESUME_FONT,
   type ResumeFont,
@@ -18,6 +20,10 @@ interface PdfResumeData {
   selectedSections: string[];
   fontFamily?: ResumeFont;
   documentHtml?: string;
+  showCertificationLogos?: boolean;
+  selectedCertificationBadges?: CertificationBadgeId[];
+  certificationBadgePosition?: CertificationBadgePosition;
+  certificationBadgeSize?: number;
 }
 
 export default function PdfRenderPage() {
@@ -86,6 +92,10 @@ export default function PdfRenderPage() {
           data.fontFamily ??
           DEFAULT_RESUME_FONT
         }
+        showCertificationLogos={data.showCertificationLogos}
+        selectedCertificationBadges={data.selectedCertificationBadges}
+        certificationBadgePosition={data.certificationBadgePosition}
+        certificationBadgeSize={data.certificationBadgeSize}
       />}
     </main>
   );

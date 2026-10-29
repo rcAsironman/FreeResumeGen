@@ -1,4 +1,5 @@
 .resume {
+  position: relative;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -65,7 +66,6 @@
   padding: 0;
   color: #000000;
 }
-
 .sectionHeading {
   display: block;
   width: 100%;
@@ -164,18 +164,17 @@
   margin: 0 0 2px;
   padding: 0;
   color: #000000;
+  font-size: 10pt;
+  font-style: italic;
 
   break-after: avoid-page;
   page-break-after: avoid;
 }
 
-.responsibilitiesLabel {
-  margin: 0 0 3px;
-  padding: 0;
-  color: #000000;
-
-  break-after: avoid-page;
-  page-break-after: avoid;
+.officialTitle {
+  color: #555555;
+  font-size: 9pt;
+  font-style: normal;
 }
 
 .environment {
@@ -225,7 +224,6 @@
   .experience,
   .clientRow,
   .role,
-  .responsibilitiesLabel,
   .environment {
     color: #000000 !important;
     background: transparent;
@@ -248,8 +246,7 @@
   }
 
   .clientRow,
-  .role,
-  .responsibilitiesLabel {
+  .role {
     break-after: avoid-page;
     page-break-after: avoid;
   }

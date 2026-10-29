@@ -1,7 +1,6 @@
 {
     "personalInfo": {
         "fullName": "Karthik Mangineni",
-        "professionalTitle": "Senior Java Full Stack Developer",
         "email": "karthikmangineni77@gmail.com",
         "phone": "+1(314)814-6677",
         "location": "",
@@ -236,7 +235,6 @@
         {
             "id": "citi-bank",
             "company": "Citi Bank",
-            "role": "Senior Java Full Stack Developer",
             "location": "Washington Blvd, Jersey City, NJ",
             "startDate": "Dec 2023",
             "endDate": "Present",
@@ -311,7 +309,6 @@
         {
             "id": "servicenow",
             "company": "ServiceNow",
-            "role": "Java Full Stack Developer",
             "location": "Santa Clara, CA",
             "startDate": "Aug 2020",
             "endDate": "Nov 2023",

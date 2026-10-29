@@ -1,7 +1,6 @@
 {
     "personalInfo": {
         "fullName": "Karthik Mangineni",
-        "professionalTitle": "Sr Java Full Stack Developer",
         "email": "karthikmangineni5@gmail.com",
         "phone": "314-814-6677",
         "location": "",
@@ -216,7 +215,6 @@
         {
             "id": "ups",
             "company": "UPS",
-            "role": "Senior Java Full Stack Developer",
             "location": "New York, NY",
             "startDate": "Dec 2025",
             "endDate": "Present",
@@ -284,7 +282,6 @@
         {
             "id": "state-of-texas",
             "company": "State of Texas",
-            "role": "Senior Java Full Stack Developer",
             "location": "Austin, TX",
             "startDate": "Jan 2025",
             "endDate": "Nov 2025",
@@ -351,7 +348,6 @@
         {
             "id": "healthgrades",
             "company": "Healthgrades",
-            "role": "Java Full Stack Developer",
             "location": "Denver, CO",
             "startDate": "Feb 2022",
             "endDate": "Dec 2024",
@@ -416,7 +412,6 @@
         {
             "id": "firstgroup-america",
             "company": "FirstGroup America",
-            "role": "Java Full Stack Java Developer",
             "location": "Cincinnati, OH",
             "startDate": "Oct 2019",
             "endDate": "Jan 2022",
@@ -481,7 +476,6 @@
         {
             "id": "outfront-media",
             "company": "Outfront Media",
-            "role": "Java Full Stack Developer",
             "location": "New York, NY",
             "startDate": "Sep 2016",
             "endDate": "Sep 2019",
@@ -543,7 +537,6 @@
         {
             "id": "liberty-mutual-insurance",
             "company": "Liberty Mutual Insurance",
-            "role": "Java Full Stack Developer",
             "location": "Plano, TX",
             "startDate": "Oct 2013",
             "endDate": "Aug 2016",
@@ -605,7 +598,6 @@
         {
             "id": "nucleus-software",
             "company": "Nucleus Software",
-            "role": "Java Developer",
             "location": "Hyderabad, India",
             "startDate": "Aug 2012",
             "endDate": "Sep 2013",

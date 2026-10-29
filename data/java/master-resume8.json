@@ -1,7 +1,6 @@
 {
     "personalInfo": {
         "fullName": "Karthik Mangineni",
-        "professionalTitle": "Java Software Engineer III",
         "email": "karthikmangineni77@gmail.com",
         "phone": "+1(314)814-6677",
         "location": "",
@@ -230,7 +229,6 @@
         {
             "id": "fidelity-investments",
             "company": "Fidelity Investments",
-            "role": "Java Software Engineer III",
             "location": "Westlake, Texas, USA (Remote)",
             "startDate": "Nov 2024",
             "endDate": "Present",
@@ -282,7 +280,6 @@
         {
             "id": "pine-labs",
             "company": "Pine Labs",
-            "role": "Java Software Engineer III",
             "location": "Bengaluru, Karnataka, India",
             "startDate": "Nov 2017",
             "endDate": "Nov 2023",

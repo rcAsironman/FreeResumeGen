@@ -8,8 +8,8 @@ export const fixedResumeTemplateConfig: TemplateConfig = {
   requiredSections: [
     "professionalSummary",
     "technicalSkills",
-    "education",
     "experience",
+    "education",
     "environment",
   ],
   optionalSections: [],
@@ -24,8 +24,8 @@ export const fixedResumeTemplateConfig: TemplateConfig = {
   sectionOrder: [
     "professionalSummary",
     "technicalSkills",
-    "education",
     "experience",
+    "education",
   ],
   sectionLabels: {
     professionalSummary: "PROFESSIONAL SUMMARY",

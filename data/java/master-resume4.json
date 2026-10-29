@@ -1,7 +1,6 @@
 {
     "personalInfo": {
         "fullName": "Karthik Mangineni",
-        "professionalTitle": "Java Software Engineer II",
         "email": "karthikmangineni77@gmail.com",
         "phone": "+1(314)814-6677",
         "location": "",
@@ -230,7 +229,6 @@
         {
             "id": "pine-labs",
             "company": "Pine Labs",
-            "role": "Java Software Engineer II",
             "location": "Bengaluru, Karnataka, India",
             "startDate": "Aug 2019",
             "endDate": "Nov 2023",

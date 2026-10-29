@@ -1,4 +1,4 @@
-.resume { width: 100%; font-family: var(--resume-font, "Times New Roman", Times, serif); font-size: 10pt; line-height: 1.314; color: #1a1a1a; background: white; }
+.resume { position: relative; width: 100%; font-family: var(--resume-font, "Times New Roman", Times, serif); font-size: 10pt; line-height: 1.314; color: #1a1a1a; background: white; }
 .resume * { font-family: inherit; box-sizing: border-box; }
 .header { text-align: center; padding-top: .7pt; }
 .header h1 { margin: 0 0 2pt; font-size: 12pt; font-weight: bold; color: #404040; letter-spacing: 1.5pt; text-transform: uppercase; line-height: normal; }

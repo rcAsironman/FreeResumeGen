@@ -24,7 +24,7 @@ ${JSON.stringify({ asOfChicagoDate: new Intl.DateTimeFormat("en-CA", { timeZone:
 TARGETING PRIORITY
 - The current JOB DESCRIPTION is authoritative for the profession, role name, skills, duties, and deliverables. Correct stale or conflicting analysis using the JD.
 - Keep this a Java engineering profile. Prioritize JD-relevant Java, Spring, APIs, application architecture, testing, cloud and delivery experience. Include frontend only for relevant full-stack duties; include Kafka only as application messaging when the JD and source support it. Do not import Kafka administrator or broker-operations claims from another profile.
-- Rewrite all editable sections for the target profession, not just a few keywords. Preserve section order, experience order, and detailed source-backed summary and responsibilities; bullet counts must not force repetition or invented work.
+- Rewrite all editable sections for the target profession, not just a few keywords. Preserve required JSON properties and employer order. Use the configured resume format, with Professional Experience before Education by default; detailed bullet targets never justify repetition or invented work.
 - Internally map mandatory and preferred JD requirements to source evidence and transferable work before writing. Factual accuracy takes precedence: never turn unsupported JD requirements into invented past experience.
 
 GLOBAL RULES
@@ -37,11 +37,11 @@ GLOBAL RULES
 - Never invent employers, dates, education, certifications, revenue, financial savings, user counts, transaction volumes, or absolute scale claims.
 
 PROFESSIONAL TITLE
-- Set personalInfo.professionalTitle to the current JD role name, retaining the core profession and specialization and only supported seniority. Never substitute the master title for a different target role.
+- Set personalInfo.professionalTitle to the advertised JD role when the source supports its essential responsibilities; otherwise choose the closest accurate JD-related title, retaining only supported seniority. Never substitute a stale master title for a different target role.
 - Do not copy marketing language, locations, contract details, requisition codes, client names, parenthetical phrases, or a list of technologies into the title.
 
 PROFESSIONAL SUMMARY
-- Retain detailed summary coverage from the master, using distinct relevant evidence rather than enforcing an exact count.
+- Write exactly 8 distinct, JD-relevant summary points when the source supports eight separate claims; otherwise use fewer rather than repeat or invent evidence. Aim for approximately 22–35 words per point.
 - Rewrite all bullets for the target role, eliminate repetition, and distribute high-value JD terminology naturally.
 - Keep seniority consistent with the source. Do not force the total career-duration figure into the opening summary when the JD seeks substantially fewer years; never imply total career years are years with a particular technology.
 - Emphasize transferable experience and use realistic enterprise language.
@@ -91,7 +91,7 @@ FINAL REVIEW
 - Ensure contact values contain no Markdown or mailto syntax.
 - Verify required JD terms are represented in realistic context.
 - Remove duplicate bullets, generic AI-style filler, and unnecessary technology repetition.
-- Verify the professional title matches the current JD role and summary, categories, responsibilities, and environment consistently target that profession. Verify original structure and distinct evidence-backed bullets, and remove all LinkedIn content.
+- Verify the professional title matches the JD where its core scope is supported, otherwise the closest accurate target role. Confirm the summary, categories, responsibilities and environments consistently target that profession; preserve the original schema and distinct evidence-backed bullets, and remove all LinkedIn content.
 - Keep factual claims interview-defensible. Proficiency labels are prohibited everywhere in the resume. Express claim strength only through contextual wording in Professional Summary and Professional Experience.
 
 JOB DESCRIPTION:

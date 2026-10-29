@@ -4,7 +4,7 @@ import { plainEmailValue } from "@/utils/resume-text";
 
 export const personalInfoSchema = z.object({
   fullName: z.string().min(1),
-  professionalTitle: z.string().min(1),
+  professionalTitle: z.string().default(""),
   email: z.string().transform(plainEmailValue),
   phone: z.string(),
   location: z.string(),
@@ -29,7 +29,7 @@ export const experienceSchema = z.array(
   z.object({
     id: z.string().min(1),
     company: z.string().min(1),
-    role: z.string().min(1),
+    role: z.string().default(""),
     location: z.string(),
     startDate: z.string().min(1),
     endDate: z.string().min(1),
@@ -78,6 +78,18 @@ export const masterResumeSchema = z.object({
   projects: projectsSchema,
   education: educationSchema,
   certifications: certificationsSchema,
+});
+
+/** Generated resumes must supply JD-specific headline and employer role labels. */
+export const generatedResumeSchema = masterResumeSchema.superRefine((resume, context) => {
+  if (!resume.personalInfo.professionalTitle.trim()) {
+    context.addIssue({ code: "custom", path: ["personalInfo", "professionalTitle"], message: "Add a headline based on the job description." });
+  }
+  resume.experience.forEach((item, index) => {
+    if (!item.role.trim()) {
+      context.addIssue({ code: "custom", path: ["experience", index, "role"], message: "Generate a JD-relevant functional role for each employer." });
+    }
+  });
 });
 
 export type MasterResumeSchema = z.infer<typeof masterResumeSchema>;

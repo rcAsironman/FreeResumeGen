@@ -1,7 +1,6 @@
 {
   "personalInfo": {
     "fullName": "Karthik Mangineni",
-    "professionalTitle": "Senior Site Reliability Engineer / Kafka Administrator",
     "email": "karthikmangineni5@gmail.com",
     "phone": "314-814-6677",
     "location": "",
@@ -339,7 +338,6 @@
     {
       "id": "att",
       "company": "AT&T",
-      "role": "Senior Site Reliability Engineer / Kafka Administrator",
       "location": "Atlanta, GA",
       "startDate": "Jul 2023",
       "endDate": "Present",
@@ -409,7 +407,6 @@
     {
       "id": "healthgrades",
       "company": "Healthgrades",
-      "role": "Site Reliability Engineer / Kafka Platform Engineer",
       "location": "Denver, CO",
       "startDate": "Feb 2022",
       "endDate": "Jun 2023",
@@ -459,7 +456,6 @@
     {
       "id": "firstgroup-america",
       "company": "FirstGroup America",
-      "role": "Kafka Platform Engineer / Site Reliability Engineer",
       "location": "Cincinnati, OH",
       "startDate": "Oct 2019",
       "endDate": "Jan 2022",
@@ -508,7 +504,6 @@
     {
       "id": "outfront-media",
       "company": "Outfront Media",
-      "role": "Site Reliability Engineer / DevOps Engineer",
       "location": "New York, NY",
       "startDate": "Oct 2017",
       "endDate": "Sep 2019",
@@ -558,7 +553,6 @@
     {
       "id": "nucleus-software",
       "company": "Nucleus Software",
-      "role": "Java Production Support / Reliability Engineer",
       "location": "Hyderabad, India",
       "startDate": "Aug 2016",
       "endDate": "Sep 2017",

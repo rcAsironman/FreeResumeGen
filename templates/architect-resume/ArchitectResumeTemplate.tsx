@@ -2,10 +2,11 @@ import { Fragment, type CSSProperties, type ComponentProps } from "react";
 import { BoldSkillsText } from "@/components/preview/BoldSkillsText";
 import { FixedResumeTemplate } from "@/templates/fixed-resume/FixedResumeTemplate";
 import { plainEmailValue } from "@/utils/resume-text";
+import { CertificationLogoStrip } from "@/components/preview/CertificationLogoStrip";
 import { DEFAULT_RESUME_FONT, getResumeFontStack } from "@/types/resume-font";
 import styles from "./architect-resume.module.css";
 
-export function ArchitectResumeTemplate({ resume, technicalSkills = [], selectedSections = [], fontFamily = DEFAULT_RESUME_FONT }: ComponentProps<typeof FixedResumeTemplate>) {
+export function ArchitectResumeTemplate({ resume, technicalSkills = [], selectedSections = [], fontFamily = DEFAULT_RESUME_FONT, showCertificationLogos = false, selectedCertificationBadges = [], certificationBadgePosition, certificationBadgeSize, onCertificationBadgePositionChange }: ComponentProps<typeof FixedResumeTemplate>) {
   const highlight = (text: string, section: string) => <BoldSkillsText text={text} skills={technicalSkills} enabled={selectedSections.includes(section)}/>;
   const qualification = (text: string) => {
     const colon = text.indexOf(":");
@@ -16,6 +17,7 @@ export function ArchitectResumeTemplate({ resume, technicalSkills = [], selected
       <h1 data-resume-field="fullName">{resume.personalInfo.fullName}</h1>
       <p className={styles.title} data-resume-field="professionalTitle">{resume.personalInfo.professionalTitle}</p>
       <p className={styles.contact}>{[{ field: "phone", value: resume.personalInfo.phone }, { field: "email", value: plainEmailValue(resume.personalInfo.email) }, { field: "location", value: resume.personalInfo.location }].filter((item) => item.value).map((item, i) => <Fragment key={item.field}>{i > 0 && "  |  "}<span data-contact-field={item.field}>{item.value}</span></Fragment>)}</p>
+      <CertificationLogoStrip selectedBadges={selectedCertificationBadges} enabled={showCertificationLogos} position={certificationBadgePosition} badgeSize={certificationBadgeSize} onPositionChange={onCertificationBadgePositionChange}/>
     </header>
     <h2>PROFESSIONAL SUMMARY</h2>
     {resume.professionalSummary.bullets[0] && <p className={styles.summary} data-summary-index={0}>{highlight(resume.professionalSummary.bullets[0], "professionalSummary")}</p>}

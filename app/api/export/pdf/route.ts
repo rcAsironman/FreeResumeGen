@@ -4,7 +4,7 @@ import { RESUME_LAYOUTS, DEFAULT_RESUME_LAYOUT } from "@/types/resume-layout";
 import { chromium } from "playwright";
 import { z } from "zod";
 
-import { masterResumeSchema } from "@/engine/validation/resume.schema";
+import { generatedResumeSchema } from "@/engine/validation/resume.schema";
 import {
   DEFAULT_RESUME_FONT,
 } from "@/types/resume-font";
@@ -12,7 +12,7 @@ import {
 export const runtime = "nodejs";
 
 const requestSchema = z.object({
-  resume: masterResumeSchema,
+  resume: generatedResumeSchema,
   saveToFolder: z.boolean().optional().default(false),
   templateId: z.enum(RESUME_LAYOUTS).optional().default(DEFAULT_RESUME_LAYOUT),
 
@@ -25,6 +25,10 @@ const requestSchema = z.object({
   ),
 
   documentHtml: z.string().max(2_000_000).optional(),
+  showCertificationLogos: z.boolean().optional().default(false),
+  selectedCertificationBadges: z.array(z.enum(["aws-saa", "aws-developer", "aws-devops", "azure-admin", "azure-devops", "azure-architect", "gcp-architect", "gcp-developer", "gcp-devops", "confluent-admin", "confluent-developer", "confluent-operator"])).optional().default([]),
+  certificationBadgePosition: z.object({ x: z.number().finite().min(-1200).max(1200), y: z.number().finite().min(-2400).max(2400) }).optional().default({ x: 0, y: 0 }),
+  certificationBadgeSize: z.number().int().min(36).max(110).optional().default(72),
 
   fontFamily: z
     .enum([
@@ -55,6 +59,10 @@ export async function POST(
       selectedSections,
       fontFamily,
       documentHtml,
+      showCertificationLogos,
+      selectedCertificationBadges,
+      certificationBadgePosition,
+      certificationBadgeSize,
     } = requestSchema.parse(body);
 
     const contentErrors = reviewResumeContent(resume).filter(issue => issue.severity === "error");
@@ -104,6 +112,10 @@ export async function POST(
         selectedSections,
         fontFamily,
         documentHtml,
+        showCertificationLogos,
+        selectedCertificationBadges,
+        certificationBadgePosition,
+        certificationBadgeSize,
       },
     );
 
@@ -130,6 +142,11 @@ export async function POST(
         state: "visible",
         timeout: 30000,
       },
+    );
+
+    await page.waitForFunction(
+      () => Array.from(document.images).every((image) => image.complete && image.naturalWidth > 0),
+      { timeout: 10000 },
     );
 
     /*

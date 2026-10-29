@@ -2,14 +2,24 @@ import {
   AlignmentType,
   BorderStyle,
   Document,
+  ImageRun,
   Packer,
   Paragraph,
   ShadingType,
+  Table,
+  TableCell,
+  TableRow,
+  VerticalAlign,
+  WidthType,
   TextRun,
 } from "docx";
 
 import type { MasterResume } from "@/types/resume";
+import { getCertificationBadgeMatches, type CertificationBadgeId, type CertificationBadgePosition } from "@/engine/certification-badges";
 import { plainEmailValue } from "@/utils/resume-text";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import sharp from "sharp";
 import {
   DEFAULT_RESUME_FONT,
   type ResumeFont,
@@ -20,6 +30,10 @@ interface CreateResumeDocxInput {
   technicalSkills: string[];
   selectedSections: string[];
   fontFamily?: ResumeFont;
+  showCertificationLogos?: boolean;
+  selectedCertificationBadges?: CertificationBadgeId[];
+  certificationBadgePosition?: CertificationBadgePosition;
+  certificationBadgeSize?: number;
 }
 
 function normalize(value: string): string {
@@ -191,8 +205,24 @@ export async function createResumeDocx({
   technicalSkills,
   selectedSections,
   fontFamily = DEFAULT_RESUME_FONT,
+  showCertificationLogos = false,
+  selectedCertificationBadges = [],
+  certificationBadgePosition = { x: 0, y: 0 },
+  certificationBadgeSize = 72,
 }: CreateResumeDocxInput): Promise<Buffer> {
-  const children: Paragraph[] = [];
+  const children: (Paragraph | Table)[] = [];
+
+  let logoRuns: (ImageRun | TextRun)[] = [];
+  if (showCertificationLogos) {
+    const matches = getCertificationBadgeMatches(selectedCertificationBadges);
+    const exportBadgeSize = Math.round(certificationBadgeSize * 0.68);
+    for (const [index, badge] of matches.entries()) {
+      const data = await readFile(path.join(process.cwd(), "public", "certification-badges", badge.image));
+      const squareBadge = await sharp(data).resize({ width: exportBadgeSize, height: exportBadgeSize, fit: "cover", position: "centre" }).png().toBuffer();
+      logoRuns.push(new ImageRun({ type: "png", data: squareBadge, transformation: { width: exportBadgeSize, height: exportBadgeSize } }));
+      if (index < matches.length - 1) logoRuns.push(new TextRun({ text: " ", font: fontFamily, size: 12 }));
+    }
+  }
 
   /*
    * ============================================================
@@ -200,7 +230,7 @@ export async function createResumeDocx({
    * ============================================================
    */
 
-  children.push(
+  const headerChildren: Paragraph[] = [
     new Paragraph({
       children: [
         new TextRun({
@@ -215,9 +245,9 @@ export async function createResumeDocx({
         after: 40,
       },
     }),
-  );
+  ];
 
-  children.push(
+  headerChildren.push(
     new Paragraph({
       children: [
         new TextRun({
@@ -243,7 +273,7 @@ export async function createResumeDocx({
   ].filter(Boolean);
 
   if (contactItems.length > 0) {
-    children.push(
+    headerChildren.push(
       new Paragraph({
         children: [
           new TextRun({
@@ -254,6 +284,42 @@ export async function createResumeDocx({
         ],
       }),
     );
+  }
+
+  if (logoRuns.length > 0) {
+    const badgeParagraph = new Paragraph({
+      children: logoRuns,
+      alignment: AlignmentType.RIGHT,
+      indent: certificationBadgePosition.x ? { right: -Math.round(certificationBadgePosition.x * 15) } : undefined,
+      spacing: { before: Math.max(0, Math.round(certificationBadgePosition.y * 15)), after: 0 },
+    });
+    children.push(new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      columnWidths: [7200, 3600],
+      borders: {
+        top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+        bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+        left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+        right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+        insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+        insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      },
+      rows: [new TableRow({ children: [
+        new TableCell({
+          width: { size: 7200, type: WidthType.DXA },
+          margins: { top: 0, bottom: 0, left: 0, right: 120 },
+          children: headerChildren,
+        }),
+        new TableCell({
+          width: { size: 3600, type: WidthType.DXA },
+          margins: { top: 0, bottom: 0, left: 0, right: 0 },
+          verticalAlign: VerticalAlign.CENTER,
+          children: [badgeParagraph],
+        }),
+      ] })],
+    }));
+  } else {
+    children.push(...headerChildren);
   }
 
 
@@ -364,8 +430,9 @@ export async function createResumeDocx({
    * ============================================================
    */
 
+  const educationChildren: Paragraph[] = [];
   if (resume.education.length > 0) {
-    children.push(
+    educationChildren.push(
       sectionHeading(
         "EDUCATION",
         fontFamily,
@@ -391,7 +458,7 @@ export async function createResumeDocx({
         ".",
       ].join("");
 
-      children.push(
+      educationChildren.push(
         new Paragraph({
           bullet: {
             level: 0,
@@ -428,6 +495,7 @@ export async function createResumeDocx({
   for (
     const experience of resume.experience
   ) {
+    const functionalRole = experience.role.match(/^(.*?) \(official title: (.+)\)$/i);
     /*
      * Client + Dates
      */
@@ -437,22 +505,8 @@ export async function createResumeDocx({
         keepNext: true,
 
         children: [
-          new TextRun({
-            text: "Client:- ",
-            bold: true,
-            font: fontFamily,
-          }),
-
-          new TextRun({
-            text: `${
-              experience.company
-            }${
-              experience.location
-                ? `, ${experience.location}`
-                : ""
-            }`,
-            font: fontFamily,
-          }),
+          new TextRun({ text: experience.company, bold: true, font: fontFamily }),
+          ...(experience.location ? [new TextRun({ text: `, ${experience.location}`, font: fontFamily })] : []),
 
           new TextRun({
             text: `\t${experience.startDate} – ${experience.endDate}`,
@@ -479,35 +533,14 @@ export async function createResumeDocx({
         keepNext: true,
 
         children: [
-          new TextRun({
-            text: "Role:- ",
-            bold: true,
-            font: fontFamily,
-          }),
-
-          new TextRun({
-            text: experience.role,
-            font: fontFamily,
-          }),
+          ...(functionalRole
+            ? [
+                new TextRun({ text: functionalRole[1], bold: true, font: fontFamily }),
+                new TextRun({ text: ` (official title: ${functionalRole[2]})`, italics: true, color: "555555", size: 18, font: fontFamily }),
+              ]
+            : [new TextRun({ text: experience.role, italics: true, font: fontFamily })]),
         ],
-      }),
-    );
-
-    /*
-     * Responsibilities Label
-     */
-
-    children.push(
-      new Paragraph({
-        keepNext: true,
-
-        children: [
-          new TextRun({
-            text: "Responsibilities:",
-            bold: true,
-            font: fontFamily,
-          }),
-        ],
+        spacing: { after: 60 },
       }),
     );
 
@@ -536,7 +569,7 @@ export async function createResumeDocx({
           ),
 
           spacing: {
-            after: 40,
+          after: 40,
           },
         }),
       );
@@ -601,6 +634,8 @@ export async function createResumeDocx({
       );
     }
   }
+
+  children.push(...educationChildren);
 
   /*
    * ============================================================

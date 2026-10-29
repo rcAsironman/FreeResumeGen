@@ -1,6 +1,8 @@
 import { BoldSkillsText } from "@/components/preview/BoldSkillsText";
 import type { MasterResume } from "@/types/resume";
 import { plainEmailValue } from "@/utils/resume-text";
+import { CertificationLogoStrip } from "@/components/preview/CertificationLogoStrip";
+import type { CertificationBadgeId, CertificationBadgePosition } from "@/engine/certification-badges";
 
 import styles from "./fixed-resume.module.css";
 
@@ -17,6 +19,11 @@ interface FixedResumeTemplateProps {
   technicalSkills?: string[];
   selectedSections?: string[];
   fontFamily?: ResumeFont;
+  showCertificationLogos?: boolean;
+  selectedCertificationBadges?: CertificationBadgeId[];
+  certificationBadgePosition?: CertificationBadgePosition;
+  certificationBadgeSize?: number;
+  onCertificationBadgePositionChange?: (position: CertificationBadgePosition) => void;
 }
 
 export function FixedResumeTemplate({
@@ -24,6 +31,11 @@ export function FixedResumeTemplate({
   technicalSkills = [],
   selectedSections = [],
   fontFamily = DEFAULT_RESUME_FONT,
+  showCertificationLogos = false,
+  selectedCertificationBadges = [],
+  certificationBadgePosition = { x: 0, y: 0 },
+  certificationBadgeSize = 72,
+  onCertificationBadgePositionChange,
 }: FixedResumeTemplateProps) {
   function shouldBold(section: string): boolean {
     return selectedSections.includes(section);
@@ -71,7 +83,7 @@ export function FixedResumeTemplate({
             ))}
           </div>
         )}
-
+        <CertificationLogoStrip selectedBadges={selectedCertificationBadges} enabled={showCertificationLogos} position={certificationBadgePosition} badgeSize={certificationBadgeSize} onPositionChange={onCertificationBadgePositionChange}/>
 
       </header>
 
@@ -131,42 +143,23 @@ export function FixedResumeTemplate({
         </div>
       </section>
 
-      {resume.education.length > 0 && (
-        <section className={styles.section}>
-          <h2 className={styles.sectionHeading}>
-            EDUCATION
-          </h2>
-
-          <ul className={styles.bulletList}>
-            {resume.education.map((education) => (
-              <li key={education.id} data-education-index={resume.education.indexOf(education)}>
-                <span data-education-field="degree">{education.degree}</span> from{" "}
-                <span data-education-field="institution">{education.institution}</span>
-                {education.location ? <>, <span data-education-field="location">{education.location}</span></> : ""}
-                {education.graduationDate ? <> in <span data-education-field="graduationDate">{education.graduationDate}</span></> : ""}
-                .
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
       <section className={styles.section}>
         <h2 className={styles.sectionHeading}>
           PROFESSIONAL EXPERIENCE
         </h2>
 
         <div className={styles.experienceList}>
-          {resume.experience.map((experience) => (
-            <section
+          {resume.experience.map((experience) => {
+            const functionalRole = experience.role.match(/^(.*?) \(official title: (.+)\)$/i);
+            return (
+              <section
               className={styles.experience}
               key={experience.id}
               data-experience-index={resume.experience.indexOf(experience)}
             >
               <div className={styles.clientRow}>
                 <div>
-                  <strong>Client:-</strong>{" "}
-                  <span data-experience-field="company">{experience.company}</span>
+                  <strong data-experience-field="company">{experience.company}</strong>
                   {experience.location ? <>, <span data-experience-field="location">{experience.location}</span></> : ""}
                 </div>
 
@@ -177,12 +170,9 @@ export function FixedResumeTemplate({
               </div>
 
               <div className={styles.role}>
-                <strong>Role:-</strong>{" "}
-                <span data-experience-field="role">{experience.role}</span>
-              </div>
-
-              <div className={styles.responsibilitiesLabel}>
-                <strong>Responsibilities:</strong>
+                <span data-experience-field="role">
+                  {functionalRole ? <><strong>{functionalRole[1]}</strong><span className={styles.officialTitle}> (official title: {functionalRole[2]})</span></> : experience.role}
+                </span>
               </div>
 
               <ul className={styles.bulletList}>
@@ -229,10 +219,28 @@ export function FixedResumeTemplate({
                   .
                 </p>
               )}
-            </section>
-          ))}
+              </section>
+            );
+          })}
         </div>
       </section>
+
+      {resume.education.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionHeading}>EDUCATION</h2>
+          <ul className={styles.bulletList}>
+            {resume.education.map((education) => (
+              <li key={education.id} data-education-index={resume.education.indexOf(education)}>
+                <span data-education-field="degree">{education.degree}</span> from{" "}
+                <span data-education-field="institution">{education.institution}</span>
+                {education.location ? <>, <span data-education-field="location">{education.location}</span></> : ""}
+                {education.graduationDate ? <> in <span data-education-field="graduationDate">{education.graduationDate}</span></> : ""}.
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
     </article>
   );
 }

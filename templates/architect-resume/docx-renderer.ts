@@ -1,17 +1,20 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { AlignmentType, Document, ImageRun, Packer, Paragraph, TextRun } from "docx";
 import JSZip from "jszip";
+import sharp from "sharp";
 import slots from "./slots.json";
 import type { MasterResume } from "@/types/resume";
+import { getCertificationBadgeMatches, type CertificationBadgeId, type CertificationBadgePosition } from "@/engine/certification-badges";
 import { plainEmailValue } from "@/utils/resume-text";
 import { DEFAULT_RESUME_FONT, type ResumeFont } from "@/types/resume-font";
 
-interface Input { resume: MasterResume; technicalSkills: string[]; selectedSections: string[]; fontFamily?: ResumeFont }
+interface Input { resume: MasterResume; technicalSkills: string[]; selectedSections: string[]; fontFamily?: ResumeFont; showCertificationLogos?: boolean; selectedCertificationBadges?: CertificationBadgeId[]; certificationBadgePosition?: CertificationBadgePosition; certificationBadgeSize?: number }
 const escape = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 
-export async function createArchitectResumeDocx({ resume, technicalSkills, selectedSections, fontFamily = DEFAULT_RESUME_FONT }: Input) {
+export async function createArchitectResumeDocx({ resume, technicalSkills, selectedSections, fontFamily = DEFAULT_RESUME_FONT, showCertificationLogos = false, selectedCertificationBadges = [], certificationBadgePosition = { x: 0, y: 0 }, certificationBadgeSize = 72 }: Input) {
   const zip = await JSZip.loadAsync(await readFile(path.join(process.cwd(), "templates/architect-resume/reference.docx")));
-  const original = await zip.file("word/document.xml")!.async("string");
+  let original = await zip.file("word/document.xml")!.async("string");
   let paragraphId = 0;
   function paragraph(slot: keyof typeof slots, pieces: { text: string; bold?: boolean; tab?: boolean }[], section = "") {
     const pattern = slots[slot];
@@ -62,7 +65,49 @@ export async function createArchitectResumeDocx({ resume, technicalSkills, selec
     body.push(text("heading", "EDUCATION"));
     resume.education.forEach((entry) => body.push(paragraph("education", [{ text: [entry.degree, entry.institution, entry.location].filter(Boolean).join(", "), bold: false }, { text: "", tab: true }, { text: entry.graduationDate ?? "", bold: false }])));
   }
-  zip.file("word/document.xml", original.replace(/<w:body>[\s\S]*?<\/w:body>/, `<w:body>${body.join("")}${slots.section}</w:body>`));
+  let logoParagraph = "";
+  if (showCertificationLogos) {
+    const matches = getCertificationBadgeMatches(selectedCertificationBadges);
+    if (matches.length) {
+      const children = [];
+      const exportBadgeSize = Math.round(certificationBadgeSize * 0.68);
+      for (const [index, badge] of matches.entries()) {
+        const data = await readFile(path.join(process.cwd(), "public", "certification-badges", badge.image));
+        const squareBadge = await sharp(data).resize({ width: exportBadgeSize, height: exportBadgeSize, fit: "cover", position: "centre" }).png().toBuffer();
+        children.push(new ImageRun({ type: "png", data: squareBadge, transformation: { width: exportBadgeSize, height: exportBadgeSize } }));
+        if (index < matches.length - 1) children.push(new TextRun({ text: " ", font: fontFamily, size: 12 }));
+      }
+      const logoDoc = new Document({ sections: [{ children: [new Paragraph({ children, alignment: AlignmentType.RIGHT, indent: certificationBadgePosition.x ? { right: -Math.round(certificationBadgePosition.x * 15) } : undefined, spacing: { before: Math.max(0, 80 + Math.round(certificationBadgePosition.y * 15)), after: 100 } })] }] });
+      const logoZip = await JSZip.loadAsync(await Packer.toBuffer(logoDoc));
+      const logoDocument = await logoZip.file("word/document.xml")!.async("string");
+      logoParagraph = logoDocument.match(/<w:p(?:\s[^>]*)?>[\s\S]*?<\/w:p>/)?.[0] ?? "";
+      let relations = await zip.file("word/_rels/document.xml.rels")!.async("string");
+      const sourceRelations = await logoZip.file("word/_rels/document.xml.rels")!.async("string");
+      const existingIds = [...relations.matchAll(/\bId="rId(\d+)"/g)].map((match) => Number(match[1]));
+      let nextId = Math.max(0, ...existingIds) + 1;
+      for (const relation of sourceRelations.matchAll(/<Relationship\b[^>]*\/>/g)) {
+        const xml = relation[0];
+        if (!xml.includes("/image\"")) continue;
+        const sourceId = xml.match(/\bId="([^"]+)"/)?.[1];
+        const sourceTarget = xml.match(/\bTarget="([^"]+)"/)?.[1];
+        if (!sourceId || !sourceTarget) continue;
+        const targetId = `rId${nextId++}`;
+        const sourcePath = `word/${sourceTarget}`;
+        const image = await logoZip.file(sourcePath)?.async("nodebuffer");
+        if (!image) continue;
+        const targetPath = `word/media/certification-logo-${targetId}.png`;
+        zip.file(targetPath, image);
+        relations = relations.replace("</Relationships>", `<Relationship Id="${targetId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/certification-logo-${targetId}.png"/></Relationships>`);
+        logoParagraph = logoParagraph.replaceAll(`r:embed="${sourceId}"`, `r:embed="${targetId}"`);
+      }
+      zip.file("word/_rels/document.xml.rels", relations);
+      let contentTypes = await zip.file("[Content_Types].xml")!.async("string");
+      if (!/Extension="png"/.test(contentTypes)) contentTypes = contentTypes.replace("</Types>", '<Default Extension="png" ContentType="image/png"/></Types>');
+      zip.file("[Content_Types].xml", contentTypes);
+      if (!original.includes("xmlns:a=")) original = original.replace("<w:document ", '<w:document xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" ');
+    }
+  }
+  zip.file("word/document.xml", original.replace(/<w:body>[\s\S]*?<\/w:body>/, `<w:body>${body.slice(0, 3).join("")}${logoParagraph}${body.slice(3).join("")}${slots.section}</w:body>`));
   zip.file("docProps/core.xml", `<?xml version="1.0" encoding="UTF-8"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>${escape(resume.personalInfo.fullName)} Resume</dc:title><dc:creator>Resume Generator</dc:creator></cp:coreProperties>`);
   return zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
 }
