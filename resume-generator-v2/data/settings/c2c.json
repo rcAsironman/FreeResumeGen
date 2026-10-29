@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "profileType": "c2c",
+  "personalInfo": {
+    "fullName": "Karthik Mangineni",
+    "email": "karthikmangineni5@gmail.com",
+    "phone": "314-814-6677",
+    "location": ""
+  },
+  "education": [
+    {
+      "id": "jntuk-bachelors",
+      "institution": "Jawaharlal Nehru Technological University Kakinada (JNTUK)",
+      "degree": "Bachelor’s in Computer Science",
+      "location": "",
+      "graduationDate": "2016"
+    }
+  ],
+  "certifications": [
+    {
+      "id": "aws-saa",
+      "name": "AWS Certified Solutions Architect – Associate",
+      "badgeId": "aws-saa",
+      "logo": "/certification-badges/aws-solutions-architect-associate.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "aws-developer",
+      "name": "AWS Certified Developer – Associate",
+      "badgeId": "aws-developer",
+      "logo": "/certification-badges/aws-developer-associate.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "aws-devops",
+      "name": "AWS Certified DevOps Engineer – Professional",
+      "badgeId": "aws-devops",
+      "logo": "/certification-badges/aws-devops-engineer-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "azure-admin",
+      "name": "Microsoft Certified: Azure Administrator Associate (AZ-104)",
+      "badgeId": "azure-admin",
+      "logo": "/certification-badges/azure-administrator-associate.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "azure-devops",
+      "name": "Microsoft Certified: DevOps Engineer Expert (AZ-400)",
+      "badgeId": "azure-devops",
+      "logo": "/certification-badges/azure-devops-engineer-expert.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "azure-architect",
+      "name": "Microsoft Certified: Azure Solutions Architect Expert (AZ-305)",
+      "badgeId": "azure-architect",
+      "logo": "/certification-badges/azure-solutions-architect-expert.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "gcp-architect",
+      "name": "Google Cloud Professional Cloud Architect",
+      "badgeId": "gcp-architect",
+      "logo": "/certification-badges/gcp-cloud-architect-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "gcp-developer",
+      "name": "Google Cloud Professional Cloud Developer",
+      "badgeId": "gcp-developer",
+      "logo": "/certification-badges/gcp-cloud-developer-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "gcp-devops",
+      "name": "Google Cloud Professional Cloud DevOps Engineer",
+      "badgeId": "gcp-devops",
+      "logo": "/certification-badges/gcp-cloud-devops-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "confluent-admin",
+      "name": "Confluent Certified Administrator for Apache Kafka (CCAAK)",
+      "badgeId": "confluent-admin",
+      "logo": "/certification-badges/confluent-administrator-kafka.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "confluent-developer",
+      "name": "Confluent Certified Developer for Apache Kafka (CCDAK)",
+      "badgeId": "confluent-developer",
+      "logo": "/certification-badges/confluent-developer-kafka.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "confluent-operator",
+      "name": "Confluent Cloud Certified Operator (CCAC)",
+      "badgeId": "confluent-operator",
+      "logo": "/certification-badges/confluent-cloud-operator.png",
+      "logoSize": 72,
+      "visible": false
+    }
+  ],
+  "companies": [
+    {
+      "id": "att",
+      "companyName": "AT&T",
+      "clientName": "",
+      "industry": "Telecommunications",
+      "location": "Atlanta, GA",
+      "jobTitle": "",
+      "technologies": [],
+      "responsibilities": [],
+      "startDate": "Jul 2023",
+      "endDate": "Present",
+      "isCurrent": true,
+      "projects": [
+        {
+          "id": "att-project",
+          "name": "Enterprise Application & Integration Platform",
+          "industry": "Telecommunications",
+          "clientName": "",
+          "context": "",
+          "technologies": [],
+          "responsibilities": []
+        }
+      ]
+    },
+    {
+      "id": "healthgrades",
+      "companyName": "Healthgrades",
+      "clientName": "",
+      "industry": "Healthcare",
+      "location": "Denver, CO",
+      "jobTitle": "",
+      "technologies": [],
+      "responsibilities": [],
+      "startDate": "Feb 2022",
+      "endDate": "Jun 2023",
+      "isCurrent": false,
+      "projects": []
+    },
+    {
+      "id": "firstgroup-america",
+      "companyName": "FirstGroup America",
+      "clientName": "",
+      "industry": "Transportation",
+      "location": "Cincinnati, OH",
+      "jobTitle": "",
+      "technologies": [],
+      "responsibilities": [],
+      "startDate": "Oct 2019",
+      "endDate": "Jan 2022",
+      "isCurrent": false,
+      "projects": []
+    },
+    {
+      "id": "outfront-media",
+      "companyName": "Outfront Media",
+      "clientName": "",
+      "industry": "Media and Advertising",
+      "location": "New York, NY",
+      "jobTitle": "",
+      "technologies": [],
+      "responsibilities": [],
+      "startDate": "Oct 2017",
+      "endDate": "Sep 2019",
+      "isCurrent": false,
+      "projects": []
+    },
+    {
+      "id": "nucleus-software",
+      "companyName": "Nucleus Software",
+      "clientName": "",
+      "industry": "Financial Software",
+      "location": "Hyderabad, India",
+      "jobTitle": "",
+      "technologies": [],
+      "responsibilities": [],
+      "startDate": "Aug 2016",
+      "endDate": "Sep 2017",
+      "isCurrent": false,
+      "projects": []
+    }
+  ],
+  "preferences": {
+    "maxExperienceYears": 13,
+    "summaryBullets": 8,
+    "latestCompanyBullets": 10,
+    "otherCompanyBullets": 7
+  }
+}

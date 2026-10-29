@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "profileType": "full-time",
+  "personalInfo": {
+    "fullName": "Karthik Mangineni",
+    "email": "karthikmangineni77@gmail.com",
+    "phone": "+1(314)814-6677",
+    "location": ""
+  },
+  "education": [
+    {
+      "id": "slu-ms",
+      "institution": "Saint Louis University",
+      "degree": "Master's in Computer Science",
+      "location": "St. Louis, Missouri, USA",
+      "graduationDate": "2025"
+    }
+  ],
+  "certifications": [
+    {
+      "id": "aws-saa",
+      "name": "AWS Certified Solutions Architect – Associate",
+      "badgeId": "aws-saa",
+      "logo": "/certification-badges/aws-solutions-architect-associate.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "aws-developer",
+      "name": "AWS Certified Developer – Associate",
+      "badgeId": "aws-developer",
+      "logo": "/certification-badges/aws-developer-associate.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "aws-devops",
+      "name": "AWS Certified DevOps Engineer – Professional",
+      "badgeId": "aws-devops",
+      "logo": "/certification-badges/aws-devops-engineer-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "azure-admin",
+      "name": "Microsoft Certified: Azure Administrator Associate (AZ-104)",
+      "badgeId": "azure-admin",
+      "logo": "/certification-badges/azure-administrator-associate.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "azure-devops",
+      "name": "Microsoft Certified: DevOps Engineer Expert (AZ-400)",
+      "badgeId": "azure-devops",
+      "logo": "/certification-badges/azure-devops-engineer-expert.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "azure-architect",
+      "name": "Microsoft Certified: Azure Solutions Architect Expert (AZ-305)",
+      "badgeId": "azure-architect",
+      "logo": "/certification-badges/azure-solutions-architect-expert.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "gcp-architect",
+      "name": "Google Cloud Professional Cloud Architect",
+      "badgeId": "gcp-architect",
+      "logo": "/certification-badges/gcp-cloud-architect-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "gcp-developer",
+      "name": "Google Cloud Professional Cloud Developer",
+      "badgeId": "gcp-developer",
+      "logo": "/certification-badges/gcp-cloud-developer-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "gcp-devops",
+      "name": "Google Cloud Professional Cloud DevOps Engineer",
+      "badgeId": "gcp-devops",
+      "logo": "/certification-badges/gcp-cloud-devops-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "confluent-admin",
+      "name": "Confluent Certified Administrator for Apache Kafka (CCAAK)",
+      "badgeId": "confluent-admin",
+      "logo": "/certification-badges/confluent-administrator-kafka.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "confluent-developer",
+      "name": "Confluent Certified Developer for Apache Kafka (CCDAK)",
+      "badgeId": "confluent-developer",
+      "logo": "/certification-badges/confluent-developer-kafka.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "confluent-operator",
+      "name": "Confluent Cloud Certified Operator (CCAC)",
+      "badgeId": "confluent-operator",
+      "logo": "/certification-badges/confluent-cloud-operator.png",
+      "logoSize": 72,
+      "visible": false
+    }
+  ],
+  "companies": [
+    {
+      "id": "fidelity-investments",
+      "companyName": "Fidelity Investments",
+      "clientName": "",
+      "industry": "Financial Services",
+      "location": "Westlake, Texas, USA (Remote)",
+      "jobTitle": "",
+      "technologies": [],
+      "responsibilities": [],
+      "startDate": "Nov 2024",
+      "endDate": "Present",
+      "isCurrent": true,
+      "projects": []
+    },
+    {
+      "id": "pine-labs",
+      "companyName": "Pine Labs",
+      "clientName": "",
+      "industry": "Financial Technology",
+      "location": "Bengaluru, Karnataka, India",
+      "jobTitle": "",
+      "technologies": [],
+      "responsibilities": [],
+      "startDate": "Nov 2017",
+      "endDate": "Nov 2023",
+      "isCurrent": false,
+      "projects": []
+    }
+  ],
+  "preferences": {
+    "maxExperienceYears": 8,
+    "summaryBullets": 8,
+    "latestCompanyBullets": 10,
+    "otherCompanyBullets": 7
+  }
+}
