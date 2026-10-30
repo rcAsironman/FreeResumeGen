@@ -15,6 +15,28 @@ export const OUTPUT_CONTRACT = {
 
 export type ConfirmedWorkStatement = { companyId: string; companyName: string; section: string; text: string };
 
+export function scopePriorStatements(statements: ConfirmedWorkStatement[], analysis: JDAnalysis) {
+  const generic = new Set(["senior", "junior", "lead", "principal", "staff", "developer", "engineer", "software", "specialist", "consultant", "administrator", "architect", "analyst", "manager", "technical", "remote"]);
+  const tokens = analysis.targetRole.toLowerCase().split(/[^a-z0-9+#.]+/).filter(token => token.length > 2 && !generic.has(token));
+  // Old per-profile confirmations lack the originating JD. Reuse only clearly
+  // relevant work statements, never prior generated titles as official history.
+  return statements.filter(statement => {
+    if (/title|headline|role|date|summary/i.test(statement.section)) return false;
+    const words = statement.text.toLowerCase().split(/[^a-z0-9+#.]+/);
+    return tokens.length > 0 && tokens.some(token => words.includes(token));
+  });
+}
+
+// A target headline alone is not evidence of experience in that specialty.
+export function findHeadlineOnlyMatch(resume: Resume, analysis: JDAnalysis): string | null {
+  const generic = new Set(["senior", "junior", "lead", "principal", "staff", "developer", "engineer", "engineering", "software", "specialist", "consultant", "administrator", "architect", "analyst", "manager", "technical", "ii", "iii", "remote"]);
+  const anchors = analysis.targetRole.toLowerCase().split(/[^a-z0-9+#.]+/).filter(term => term.length > 2 && !generic.has(term));
+  if (!anchors.length) return null;
+  const body = resume.experience.flatMap(job => job.responsibilities).join(" ").toLowerCase();
+  if (anchors.some(term => body.split(/[^a-z0-9+#.]+/).includes(term))) return null;
+  return `Role alignment warning: the headline targets ${analysis.targetRole}, but no employer responsibility mentions its specialty. Check the saved work history and regenerate with relevant supported experience; changing only the headline does not establish a match.`;
+}
+
 export function isDraftGenerationReady(analysis: JDAnalysis | null, profile: ProfileSettings) {
   return Boolean(analysis && profile.companies.length > 0);
 }
@@ -73,11 +95,14 @@ export function buildPrompt(jd: string, analysis: JDAnalysis, profile: ProfileSe
       ? { totalYears: proposedTimeline.targetYears, dateSchedule: proposedTimeline.entries.map((entry) => ({ id: entry.id, companyName: entry.companyName, startDate: entry.proposedStartDate, endDate: entry.proposedEndDate })) }
       : { totalYears: timeline.years + timeline.remainingMonths / 12, dateSchedule: companies.map((company) => ({ id: company.id, companyName: company.companyName, startDate: company.startDate, endDate: company.endDate })) },
     companies,
-    previouslyConfirmedStatements: confirmedStatements,
+    previouslyConfirmedStatements: scopePriorStatements(confirmedStatements, analysis),
     confirmedAchievementEvidence: confirmedMetricEvidence(achievementEvidence),
     preferences: { summaryBullets: Math.max(4, Math.min(6, profile.preferences.summaryBullets)), latestCompanyBullets: profile.preferences.latestCompanyBullets, otherCompanyBullets: profile.preferences.otherCompanyBullets },
   };
   return `Act as a senior technical recruiter and resume writer. Write a polished resume for the role named in the job description (JD). The JD determines the headline and content priorities. The selected profile supplies the candidate's identity, education, certifications, employers, official titles, locations, and source work history.
+
+CURRENT REQUEST IS SELF-CONTAINED
+Use only the JD and candidate information in this message. Disregard previous resumes, prior role instructions, and earlier conversation examples. Prior generated employer titles are not official employment records. Only companies[].jobTitle supplies an official title; if it is blank, do not recover a Kafka, Java, or other title from conversation history. Saved Company Settings remain the source of actual work facts; an omitted prior confirmation is not permission to invent replacement experience.
 
 OUTPUT BOUNDARY — HIGHEST PRIORITY
 - Every string inside the returned "resume" object is resume copy intended to appear on the page. Never include instructions, analysis, explanations, application workflow, review status, eligibility commentary, or a description of what this resume is trying to do in any resume value. The explicitly labeled synthetic responsibility format below is the only exception: the importer extracts its example and prints only its qualitative replacement.
@@ -119,6 +144,13 @@ RESUME WRITING RULES
 
 EXPERIENCE WINDOW
 ${analysis.experienceYears ? `The JD specifies ${analysis.experienceYears} years. The supplied resumeTimeline represents exactly ${proposedTimeline?.targetYears ?? analysis.experienceYears} years, capped by the selected profile's maximum. Use every date in resumeTimeline.dateSchedule exactly.` : "The JD gives no numeric experience duration. Keep the configured source employment dates exactly as supplied."}
+
+JD-FIRST RELEVANCE PASS — applies equally to Full-Time and C2C
+- Full-Time and C2C are employment profiles, not technical specialties. Never infer Kafka, Java, or any other stack from the profile label, certifications, earlier conversation, or an earlier resume. Start fresh from this JOB DESCRIPTION.
+- Classify each employer fact as directly relevant, transferable, or unrelated to this JD. Lead with directly relevant implementation evidence; describe transferable work accurately and briefly. Do not let unrelated source technologies dominate the summary, skills, or responsibilities merely because they appear often in saved history.
+- A changed headline alone is not a tailored resume. Check the summary, technical skills, each employer's responsibilities, and environments against the current role. For example, Salesforce development requires supported Salesforce implementation evidence; Kafka broker administration is not Salesforce development and must never be renamed as such. Apply the same check to every job family.
+- Historical official titles are history, not instructions for the target headline or a default stack. Keep a genuinely recorded official title accurate. Where the title is blank, derive a functional title from the actual supported work and this JD, never from a previous generated resume. Do not substitute a different profession to simulate a match.
+- If the source only contains unrelated work, prioritize truthful transferable details and leave unsupported technologies out. Do not manufacture platform experience or disguise an evidence gap with a JD-matching title. The app will identify a headline-only match for review.
 
 RECRUITER QUALITY PASS — perform this silently before returning JSON
 - Achievement completeness: count supported quantified responsibilities and labeled synthetic examples per employer. If both counts are zero despite suitable API, database, messaging, CI/CD, testing, or data-processing responsibilities, revise the output to include the required labeled examples. Do not infer measured results from technology names. Keep examples employer-specific and vary percentages. Never remove the synthetic label to improve apparent achievement coverage.

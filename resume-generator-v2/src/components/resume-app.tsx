@@ -4,16 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { OriginalResumeEditor, originalResumeHTML } from "@/components/original-resume-editor";
 import { createEditedDocx, snapshotDocument, saveResumeDownload } from "@/lib/document-export";
-import { analyzeJD, companyId, projectId } from "@/lib/jd";
-import { applyProposedTimelineDates, proposeJDTimeline, reviewEmploymentDates } from "@/lib/timeline";
-import { buildPrompt, findResumeMetaLanguage, isDraftGenerationReady } from "@/lib/prompt";
+import { analyzeJD, companyId } from "@/lib/jd";
+import { proposeJDTimeline, reviewEmploymentDates } from "@/lib/timeline";
+import { buildPrompt, findHeadlineOnlyMatch, isDraftGenerationReady } from "@/lib/prompt";
 import { prettyIssues, profileSchema, resumeSchema } from "@/lib/contracts";
 import { matchExperienceToJD, scoreAlignment } from "@/lib/alignment";
 import { evaluateResumeStrength } from "@/lib/resume-quality";
 import { claimsFromResume } from "@/lib/claims";
 import { certificationBadges, loadBadgeDataUrl } from "@/lib/certification-badges";
 import { recommendCertificationBadges } from "@/lib/certification-recommendations";
-import { selectDraftAchievements, confirmedMetricEvidence, mergeMetricOpportunities, parseSyntheticAchievementDraft, type AchievementEvidence, type SyntheticAchievementDraft } from "@/lib/achievements";
+import { selectDraftAchievements, confirmedMetricEvidence, parseSyntheticAchievementDraft, type AchievementEvidence, type SyntheticAchievementDraft } from "@/lib/achievements";
 
 import { starterProfiles } from "@/lib/default-settings";
 import { emptyProfile, type DraftClaim, type ProfileSettings, type Resume } from "@/types/resume";
@@ -256,7 +256,6 @@ export default function ResumeApp() {
     setNotice({ kind: "success", text: `${file.name} imported. Save the profile settings to keep the badge.` });
   }
   function validateResume() {
-    if (!analysis) { setNotice({ kind: "error", text: "Paste and analyze a job description before validating a proposed resume." }); return; }
     let response: unknown; try { response = JSON.parse(resumeText); } catch (error) { setResume(null); setSyntheticAchievementDraft(null); setNotice({ kind: "error", text: `Resume JSON syntax error: ${(error as Error).message}` }); return; }
     const responseObject = response && typeof response === "object" && !Array.isArray(response) ? response as Record<string, unknown> : null;
     const isEnvelope = Boolean(responseObject && Object.hasOwn(responseObject, "resume"));
@@ -264,75 +263,18 @@ export default function ResumeApp() {
     setSyntheticAchievementDraft(null);
     const result = resumeSchema.safeParse(candidate);
     if (!result.success) { setResume(null); setClaims([]); setNotice({ kind: "error", text: prettyIssues(result.error).slice(0, 6).join(" · ") }); return; }
+    const importAnalysis = analysis ?? analyzeJD(`Role: ${result.data.personalInfo.professionalTitle}`);
     let separated: ReturnType<typeof selectDraftAchievements>;
-    try { separated = selectDraftAchievements(result.data as Resume, analysis); } catch (error) { setResume(null); setClaims([]); setNotice({ kind: "error", text: (error as Error).message }); return; }
-    const metaLanguageFields = findResumeMetaLanguage(separated.resume);
-    if (metaLanguageFields.length) {
-      setResume(null); setClaims([]);
-      setNotice({ kind: "error", text: `Resume text contains prompt or job-requirement commentary in ${metaLanguageFields.slice(0, 3).join(", ")}. Copy a fresh prompt and regenerate; the resume should describe the candidate, not the writing process or the JD's requirement.` });
-      return;
-    }
-    let draft = separated.resume;
-    const datesAdjustedToJD = Boolean(resumeTimeline && draft.experience.some((job) => {
-      const proposed = resumeTimeline.entries.find((entry) => entry.id === job.id);
-      return proposed && (job.startDate !== proposed.proposedStartDate || job.endDate !== proposed.proposedEndDate);
-    }));
-    if (resumeTimeline) draft = applyProposedTimelineDates(draft, resumeTimeline.entries);
-    const email = result.data.personalInfo.email;
-    if (email.includes("\\") || email.includes("/")) { setResume(null); setClaims([]); setNotice({ kind: "error", text: "Email contains a slash or backslash. Correct it in the JSON, then validate again." }); return; }
-    const mismatches: string[] = [];
-    if (currentProfile.personalInfo.fullName && result.data.personalInfo.fullName !== currentProfile.personalInfo.fullName) mismatches.push("Keep the candidate name from the active profile.");
-    if (currentProfile.personalInfo.email && result.data.personalInfo.email !== currentProfile.personalInfo.email) mismatches.push("Keep the email from the active profile.");
-    if (currentProfile.personalInfo.phone && result.data.personalInfo.phone !== currentProfile.personalInfo.phone) mismatches.push("Keep the phone number from the active profile.");
-    const normalizeTitle = (value: string) => value.toLocaleLowerCase().replace(/[^a-z0-9+#.]+/g, " ").replace(/\s+/g, " ").trim();
-    if (normalizeTitle(result.data.personalInfo.professionalTitle) !== normalizeTitle(analysis.targetRole)) mismatches.push(`Set the resume headline to the JD target role: ${analysis.targetRole}.`);
-    const degreePattern = profileType === "full-time" ? /master|m\.s\.?|mba|m\.tech/i : /bachelor|b\.s\.?|b\.tech/i;
-    for (const education of result.data.education) {
-      if (!degreePattern.test(education.degree)) mismatches.push(`Only the verified ${profileType === "full-time" ? "master’s" : "bachelor’s"} education belongs in this profile’s resume.`);
-      if (!currentProfile.education.some((source) => source.id === education.id && source.institution === education.institution && source.degree === education.degree)) mismatches.push(`Education ${education.institution} is not present in the active profile.`);
-    }
-    for (const credential of result.data.certifications) if (!currentProfile.certifications.some((source) => source.id === credential.id && source.name === credential.name)) mismatches.push(`Certification ${credential.name} is not present in the active profile.`);
-    const sourceById = new Map(currentProfile.companies.map((company) => [companyId(company), company]));
-    const proposedById = new Map((resumeTimeline?.entries ?? []).map((entry) => [entry.id, entry]));
-    const includedSourceCompanies = resumeTimeline
-      ? resumeTimeline.entries.map((entry) => sourceById.get(entry.id)).filter((company): company is ProfileSettings["companies"][number] => Boolean(company))
-      : currentProfile.companies;
-    const projectById = new Map(currentProfile.companies.flatMap((company) => company.projects.map((project, index) => [projectId(company, project, index), { company, project }] as const)));
-    const seenCompanyIds = new Set<string>();
-    for (const job of draft.experience) {
-      const source = sourceById.get(job.id);
-      if (!source || source.companyName !== job.company) mismatches.push(`Employer ${job.company} is not present under that ID in the active profile.`);
-      else {
-        if (resumeTimeline && !proposedById.has(job.id)) mismatches.push(`Employer ${job.company} is outside the JD-targeted timeline. Use the employers listed in the generated prompt.`);
-        if (seenCompanyIds.has(job.id)) mismatches.push(`Employer ${job.company} appears more than once.`);
-        seenCompanyIds.add(job.id);
-        const proposed = proposedById.get(job.id);
-        const expectedStartDate = proposed?.proposedStartDate ?? source.startDate;
-        const expectedEndDate = proposed?.proposedEndDate ?? (source.isCurrent ? "Present" : source.endDate);
-        if (expectedStartDate !== job.startDate || expectedEndDate !== job.endDate) mismatches.push(proposed
-          ? `Use the JD-targeted proposed dates for ${job.company}: ${expectedStartDate} – ${expectedEndDate}.`
-          : `Keep the configured employment dates unchanged for ${job.company}.`);
-        if (source.location !== job.location) mismatches.push(`Keep the configured location unchanged for ${job.company}.`);
-        if (source.jobTitle.trim() && source.jobTitle.trim() !== job.role.trim()) mismatches.push(`Keep the actual configured job title for ${job.company}: ${source.jobTitle}.`);
-      }
-    }
-    for (const source of includedSourceCompanies) if (!seenCompanyIds.has(companyId(source))) mismatches.push(`Include the configured employer ${source.companyName} in the proposed draft.`);
-    for (const project of result.data.projects) {
-      const source = projectById.get(project.id);
-      if (!source || source.project.name !== project.name) mismatches.push(`Project ${project.name} is not present in the profile's optional project context.`);
-    }
-    if (mismatches.length) { setResume(null); setClaims([]); setNotice({ kind: "error", text: [...new Set(mismatches)].slice(0, 4).join(" · ") }); return; }
-    const nextClaims = claimsFromResume(draft, currentProfile, new Set(Object.keys(confirmedStatements[profileType])));
-    setResume(draft); setClaims(nextClaims);
+    try { separated = selectDraftAchievements(result.data as Resume, importAnalysis); } catch (error) { setResume(null); setClaims([]); setNotice({ kind: "error", text: (error as Error).message }); return; }
+    // Imported JSON is authoritative. Company Settings are only a Step 1 source.
+    const draft = separated.resume;
+    setResume(draft); setClaims([]);
     const importedSyntheticDraft = isEnvelope ? parseSyntheticAchievementDraft(responseObject!.syntheticAchievementDraft, draft) : null;
     setSyntheticAchievementDraft(separated.synthetic.examples.length ? separated.synthetic : importedSyntheticDraft);
-    setAchievementEvidenceByProfile((current) => ({ ...current, [profileType]: mergeMetricOpportunities(current[profileType], draft, analysis) }));
-    const timelineNotice = datesAdjustedToJD && resumeTimeline
-      ? ` Imported dates were aligned to the JD's proposed ${resumeTimeline.targetYears}-year timeline; review and confirm each date pair before final export.`
-      : "";
     const syntheticCount = separated.synthetic.examples.length + (importedSyntheticDraft?.examples.length ?? 0);
     const syntheticNotice = syntheticCount ? ` ${syntheticCount} synthetic example${syntheticCount === 1 ? "" : "s"} retained in the draft as unverified examples.` : " Resume JSON loaded.";
-    setNotice({ kind: "success", text: `Resume ready.${syntheticNotice}${timelineNotice} Review the preview before downloading.` });
+    const roleWarning = analysis ? findHeadlineOnlyMatch(draft, analysis) : null;
+    setNotice({ kind: roleWarning ? "info" : "success", text: roleWarning ?? `Resume ready.${syntheticNotice} Review the preview before downloading.` });
   }
   async function copyPrompt() {
     if (!jd.trim()) { setNotice({ kind: "error", text: "Paste a job description first." }); return; }
@@ -438,7 +380,7 @@ ${jd}`;
 
           <section id="step-05" className="panel section-card"><div className="section-title"><div className="step">01</div><div><span className="field-label">STEP 1 · COPY PROMPT</span><h2>Generate in ChatGPT (manual)</h2></div></div><p className="helper">Copy the prompt, open ChatGPT yourself, paste it, and send it. The prompt returns complete resume JSON with supported measurable results directly in the experience bullets. Paste the response in Step 2. No API connection is used.</p>{missingEvidenceCompanies.length > 0 && <div className="evidence-warning">Draft generation is available. Companies without source work facts will receive unverified AI suggestions that require your review and confirmation.</div>}<div className="button-row"><button className="button primary" disabled={!canGeneratePrompt} onClick={() => void copyPrompt()}>Copy prompt for ChatGPT</button><button className="button secondary" disabled={!canGeneratePrompt} onClick={() => { if (!jd.trim()) return setNotice({ kind: "error", text: "Paste a job description in Step 2 first." }); setPrompt(buildPrompt(jd, analyzeJD(jd), currentProfile, confirmedSourceFacts, referenceDate, achievementEvidence)); setNotice({ kind: "success", text: "Prompt is shown below. Select and copy it, then paste it into ChatGPT." }); }}>Show prompt here</button><button className="button quiet" onClick={() => setActiveTab("settings")}>Open Company Settings →</button></div>{prompt && <textarea className="code-input prompt-box" readOnly value={prompt} onFocus={(e) => e.currentTarget.select()} aria-label="Generated ChatGPT prompt"/>}<div className="input-footer"><span>When ChatGPT returns the complete JSON object, continue to import it.</span><a className="button primary" href="#resume-import">Continue to import ↓</a></div></section>
 
-          <section id="resume-import" className="panel section-card"><div className="section-title"><div className="step">02</div><div><span className="field-label">STEP 2 · PASTE RESPONSE</span><h2>Bring ChatGPT’s resume back</h2></div></div><p className="helper">Paste or import the complete JSON object from ChatGPT. Paste the complete resume JSON from ChatGPT. Click <b>Generate resume</b> to open the preview. </p><label className="file-button">Import JSON file<input type="file" accept=".json,application/json" onChange={(e) => void importFile(e, "resume")}/></label><textarea className="code-input resume-json" value={resumeText} onChange={(e) => { setResumeText(e.target.value); setResume(null); setClaims([]); setSyntheticAchievementDraft(null); }} placeholder="Paste the complete JSON response here…" aria-label="Resume JSON editor"/><div className="input-footer"><span>{resume ? "Resume ready · preview alongside" : "Waiting for ChatGPT JSON"}</span><button className="button primary" onClick={validateResume}>Generate resume</button>{resume && <a className="button primary" href="#resume-preview">Continue to preview ↓</a>}</div></section>
+          <section id="resume-import" className="panel section-card"><div className="section-title"><div className="step">02</div><div><span className="field-label">STEP 2 · PASTE RESPONSE</span><h2>Bring ChatGPT’s resume back</h2></div></div><p className="helper">Paste or import complete resume JSON for any candidate. Its details and dates are used as supplied, independently of Company Settings. Click <b>Generate resume</b> to open the preview. </p><label className="file-button">Import JSON file<input type="file" accept=".json,application/json" onChange={(e) => void importFile(e, "resume")}/></label><textarea className="code-input resume-json" value={resumeText} onChange={(e) => { setResumeText(e.target.value); setResume(null); setClaims([]); setSyntheticAchievementDraft(null); }} placeholder="Paste the complete JSON response here…" aria-label="Resume JSON editor"/><div className="input-footer"><span>{resume ? "Resume ready · preview alongside" : "Waiting for ChatGPT JSON"}</span><button className="button primary" onClick={validateResume}>Generate resume</button>{resume && <a className="button primary" href="#resume-preview">Continue to preview ↓</a>}</div></section>
 
         </div>
 

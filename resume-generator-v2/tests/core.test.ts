@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { resumeSchema, profileSchema } from "../src/lib/contracts";
 import { analyzeJD, cleanTargetRole, companyId, targetExperienceWindow } from "../src/lib/jd";
 import { applyProposedTimelineDates, proposeJDTimeline, reviewEmploymentDates } from "../src/lib/timeline";
-import { buildPrompt, findResumeMetaLanguage, isDraftGenerationReady } from "../src/lib/prompt";
+import { buildPrompt, findResumeMetaLanguage, findHeadlineOnlyMatch, isDraftGenerationReady, scopePriorStatements } from "../src/lib/prompt";
 import { claimsFromResume, finalizeResume } from "../src/lib/claims";
 import { createResumeDocx } from "../src/lib/docx-export";
 import { matchExperienceToJD, scoreAlignment } from "../src/lib/alignment";
@@ -19,6 +19,44 @@ const validResume: Resume = {
   technicalSkills: { categories: [{ name: "Cloud", skills: ["AWS"] }] },
   experience: [], projects: [], education: [], certifications: [],
 };
+
+test("C2C confirmation memory does not carry Kafka history or generated titles into Salesforce", () => {
+  const base = { companyId: "att", companyName: "AT&T" };
+  const statements = [
+    { ...base, section: "role", text: "Senior Kafka Engineer" },
+    { ...base, section: "responsibility", text: "Administered Kafka brokers." },
+    { ...base, section: "responsibility", text: "Implemented Salesforce Apex case routing." },
+  ];
+  const analysis = analyzeJD("Role: Salesforce Developer\nSalesforce Apex required.");
+  assert.deepEqual(scopePriorStatements(statements, analysis), [statements[2]]);
+  assert.equal(statements.length, 3, "source memory is not deleted");
+  const prompt = buildPrompt("Salesforce Developer", analysis, profileSchema.parse(c2cSeed), statements);
+  assert.ok(!prompt.includes("Administered Kafka brokers."));
+  assert.ok(!prompt.includes("Senior Kafka Engineer"));
+  assert.ok(prompt.includes("Implemented Salesforce Apex case routing."));
+  assert.ok(prompt.includes("CURRENT REQUEST IS SELF-CONTAINED"));
+});
+
+test("detects a Salesforce headline over Kafka responsibilities without treating historical titles as errors", () => {
+  const resume = structuredClone(validResume);
+  resume.personalInfo.professionalTitle = "Salesforce Developer";
+  resume.experience = [{ id: "att", company: "AT&T", role: "Kafka Engineer", location: "", startDate: "2024", endDate: "Present", responsibilities: ["Administered Kafka brokers and consumer groups."], environment: ["Kafka"] }];
+  const analysis = analyzeJD("Role: Salesforce Developer\nRequired: Salesforce, Apex, Lightning Web Components.");
+  assert.match(findHeadlineOnlyMatch(resume, analysis) ?? "", /Role alignment warning/);
+  resume.experience[0].responsibilities.push("Built Salesforce Apex integrations for customer case workflows.");
+  assert.equal(findHeadlineOnlyMatch(resume, analysis), null);
+  assert.equal(resume.experience[0].role, "Kafka Engineer");
+});
+
+test("both profile prompts explicitly prevent previous-role stack leakage", () => {
+  const jd = "Role: Salesforce Developer\nRequired: Salesforce and Apex. 6 years experience.";
+  for (const seed of [fullTimeSeed, c2cSeed]) {
+    const prompt = buildPrompt(jd, analyzeJD(jd), profileSchema.parse(seed));
+    assert.match(prompt, /employment profiles, not technical specialties/);
+    assert.match(prompt, /directly relevant, transferable, or unrelated/);
+    assert.match(prompt, /A changed headline alone is not a tailored resume/);
+  }
+});
 
 test("resume contract accepts canonical shape and rejects additional root keys", () => {
   assert.equal(resumeSchema.safeParse(validResume).success, true);
