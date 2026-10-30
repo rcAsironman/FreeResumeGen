@@ -1,3 +1,4 @@
+import "./original-resume.css";
 import type { Metadata } from "next";
 import "./globals.css";
 

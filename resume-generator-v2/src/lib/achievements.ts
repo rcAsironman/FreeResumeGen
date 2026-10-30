@@ -29,6 +29,22 @@ export type MetricOpportunity = Pick<AchievementEvidence, "id" | "employerId" | 
   question: string;
 };
 
+export type SyntheticAchievementExample = {
+  employerId: string;
+  employer: string;
+  sourceResponsibility: string;
+  achievementExample: string;
+  metricType: string;
+  percentage: number;
+  direction: MetricDirection;
+  status: "synthetic-unverified";
+};
+
+export type SyntheticAchievementDraft = {
+  status: "synthetic-unverified";
+  examples: SyntheticAchievementExample[];
+};
+
 export type MetricCalculation = {
   value: number;
   unit: "%";
@@ -58,6 +74,76 @@ export type AchievementCoverage = {
 };
 
 const metricNumber = String.raw`\d[\d,]*(?:\.\d+)?`;
+
+/** Draft annotations stay in string fields, preserving the public resume schema. */
+export function cleanDraftLabels(text: string): string {
+  const labels = /\s*\[\s*(?:synthetic(?:\s+example)?|qualitative)\s*\]\s*/gi;
+  return text.replace(labels, " ").trim();
+}
+
+export function separateSyntheticAchievements(input: Resume, preserveDraftText = false) {
+  const examples: SyntheticAchievementExample[] = [];
+  const resume = structuredClone(input);
+  for (const job of resume.experience) {
+    job.responsibilities = job.responsibilities.flatMap((bullet) => {
+      const syntheticLabel = /^\s*\[\s*synthetic(?:\s+example)?\s*\]\s*/i;
+      const qualitativeLabel = /\[\s*qualitative\s*\]\s*/i;
+      if (!syntheticLabel.test(bullet)) {
+        if (/^\s*\[\s*qualitative\s*\]/i.test(bullet)) return [bullet.replace(/^\s*\[\s*qualitative\s*\]\s*/i, "").trim()];
+        return [bullet];
+      }
+      const [example, qualitative = "", ...extra] = bullet.replace(syntheticLabel, "").split(qualitativeLabel);
+      if (extra.length) throw new Error("Each synthetic bullet must contain exactly one qualitative replacement.");
+      const measurements = findPerformanceMeasurements(example);
+      const percentage = measurements.find((item) => item.unit === "%")?.value;
+      if (!qualitative.trim() || findPerformanceMeasurements(qualitative).length || percentage === undefined) {
+        throw new Error("Synthetic achievement must include a numerical example and a qualitative replacement without measurements.");
+      }
+      examples.push({ employerId: job.id, employer: job.company, sourceResponsibility: qualitative.trim(), achievementExample: example.trim(), metricType: "Illustrative outcome", percentage, direction: /reduc|decreas|lower/i.test(example) ? "decrease" : "increase", status: "synthetic-unverified" });
+      return [preserveDraftText ? cleanDraftLabels(bullet) : qualitative.trim()];
+    });
+  }
+  // Clean values after parsing JSON; never alter property names or JSON syntax.
+  const cleaned: Resume = preserveDraftText
+    ? JSON.parse(JSON.stringify(resume), (_key, value) => typeof value === "string" ? cleanDraftLabels(value) : value)
+    : resume;
+  return { resume: cleaned, synthetic: { status: "synthetic-unverified" as const, examples } };
+}
+
+/** Select once on import, not on render. Unselected examples use their qualitative counterpart. */
+export function selectDraftAchievements(input: Resume, analysis: JDAnalysis, random: () => number = Math.random) {
+  const separated = separateSyntheticAchievements(input);
+  const ignored = new Set(["experience", "years", "engineer", "developer", "senior", "software", "work", "skills", "development", "required", "preferred"]);
+  const terms = [...new Set([
+    analysis.targetRole,
+    ...analysis.requirements.flatMap((requirement) => requirement.keywords),
+  ].flatMap((text) => norm(text).split(" ")).filter((term) => term.length > 1 && !ignored.has(term)))];
+  const selected: SyntheticAchievementExample[] = [];
+  for (const job of separated.resume.experience) {
+    const candidates = separated.synthetic.examples.filter((example) => {
+      const text = ` ${norm(example.achievementExample)} `;
+      return example.employerId === job.id && terms.some((term) => text.includes(` ${term} `));
+    });
+    // Fisher–Yates keeps selection unbiased among relevant candidates.
+    for (let i = candidates.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    // Keep a qualitative alternative in the mix when there are at least three pairs.
+    const maximum = candidates.length > 2 ? Math.min(4, candidates.length - 1) : candidates.length;
+    const minimum = Math.min(2, maximum);
+    const count = minimum + Math.floor(random() * (maximum - minimum + 1));
+    const chosen = candidates.slice(0, count);
+    const remaining = [...chosen];
+    job.responsibilities = job.responsibilities.map((bullet) => {
+      const index = remaining.findIndex((example) => example.sourceResponsibility === bullet);
+      if (index < 0) return bullet;
+      return cleanDraftLabels(remaining.splice(index, 1)[0].achievementExample);
+    });
+    selected.push(...chosen);
+  }
+  return { resume: separated.resume, synthetic: { status: "synthetic-unverified" as const, examples: selected } };
+}
 
 function norm(value: string) { return value.toLocaleLowerCase().replace(/[^a-z0-9%$/.]+/g, " ").replace(/\s+/g, " ").trim(); }
 function normalizeUnit(value: string) {
@@ -105,6 +191,37 @@ export function findPerformanceMeasurements(text: string) {
     found.push({ value: candidate.value, unit: candidate.unit, raw: candidate.raw });
   }
   return found;
+}
+
+/** Parse separate illustrative examples; these are never inserted into Resume JSON. */
+export function parseSyntheticAchievementDraft(value: unknown, resume: Resume): SyntheticAchievementDraft {
+  if (!value || typeof value !== "object") return { status: "synthetic-unverified", examples: [] };
+  const draft = value as { status?: unknown; examples?: unknown };
+  if (draft.status !== "synthetic-unverified" || !Array.isArray(draft.examples)) return { status: "synthetic-unverified", examples: [] };
+  const seen = new Map<string, Set<string>>();
+  const examples: SyntheticAchievementExample[] = [];
+  for (const item of draft.examples) {
+    if (!item || typeof item !== "object") continue;
+    const example = item as Record<string, unknown>;
+    const employerId = typeof example.employerId === "string" ? example.employerId : "";
+    const job = resume.experience.find((entry) => entry.id === employerId);
+    const sourceResponsibility = typeof example.sourceResponsibility === "string" ? example.sourceResponsibility : "";
+    const achievementExample = typeof example.achievementExample === "string" ? example.achievementExample.trim() : "";
+    const metricType = typeof example.metricType === "string" ? example.metricType.trim() : "";
+    const percentage = Number(example.percentage);
+    const direction = example.direction;
+    if (!job || example.employer !== job.company || !sourceResponsibility || !job.responsibilities.includes(sourceResponsibility)
+      || !achievementExample || !metricType || !Number.isFinite(percentage) || percentage <= 0 || percentage > 100
+      || (direction !== "increase" && direction !== "decrease")) continue;
+    const measurements = findPerformanceMeasurements(achievementExample).filter((measurement) => measurement.unit === "%");
+    if (measurements.length !== 1 || measurements[0]?.value !== percentage) continue;
+    const employerValues = seen.get(employerId) ?? new Set<string>();
+    if (examples.filter((entry) => entry.employerId === employerId).length >= 4 || employerValues.has(String(percentage))) continue;
+    employerValues.add(String(percentage));
+    seen.set(employerId, employerValues);
+    examples.push({ employerId, employer: job.company, sourceResponsibility, achievementExample, metricType, percentage, direction, status: "synthetic-unverified" });
+  }
+  return { status: "synthetic-unverified", examples };
 }
 
 export function calculatePercentChange(input: {

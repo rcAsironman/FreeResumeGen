@@ -1,0 +1,258 @@
+.old-resume {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #000000;
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-size: 10.5pt;
+  line-height: 1.18;
+  box-sizing: border-box;
+}
+
+.old-resume,
+.old-resume * {
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+}
+
+.old-header {
+  margin: 0 0 8px;
+  padding: 0;
+  color: #000000;
+}
+
+.old-name {
+  margin: 0;
+  padding: 0;
+  color: #000000;
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-size: 18pt;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.old-title {
+  margin: 2px 0 0;
+  padding: 0;
+  color: #000000;
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-size: 11.5pt;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.old-contactLine,
+.old-linkedIn {
+  margin: 2px 0 0;
+  padding: 0;
+  color: #000000;
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-size: 10pt;
+  line-height: 1.15;
+}
+
+.old-separator {
+  margin: 0 3px;
+}
+
+.old-section {
+  margin: 9px 0 0;
+  padding: 0;
+  color: #000000;
+}
+.old-sectionHeading {
+  display: block;
+  width: 100%;
+  margin: 0 0 6px;
+  padding: 3px 9px;
+  box-sizing: border-box;
+  border: 1px solid #000000;
+  background: #d3d3d3;
+  color: #000000;
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-size: 11pt;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+
+  break-after: avoid-page;
+  page-break-after: avoid;
+}
+
+.old-bulletList {
+  margin: 0;
+  padding: 0 0 0 25px;
+  color: #000000;
+  list-style-position: outside;
+  list-style-type: disc;
+}
+
+.old-bulletList li {
+  display: list-item;
+  margin: 0 0 3px;
+  padding: 0 0 0 3px;
+  color: #000000;
+  text-align: left;
+
+  break-inside: avoid;
+  page-break-inside: avoid;
+  orphans: 2;
+  widows: 2;
+}
+
+.old-bulletList li::marker {
+  color: #000000;
+  font-size: 9pt;
+}
+
+.old-skills {
+  display: block;
+  margin: 0;
+  padding: 0;
+  color: #000000;
+}
+
+.old-skillRow {
+  margin: 0 0 3px;
+  padding: 0;
+  color: #000000;
+
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.old-experienceList {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+.old-experience {
+  margin: 0 0 8px;
+  padding: 0;
+  color: #000000;
+}
+
+.old-clientRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 2px;
+  padding: 0;
+  color: #000000;
+
+  break-after: avoid-page;
+  page-break-after: avoid;
+}
+
+.old-dates {
+  flex-shrink: 0;
+  color: #000000;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.old-role {
+  margin: 0 0 2px;
+  padding: 0;
+  color: #000000;
+  font-size: 10pt;
+  font-style: italic;
+
+  break-after: avoid-page;
+  page-break-after: avoid;
+}
+
+.old-officialTitle {
+  color: #555555;
+  font-size: 9pt;
+  font-style: normal;
+}
+
+.old-environment {
+  margin: 4px 0 0;
+  padding: 0;
+  color: #000000;
+
+  break-inside: avoid;
+  page-break-inside: avoid;
+  orphans: 2;
+  widows: 2;
+}
+
+.old-resume strong {
+  font-family:
+    var(--resume-font, "Times New Roman", Times, serif);
+  font-weight: 700;
+}
+
+@media screen {
+  .old-resume {
+    background: #ffffff;
+  }
+}
+
+@media print {
+  .old-resume {
+    width: 100%;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none;
+  }
+
+  .old-resume,
+  .old-resume * {
+    font-family:
+      var(--resume-font, "Times New Roman", Times, serif) !important;
+  }
+
+  .old-header,
+  .old-section,
+  .old-skills,
+  .old-experienceList,
+  .old-experience,
+  .old-clientRow,
+  .old-role,
+  .old-environment {
+    color: #000000 !important;
+    background: transparent;
+  }
+
+  .old-sectionHeading {
+    background: #d3d3d3 !important;
+    color: #000000 !important;
+    border: 1px solid #000000;
+
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .old-bulletList li,
+  .old-skillRow,
+  .old-environment {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .old-clientRow,
+  .old-role {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .old-experience {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+}

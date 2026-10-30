@@ -1,28 +1,33 @@
 "use client";
 
-import type { AchievementEvidence } from "@/lib/achievements";
+import type { AchievementEvidence, SyntheticAchievementDraft } from "@/lib/achievements";
 import { achievementCoverage, buildMetricOpportunities, composeAchievementBullet, evidenceForAchievement, isEvidenceReady } from "@/lib/achievements";
 import type { JDAnalysis, Resume } from "@/types/resume";
-import { useState } from "react";
 
-export function AchievementReview({ resume, analysis, evidence, onChange, onApply }: {
+export function AchievementReview({ resume, analysis, evidence, syntheticDraft, onChange, onApply }: {
   resume: Resume;
   analysis: JDAnalysis;
   evidence: AchievementEvidence[];
+  syntheticDraft: SyntheticAchievementDraft | null;
   onChange: (item: AchievementEvidence) => void;
   onApply: (item: AchievementEvidence, statement: string) => void;
 }) {
   const coverage = achievementCoverage(resume, evidence, analysis);
-  const [showOpportunities, setShowOpportunities] = useState(() => coverage.zeroQuantifiedAchievements);
   const opportunities = buildMetricOpportunities(resume, analysis);
   return <section className="achievement-review" aria-label="Achievement evidence review">
-    <div className="achievement-review-heading"><div><span className="field-label">ACHIEVEMENTS · MEASURED EVIDENCE</span><h3>Strengthen experience with outcomes you can support</h3></div><div className="achievement-counts"><b>{coverage.totalExperienceBullets}</b> experience bullets <span>·</span> <b>{coverage.quantifiedAchievementCount}</b> quantified <span>·</span> <b>{coverage.verifiedAchievementCount}</b> verified</div></div>
+    <div className="achievement-review-heading"><div><span className="field-label">ACHIEVEMENT EXAMPLES · AUTOMATIC</span><h3>Role-specific quantified examples</h3></div><div className="achievement-counts"><b>{coverage.totalExperienceBullets}</b> experience bullets <span>·</span> <b>{coverage.quantifiedAchievementCount}</b> quantified in resume <span>·</span> <b>{coverage.verifiedAchievementCount}</b> measured evidence</div></div>
     <div className="achievement-coverage" aria-live="polite"><span><b>{coverage.missingMetricOpportunities}</b> metric opportunities</span><span><b>{coverage.unsupportedNumericalClaims}</b> unsupported numerical claims</span>{coverage.estimatedAchievementCount > 0 && <span><b>{coverage.estimatedAchievementCount}</b> candidate estimates</span>}</div>
     <div className="achievement-employer-grid" aria-label="Achievement counts by employer">{coverage.employers.map((employer) => <article key={employer.employerId}><strong>{employer.employer}</strong><span><b>{employer.totalExperienceBullets}</b> bullets · <b>{employer.quantifiedAchievementCount}</b> quantified · <b>{employer.verifiedAchievementCount}</b> verified</span><small>{employer.missingMetricOpportunities} metric opportunities · {employer.unsupportedNumericalClaims} unsupported numbers</small></article>)}</div>
-    <p className="helper">{coverage.zeroQuantifiedAchievements ? "This draft has no quantified achievements yet. Choose relevant responsibilities below and enter measurements you can substantiate. A natural target is 2–4 per employer when evidence supports them; this is not a quota. If you do not have measurements, keep the technical bullet qualitative." : "Suggestions are optional questions, never assumed results. Add only measurements you personally observed and can explain. A natural target is 2–4 per employer when evidence supports them; this is not a quota. The app does not independently audit your attestation."}</p>
-    {coverage.zeroQuantifiedAchievements && <button type="button" className="button primary strengthen-achievements" onClick={() => setShowOpportunities(true)}>Strengthen Achievements · Review {coverage.missingMetricOpportunities} opportunities</button>}
-    <details className="achievement-opportunities" open={showOpportunities} onToggle={(event) => setShowOpportunities(event.currentTarget.open)}>
-      <summary>Review role-specific metric opportunities ({opportunities.length})</summary>
+    <div className="synthetic-draft-panel">
+      <div className="synthetic-draft-warning"><strong>SYNTHETIC EXAMPLES · UNVERIFIED · NEVER FOR APPLICATION</strong><p>Generated automatically by the resume prompt. The percentages below are fictional examples for testing and are kept separate from your resume and downloads.</p></div>
+      {!syntheticDraft?.examples.length ? <p className="helper">No synthetic examples were included in the imported response. Generate a fresh prompt and import its complete JSON response to see them here.</p> : <div className="synthetic-employer-list">{coverage.employers.map((employer) => {
+        const examples = syntheticDraft.examples.filter((item) => item.employerId === employer.employerId);
+        return examples.length ? <article className="synthetic-employer" key={employer.employerId}><h4>{employer.employer} · {examples.length} illustrative example{examples.length === 1 ? "" : "s"}</h4>{examples.map((item, index) => <div className="synthetic-example" key={`${item.employerId}-${item.metricType}-${index}`}><span className="claim-status suggested">SYNTHETIC · {item.percentage}% {item.direction}</span><blockquote>{item.achievementExample}</blockquote><small>Based on this responsibility: {item.sourceResponsibility}</small></div>)}</article> : null;
+      })}</div>}
+    </div>
+    <details className="achievement-opportunities">
+      <summary>Optional: record actual measurements for application-ready bullets ({opportunities.length} opportunities)</summary>
+      <p className="helper">You do not need to fill these fields to generate synthetic examples. Only measurements you can substantiate may be added to the application-ready resume.</p>
       <div className="achievement-opportunity-list">{opportunities.map((opportunity) => {
         const saved = evidence.find((item) => item.id === opportunity.id && item.originalBullet === opportunity.originalBullet);
         if (!saved) return null;

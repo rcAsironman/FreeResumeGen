@@ -161,7 +161,8 @@ test("JD timeline starts from the current month, spreads backward, and prioritiz
   const prompt = buildPrompt("Role: Cloud Engineer", noYearsJD, profile, [], new Date(2026, 9, 29));
   assert.match(prompt, /When no numeric experience duration appears in the JD, use the configured employment dates/);
   assert.match(prompt, /Match each JD requirement against each employer's recorded facts/);
-  assert.match(prompt, /Every string inside the returned JSON is resume copy intended to appear on the page/);
+  assert.match(prompt, /Every string inside the returned "resume" object is resume copy intended to appear on the page/);
+  assert.match(prompt, /syntheticAchievementDraft/);
   const fourYearPrompt = buildPrompt("Role: Java Developer\nMinimum 4 years of experience", fourYearJD, profile, [], new Date(2026, 9, 29));
   assert.match(fourYearPrompt, /The supplied resumeTimeline represents exactly 4 years/);
   assert.match(fourYearPrompt, /Nov 2022/);

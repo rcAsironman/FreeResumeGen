@@ -45,11 +45,15 @@ body{background:var(--bg);color:var(--ink)}.app-shell{max-width:1280px}.topbar{b
 .resume-job small{font-size:9pt;margin:4px 0 0;line-height:1.18;display:block}
 .workflow-guide>button.active,.workflow-guide>button[aria-current="step"]{background:#2b423f;color:#e1eee9;box-shadow:inset 0 0 0 1px #45685f}
 .workflow-guide>button:disabled{opacity:.42}
-main[data-active-step="1"] #step-02,main[data-active-step="1"] .workspace-grid,main[data-active-step="2"] #profile-step,main[data-active-step="2"] .workspace-grid,main[data-active-step="3"] #profile-step,main[data-active-step="3"] #step-02,main[data-active-step="4"] #profile-step,main[data-active-step="4"] #step-02,main[data-active-step="5"] #profile-step,main[data-active-step="5"] #step-02,main[data-active-step="6"] #profile-step,main[data-active-step="6"] #step-02,main[data-active-step="7"] #profile-step,main[data-active-step="7"] #step-02,main[data-active-step="8"] #profile-step,main[data-active-step="8"] #step-02,main[data-active-step="9"] #profile-step,main[data-active-step="9"] #step-02{display:none}
-main[data-active-step="3"] #experience-match,main[data-active-step="3"] #step-05,main[data-active-step="3"] #step-06,main[data-active-step="3"] #step-07,main[data-active-step="4"] #step-03,main[data-active-step="4"] #step-05,main[data-active-step="4"] #step-06,main[data-active-step="4"] #step-07,main[data-active-step="5"] #step-03,main[data-active-step="5"] #experience-match,main[data-active-step="5"] #step-06,main[data-active-step="5"] #step-07,main[data-active-step="6"] #step-03,main[data-active-step="6"] #experience-match,main[data-active-step="6"] #step-05,main[data-active-step="6"] #step-07,main[data-active-step="7"] #step-03,main[data-active-step="7"] #experience-match,main[data-active-step="7"] #step-05,main[data-active-step="7"] #step-06,main[data-active-step="8"] .workspace-column:not(.right-column),main[data-active-step="9"] .workspace-column:not(.right-column),main[data-active-step="8"] #step-09,main[data-active-step="9"] #step-08{display:none}
-main[data-active-step="3"] .workspace-grid,main[data-active-step="4"] .workspace-grid,main[data-active-step="5"] .workspace-grid,main[data-active-step="6"] .workspace-grid,main[data-active-step="7"] .workspace-grid,main[data-active-step="8"] .workspace-grid,main[data-active-step="9"] .workspace-grid{display:block}
-main[data-active-step="3"] .right-column,main[data-active-step="4"] .right-column,main[data-active-step="5"] .right-column,main[data-active-step="6"] .right-column,main[data-active-step="7"] .right-column{display:none}
-main[data-active-step="8"] .right-column,main[data-active-step="9"] .right-column{display:block;max-width:none}
+.export-confirmation,.synthetic-draft-review{margin:10px 0;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--surface-soft,#f4f7f5);color:var(--ink)}.export-confirmation>strong{display:block;font-size:13px}.export-confirmation p,.synthetic-draft-review>p{margin:5px 0 9px;color:var(--muted);font-size:11px;line-height:1.5}.synthetic-draft-review>summary{cursor:pointer;font-weight:750;font-size:11px}.synthetic-draft-review article{margin-top:8px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}.synthetic-draft-review article b{font-size:10px}.synthetic-draft-review article p{margin:5px 0 0;font-size:11px;line-height:1.45}
+main[data-active-step="1"] .workspace-grid,main[data-active-step="2"] #profile-step,main[data-active-step="2"] #step-02,main[data-active-step="3"] #profile-step,main[data-active-step="3"] #step-02,main[data-active-step="4"] #profile-step,main[data-active-step="4"] #step-02{display:none}
+main[data-active-step="2"] #step-05,main[data-active-step="2"] #resume-import,main[data-active-step="3"] #job-description,main[data-active-step="3"] #experience-match,main[data-active-step="3"] #step-07,main[data-active-step="3"] #step-08,main[data-active-step="3"] #resume-preview,main[data-active-step="4"] .workspace-column:not(.right-column){display:none}
+main[data-active-step="2"] .workspace-grid,main[data-active-step="3"] .workspace-grid{display:block}
+main[data-active-step="2"] .right-column,main[data-active-step="3"] .right-column{display:none}
+main[data-active-step="4"] .workspace-grid{display:block}
+.workflow-guide{grid-template-columns:repeat(4,minmax(0,1fr))}
+main[data-active-step="4"] .right-column{display:grid;grid-template-columns:minmax(260px,.78fr) minmax(0,1.22fr);align-items:start;max-width:none}
+@media(max-width:900px){main[data-active-step="4"] .right-column{grid-template-columns:1fr}}
 @media(max-width:900px){.resume-paper{padding:24px 22px 30px}}
 
 /* Keep the first section close to the contact line when no badges are selected. */
@@ -77,8 +81,34 @@ main[data-active-step="8"] .right-column,main[data-active-step="9"] .right-colum
 .achievement-error{margin:0;color:#e8a2a2;font-size:10px;font-weight:700;line-height:1.45}
 .achievement-existing-claim p{margin:0 0 7px;color:var(--muted);font-size:10px}
 .achievement-card .button{justify-self:start}
+.synthetic-draft-panel{display:grid;gap:12px;margin-top:14px}.synthetic-draft-warning{border:1px solid #d99838;border-left:4px solid #d99838;border-radius:8px;background:color-mix(in srgb,#d99838 10%,var(--surface));padding:11px 13px}.synthetic-draft-warning strong{font-size:11px;letter-spacing:.04em;color:#88510b}.synthetic-draft-warning p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.45}.synthetic-employer-list{display:grid;gap:10px}.synthetic-employer{display:grid;gap:8px;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface-soft)}.synthetic-employer h4{margin:0;font-size:13px}.synthetic-example{display:grid;gap:6px;padding:9px;border-radius:8px;background:var(--surface)}.synthetic-example .claim-status{justify-self:start}.synthetic-example blockquote{margin:0;padding-left:10px;border-left:2px dashed #d99838;font-size:12px;line-height:1.5}.synthetic-example small{color:var(--muted);font-size:10px;line-height:1.4}
 .claim-status.suggested{color:#b2c4c8;background:#283642}
 .achievement-score-note{color:var(--muted);font-size:10px}
 .achievement-score-note b{color:var(--green)}
 @media(max-width:850px){.achievement-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.achievement-form{grid-template-columns:1fr}.achievement-form .achievement-source-field{grid-column:auto}}
+
+.workflow-guide{grid-template-columns:repeat(2,minmax(0,1fr))}
+main[data-active-step="1"] .workspace-grid{display:block}
+main[data-active-step="1"] #step-02,main[data-active-step="1"] #experience-match,main[data-active-step="1"] #resume-import,main[data-active-step="1"] .right-column{display:none}
+main[data-active-step="2"] .workspace-grid{display:grid;grid-template-columns:minmax(260px,.7fr) minmax(0,1.3fr)}
+main[data-active-step="2"] #job-description,main[data-active-step="2"] #experience-match,main[data-active-step="2"] #step-05,main[data-active-step="2"] #step-08{display:none}
+main[data-active-step="2"] #resume-import,main[data-active-step="2"] .right-column{display:block}
+@media(max-width:900px){main[data-active-step="2"] .workspace-grid{grid-template-columns:1fr}}
+
+/* Original fixed resume: Letter paper, original margins, and no preview-only scaling. */
+.original-paper-scroll{overflow:auto;max-width:100%;background:#17232c;padding:12px}
+.original-paper[data-resume-paper]{width:816px;min-width:816px;min-height:1056px;padding:40.32px 48px;margin:0 auto;position:relative;box-sizing:border-box;background:white;color:black}
+.original-paper .credential-logos{top:90.32px;right:48px;gap:6px}
+.original-paper .credential-logo img{max-width:none;max-height:none;object-fit:contain}
+.original-paper .original-editable{outline:none;min-height:200px;color:black}
+.original-paper [contenteditable=true] [data-edit-path]:hover{outline:1px dashed #b1cac3}
+.editor-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 0}
+.editor-actions span{font-size:12px;color:var(--muted)}
+.original-editor{min-width:0}
+.original-editor>div:has(>button[aria-label="Undo"]){position:sticky;top:0;z-index:10;background:var(--surface);padding:10px;display:flex;gap:6px;flex-wrap:wrap;border:1px solid var(--line)}
+.original-editor>div:has(>button[aria-label="Undo"]) button,.original-editor>div:has(>button[aria-label="Undo"]) select{border:1px solid var(--line);padding:5px 8px;background:var(--surface-soft);color:var(--ink);border-radius:5px}
+
+.download-feedback{padding:12px 20px;overflow-wrap:anywhere}.download-feedback>p{margin:6px 0;font-size:13px}.download-feedback .notice{position:static;width:auto;max-width:none}
+
+.side-toasts{position:fixed;right:20px;top:20px;z-index:200;display:grid;gap:10px;width:min(420px,calc(100vw - 40px));max-height:85vh;overflow:auto}.side-toast{position:relative;background:var(--surface);color:var(--ink);border:1px solid var(--green);border-left:4px solid var(--green);border-radius:12px;padding:18px 42px 18px 18px;box-shadow:0 8px 30px #0005}.side-toast p{font-size:13px;overflow-wrap:anywhere;margin:8px 0 0}.side-toast button{position:absolute;right:10px;top:8px;background:none;border:0;color:inherit;font-size:24px;cursor:pointer}

@@ -9,6 +9,9 @@ import { emptyProfile, type Resume } from "@/types/resume";
 import { createResumeDocx } from "@/lib/docx-export";
 import { buildResumePrintBlocks } from "@/lib/resume-print";
 import {
+  cleanDraftLabels,
+  selectDraftAchievements,
+  separateSyntheticAchievements,
   achievementCoverage,
   applyAchievementStatement,
   buildMetricOpportunities,
@@ -19,9 +22,24 @@ import {
   findUnsupportedMetricClaims,
   isEvidenceReady,
   mergeMetricOpportunities,
+  parseSyntheticAchievementDraft,
   repeatedMetricFindings,
   type AchievementEvidence,
 } from "@/lib/achievements";
+
+test("Step 2 cleans annotation labels and spacing while retaining both sentences and metric metadata", () => {
+  const bullet = "  [SYNTHETIC EXAMPLE]   Reduced PostgreSQL query latency by 34%.   [QUALITATIVE]   Tuned PostgreSQL queries.  ";
+  const input = makeResume([bullet]);
+  const { resume, synthetic } = separateSyntheticAchievements(input, true);
+  assert.equal(resume.experience[0].responsibilities[0], "Reduced PostgreSQL query latency by 34%. Tuned PostgreSQL queries.");
+  assert.equal(synthetic.examples[0].percentage, 34);
+  assert.equal(synthetic.examples[0].status, "synthetic-unverified");
+  assert.equal(findUnsupportedMetricClaims(resume, []).length, 1);
+  assert.equal(cleanDraftLabels("One.[qualitative]Two."), "One. Two.");
+  assert.equal(cleanDraftLabels("  [ synthetic example ]\nText  [ QUALITATIVE ]  more  "), "Text more");
+  assert.equal(resumeSchema.safeParse(resume).success, true);
+  assert.equal(input.experience[0].responsibilities[0], bullet);
+});
 
 function makeResume(bullets: string[] = ["Optimized PostgreSQL query execution time."]): Resume {
   return {
@@ -32,6 +50,38 @@ function makeResume(bullets: string[] = ["Optimized PostgreSQL query execution t
     projects: [], education: [], certifications: [],
   };
 }
+
+test("JD-relevant draft selection keeps 2–4 examples per employer and exactly one version per bullet", () => {
+  const bullets = Array.from({ length: 6 }, (_, i) => `[SYNTHETIC EXAMPLE] Tuned PostgreSQL query ${i}, reducing latency by ${20 + i}%. [QUALITATIVE] Tuned PostgreSQL query ${i}.`);
+  bullets.push("[SYNTHETIC EXAMPLE] Tuned Salesforce workflows, reducing effort by 30%. [QUALITATIVE] Tuned Salesforce workflows.");
+  const input = makeResume(bullets);
+  input.experience.push({ ...structuredClone(input.experience[0]), id: "second", company: "Second" });
+  const analysis = analyzeJD("Role: Database Engineer\nRequired skills: PostgreSQL query optimization");
+  for (const [random, expected] of [[0, 2], [0.5, 3], [0.999, 4]] as const) {
+    const result = selectDraftAchievements(input, analysis, () => random);
+    for (const job of result.resume.experience) {
+      assert.equal(job.responsibilities.filter((bullet) => bullet.includes("%")).length, expected);
+      assert.equal(job.responsibilities.length, 7);
+      assert.equal(job.responsibilities[6], "Tuned Salesforce workflows.");
+      for (const bullet of job.responsibilities) assert.doesNotMatch(bullet, /\[SYNTHETIC|\[QUALITATIVE|%\. Tuned/);
+    }
+    assert.equal(result.synthetic.examples.length, expected * 2);
+    assert.ok(result.synthetic.examples.every((item) => item.status === "synthetic-unverified"));
+    assert.equal(findUnsupportedMetricClaims(result.resume, []).length, expected * 2);
+  }
+  const one = selectDraftAchievements(makeResume([bullets[0]]), analysis, () => 0.999);
+  const fourPairs = makeResume(bullets.slice(0, 4));
+  const low = selectDraftAchievements(fourPairs, analysis, () => 0);
+  const high = selectDraftAchievements(fourPairs, analysis, () => 0.999);
+  assert.equal(low.synthetic.examples.length, 2);
+  assert.equal(high.synthetic.examples.length, 3);
+  assert.equal(high.resume.experience[0].responsibilities.filter((bullet) => !bullet.includes("%")).length, 1);
+  assert.ok(fourPairs.experience[0].responsibilities.every((bullet) => bullet.includes("[QUALITATIVE]")));
+  assert.equal(one.synthetic.examples.length, 1);
+  const none = selectDraftAchievements(makeResume([bullets[6]]), analysis, () => 0.999);
+  assert.equal(none.synthetic.examples.length, 0);
+  assert.match(input.experience[0].responsibilities[0], /SYNTHETIC/);
+});
 
 function evidenceFor(bullet: string, patch: Partial<AchievementEvidence> = {}): AchievementEvidence {
   return {
@@ -276,7 +326,83 @@ test("achievement evidence feeds the universal prompt only when candidate-attest
   assert.match(prompt, /QUANTIFIED ACHIEVEMENTS/);
   assert.match(prompt, /incorporate each supported result into the closest relevant responsibility/);
   assert.match(prompt, /confirmedAchievementEvidence/);
+  assert.match(prompt, /SYNTHETIC ACHIEVEMENT EXAMPLES/);
+  assert.match(prompt, /synthetic draft mode is enabled for this request/);
+  assert.match(prompt, /Achievement completeness/);
+  assert.doesNotMatch(prompt, /optional synthetic draft mode/);
+  assert.match(prompt, /syntheticAchievementDraft/);
+  assert.match(prompt, /never factual candidate measurements/);
+  assert.match(prompt, /Never put illustrative percentages in the resume object/);
+  assert.match(prompt, /No manual measurement entry is needed to create these examples/);
   assert.equal((prompt.match(/PostgreSQL query performance report/g) ?? []).length, 1);
   assert.equal(resumeSchema.safeParse(resume).success, true);
   assert.equal(Object.hasOwn(resume, "achievementEvidence"), false);
+});
+
+test("synthetic achievement examples are automatically parsed into separate unverified metadata and never alter the export resume", () => {
+  const sourceResponsibility = "Optimized PostgreSQL query execution time.";
+  const resume = makeResume([sourceResponsibility]);
+  const synthetic = parseSyntheticAchievementDraft({
+    status: "synthetic-unverified",
+    examples: [
+      { employerId: "acme", employer: "Acme", sourceResponsibility, achievementExample: "Optimized PostgreSQL query execution, hypothetically reducing query latency by 35%.", metricType: "query latency", percentage: 35, direction: "decrease", status: "synthetic-unverified" },
+      { employerId: "other", employer: "Other", sourceResponsibility, achievementExample: "Improved results by 27%.", metricType: "reliability", percentage: 27, direction: "increase", status: "synthetic-unverified" },
+      { employerId: "acme", employer: "Acme", sourceResponsibility: "A responsibility not in the resume", achievementExample: "Improved query latency by 22%.", metricType: "query latency", percentage: 22, direction: "decrease", status: "synthetic-unverified" },
+      { employerId: "acme", employer: "Acme", sourceResponsibility, achievementExample: "Improved query latency by 22% and throughput by 10%.", metricType: "query latency", percentage: 22, direction: "decrease", status: "synthetic-unverified" },
+    ],
+  }, resume);
+  assert.equal(synthetic.status, "synthetic-unverified");
+  assert.equal(synthetic.examples.length, 1);
+  assert.equal(synthetic.examples[0]?.status, "synthetic-unverified");
+  assert.equal(synthetic.examples[0]?.percentage, 35);
+  assert.deepEqual(resume.experience[0]?.responsibilities, [sourceResponsibility]);
+  assert.equal(resumeSchema.safeParse(resume).success, true);
+  assert.equal(resumeSchema.safeParse({ resume, syntheticAchievementDraft: synthetic }).success, false);
+  assert.equal(findUnsupportedMetricClaims(resume, []).length, 0);
+});
+
+test("synthetic percentage examples never leak into application-ready DOCX or PDF content", async () => {
+  const sourceResponsibility = "Optimized PostgreSQL query execution time.";
+  const resume = makeResume([sourceResponsibility]);
+  const synthetic = parseSyntheticAchievementDraft({ status: "synthetic-unverified", examples: [
+    { employerId: "acme", employer: "Acme", sourceResponsibility, achievementExample: "Optimized PostgreSQL query execution, hypothetically reducing query latency by 35%.", metricType: "query latency", percentage: 35, direction: "decrease", status: "synthetic-unverified" },
+  ] }, resume);
+  const profile = emptyProfile("full-time");
+  const docx = await createResumeDocx(resume, profile);
+  const docxText = readZipEntry(Buffer.from(await docx.arrayBuffer()), "word/document.xml");
+  const pdfContent = buildResumePrintBlocks(resume).map((block) => block.text).join(" ");
+  assert.equal(synthetic.examples.length, 1);
+  assert.doesNotMatch(docxText, /35%/);
+  assert.doesNotMatch(pdfContent, /35%/);
+  assert.match(docxText, /Optimized PostgreSQL query execution time/);
+});
+
+
+test("same-schema synthetic draft imports as qualitative content across export formats", async () => {
+  const input = makeResume(["[SYNTHETIC EXAMPLE] Optimized PostgreSQL indexes, reducing query execution time by 35%. [QUALITATIVE] Optimized PostgreSQL queries using indexing and execution-plan analysis."]);
+  assert.equal(resumeSchema.safeParse(input).success, true);
+  const { resume, synthetic } = separateSyntheticAchievements(input);
+  assert.equal(synthetic.examples[0]?.status, "synthetic-unverified");
+  assert.equal(synthetic.examples[0]?.employerId, "acme");
+  assert.equal(synthetic.examples[0]?.percentage, 35);
+  assert.equal(findUnsupportedMetricClaims(resume, []).length, 0);
+  assert.doesNotMatch(JSON.stringify(resume), /35%|SYNTHETIC/);
+  assert.doesNotMatch(buildResumePrintBlocks(resume).map(x => x.text).join(" "), /35%/);
+  const blob = await createResumeDocx(resume, emptyProfile("full-time"));
+  assert.doesNotMatch(readZipEntry(Buffer.from(await blob.arrayBuffer()), "word/document.xml"), /35%/);
+  assert.match(input.experience[0]!.responsibilities[0]!, /35%/);
+  assert.throws(() => separateSyntheticAchievements(makeResume(["[SYNTHETIC EXAMPLE] Improved latency by 35%."])));
+  assert.equal(findUnsupportedMetricClaims(makeResume(["Improved query execution time by 35%."]), []).length, 1);
+});
+
+
+
+test("import removes case and whitespace variants of draft labels without promoting synthetic numbers", () => {
+  const input = makeResume(["  [ synthetic ] Reduced PostgreSQL query time by 34%. [ qualitative ] Implemented PostgreSQL queries.", " [Qualitative] Created Java unit tests."]);
+  const { resume, synthetic } = separateSyntheticAchievements(input);
+  assert.deepEqual(resume.experience[0]!.responsibilities, ["Implemented PostgreSQL queries.", "Created Java unit tests."]);
+  assert.equal(synthetic.examples[0]!.percentage, 34);
+  assert.equal(synthetic.examples[0]!.status, "synthetic-unverified");
+  assert.doesNotMatch(JSON.stringify(resume), /synthetic|qualitative|34%/i);
+  assert.throws(() => separateSyntheticAchievements(makeResume(["[synthetic] Reduced latency by 30%."])));
 });
