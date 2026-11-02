@@ -34,7 +34,7 @@ function dateToMonth(value: string, isEnd: boolean, presentMonth: number): numbe
   if (!text) return null;
   if (/^(present|current|now)$/i.test(text)) return presentMonth;
   const iso = text.match(/^(\d{4})[-/](\d{1,2})$/);
-  if (iso) return Number(iso[1]) * 12 + Number(iso[2]) - 1;
+  if (iso) return Number(iso[2]) >= 1 && Number(iso[2]) <= 12 ? Number(iso[1]) * 12 + Number(iso[2]) - 1 : null;
   const named = text.match(/^(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?\s+(\d{4})$/i);
   if (named) {
     const month = new Date(`${named[1]} 1, ${named[2]}`).getMonth();
@@ -47,10 +47,14 @@ function dateToMonth(value: string, isEnd: boolean, presentMonth: number): numbe
 
 export function reviewEmploymentDates(companies: CompanySettings[], today = new Date()) {
   const presentMonth = today.getFullYear() * 12 + today.getMonth();
+  const invalidPeriods: string[] = [];
   const periods = companies.flatMap((company) => {
     const start = dateToMonth(company.startDate, false, presentMonth);
     const end = dateToMonth(company.isCurrent ? "Present" : company.endDate, true, presentMonth);
-    return start === null || end === null || start > end ? [] : [{ company, start, end }];
+    if (start === null || end === null || start > end || start > presentMonth) {
+      invalidPeriods.push(company.companyName); return [];
+    }
+    return [{ company, start, end: Math.min(end, presentMonth) }];
   });
   const overlaps: string[] = [];
   for (let i = 0; i < periods.length; i++) for (let j = i + 1; j < periods.length; j++) {
@@ -64,7 +68,7 @@ export function reviewEmploymentDates(companies: CompanySettings[], today = new 
     else merged.push({ start: period.start, end: period.end });
   }
   const totalMonths = merged.reduce((sum, period) => sum + period.end - period.start + 1, 0);
-  return { totalMonths, years: Math.floor(totalMonths / 12), remainingMonths: totalMonths % 12, overlaps, validPeriods: periods.length };
+  return { totalMonths, years: Math.floor(totalMonths / 12), remainingMonths: totalMonths % 12, overlaps, validPeriods: periods.length, invalidPeriods };
 }
 
 export function proposeJDTimeline(companies: CompanySettings[], analysis: JDAnalysis, configuredMax: number, today = new Date()) {

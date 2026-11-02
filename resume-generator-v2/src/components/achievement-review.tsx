@@ -32,7 +32,7 @@ export function AchievementReview({ resume, analysis, evidence, syntheticDraft, 
         const saved = evidence.find((item) => item.id === opportunity.id && item.originalBullet === opportunity.originalBullet);
         if (!saved) return null;
         const calculation = evidenceForAchievement(saved);
-        const ready = isEvidenceReady(saved);
+        const ready = saved.status === "verified" && isEvidenceReady(saved);
         const generated = ready ? (opportunity.hasExistingNumber ? opportunity.originalBullet : composeAchievementBullet(saved, calculation)) : "";
         const measurementError = calculation.error;
         const patch = (value: Partial<AchievementEvidence>) => onChange({ ...saved, ...value });
@@ -49,7 +49,7 @@ export function AchievementReview({ resume, analysis, evidence, syntheticDraft, 
             <label>Baseline unit<input value={saved.measurementUnit} onChange={(event) => patch({ measurementUnit: event.target.value })} placeholder="Same unit before and after"/></label>
             <label>Metric period<input value={saved.measurementPeriod} onChange={(event) => patch({ measurementPeriod: event.target.value })} placeholder="e.g. Q2 2025"/></label>
             <label className="achievement-source-field">Measurement source or basis<input value={saved.source} onChange={(event) => patch({ source: event.target.value })} placeholder="e.g. Grafana dashboard, release records, test report"/></label>
-            <label>Evidence type<select value={saved.status} onChange={(event) => patch({ status: event.target.value as AchievementEvidence["status"] })}><option value="suggested">Not provided</option><option value="verified">Measured result I can substantiate</option><option value="candidate-estimated">Candidate estimate with a clear basis</option><option value="rejected">Reject this metric suggestion</option></select></label>
+            <label>Evidence type<select value={saved.status} onChange={(event) => patch({ status: event.target.value as AchievementEvidence["status"] })}><option value="suggested">Not provided</option><option value="verified">Measured result I can substantiate</option><option value="candidate-estimated">Estimate with a clear basis (draft only)</option><option value="rejected">Reject this metric suggestion</option></select></label>
           </div>
           {(saved.beforeValue || saved.afterValue) && <p className={measurementError ? "achievement-error" : "achievement-calculation"}>{measurementError ? calculationErrorText(measurementError) : `${calculation.resultValue}% ${saved.direction === "decrease" ? "reduction" : "increase"} calculated from ${saved.beforeValue} to ${saved.afterValue} ${saved.measurementUnit}.`}</p>}
           {ready && !opportunity.hasExistingNumber && <><label className="achievement-statement-label">Proposed resume bullet — review wording before applying<textarea value={saved.proposedStatement ?? generated} onChange={(event) => patch({ proposedStatement: event.target.value })}/></label><button className="button primary" disabled={!(saved.proposedStatement ?? generated).trim()} onClick={() => onApply(saved, (saved.proposedStatement ?? generated).trim())}>Apply and confirm this measured achievement</button></>}

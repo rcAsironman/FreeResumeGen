@@ -32,7 +32,7 @@ export type ProfileSettings = {
   profileType: "full-time" | "c2c";
   personalInfo: { fullName: string; email: string; phone: string; location: string; portfolio?: string };
   education: { id: string; institution: string; degree: string; location?: string; graduationDate?: string }[];
-  certifications: { id: string; name: string; issuer?: string; year?: string; credentialId?: string; verificationLink?: string; badgeId?: string; logo?: string; logoSize?: number; logoPosition?: { x: number; y: number }; visible?: boolean }[];
+  certifications: { id: string; name: string; issuer?: string; year?: string; credentialId?: string; verificationStatus?: "confirmed" | "unconfirmed"; verificationLink?: string; badgeId?: string; logo?: string; logoSize?: number; logoPosition?: { x: number; y: number }; visible?: boolean }[];
   companies: CompanySettings[];
   preferences: { maxExperienceYears: number; summaryBullets: number; latestCompanyBullets: number; otherCompanyBullets: number };
 };
@@ -46,8 +46,8 @@ export type CompanySettings = {
 
 export type DraftClaim = { id: string; path: string; section: string; companyId?: string; text: string; status: "needs-confirmation" | "confirmed" | "rejected"; memoryKey: string };
 
-export type JDRequirement = { text: string; kind: "required" | "preferred" | "responsibility"; keywords: string[] };
-export type JDAnalysis = { targetRole: string; seniority: string; industry: string; requirements: JDRequirement[]; experienceYears: number | null };
+export type JDRequirement = { text: string; kind: "required" | "preferred" | "responsibility"; category?: "skill" | "responsibility" | "education" | "certification" | "experience" | "architecture" | "testing" | "deployment" | "operations"; keywords: string[] };
+export type JDAnalysis = { targetRole: string; seniority: string; industry: string; requirements: JDRequirement[]; facets?: Record<string, string[]>; experienceYears: number | null };
 
 export const emptyProfile = (profileType: "full-time" | "c2c"): ProfileSettings => ({
   schemaVersion: 1, profileType,

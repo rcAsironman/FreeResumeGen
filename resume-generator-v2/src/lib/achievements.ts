@@ -279,7 +279,9 @@ export function buildMetricOpportunities(resume: Resume, analysis: JDAnalysis): 
   const candidates = resume.experience.flatMap((job, employerIndex) => job.responsibilities.flatMap((text, bulletIndex) => {
     // Classify from the responsibility itself, never the JD's full keyword set or job title.
     // Irrelevant duties should not get forced metric questions.
-    const recommendation = recommendedMetric(text);
+    const recommendation = recommendedMetric(text) ?? (findPerformanceMeasurements(text).length
+      ? { metricType: "Recorded outcome", direction: /\b(increas|improv|grew)/i.test(text) ? "increase" as const : "decrease" as const }
+      : null);
     if (!recommendation) return [];
     const path = `experience.${employerIndex}.responsibilities.${bulletIndex}`;
     const id = evidenceId(job.id, text);
@@ -320,7 +322,7 @@ export function buildMetricOpportunities(resume: Resume, analysis: JDAnalysis): 
     const current = bestByEmployerMetric.get(key);
     if (!current || specificity(candidate) > specificity(current)) bestByEmployerMetric.set(key, candidate);
   }
-  return candidates.filter((candidate) => bestByEmployerMetric.get(`${candidate.employerId}|${candidate.metricType}`)?.id === candidate.id);
+  return candidates.filter((candidate) => candidate.hasExistingNumber || bestByEmployerMetric.get(`${candidate.employerId}|${candidate.metricType}`)?.id === candidate.id);
 }
 
 export function achievementCoverage(resume: Resume, evidence: AchievementEvidence[], analysis: JDAnalysis): AchievementCoverage {

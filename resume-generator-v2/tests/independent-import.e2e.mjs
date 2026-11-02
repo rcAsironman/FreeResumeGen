@@ -29,6 +29,12 @@ try {
     assert.ok(preview.includes(job.startDate));
     assert.ok(preview.includes(job.endDate));
   }
+  assert.equal(await page.getByRole('button', { name: 'Download DOCX', exact: true }).isEnabled(), false);
+  let confirmed = 0;
+  while (await page.getByRole('button', { name: 'Confirm this statement', exact: true }).count()) {
+    await page.getByRole('button', { name: 'Confirm this statement', exact: true }).first().click();
+    assert.ok(++confirmed < 400);
+  }
   assert.equal(await page.getByRole('button', { name: 'Download DOCX', exact: true }).isEnabled(), true);
   assert.equal(await page.getByRole('button', { name: 'Download PDF', exact: true }).isEnabled(), true);
   await page.reload();

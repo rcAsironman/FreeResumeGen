@@ -14,7 +14,7 @@ import assert from 'node:assert/strict';
       professionalSummary: { bullets: Array.from({length: 6}, (_, i) => `Developed Java backend services with Spring Boot, PostgreSQL and Kafka for financial workflows, covering requirements, implementation, testing and production support ${i + 1}.`) },
       technicalSkills: { categories: [{ name: 'Backend', skills: ['Java', 'Spring Boot', 'PostgreSQL', 'Kafka'] }] },
       experience: profile.companies.map((company) => ({ id: company.id, company: company.companyName, role: 'Java Backend Developer', location: company.location, startDate: company.startDate, endDate: company.isCurrent ? 'Present' : company.endDate, responsibilities: Array.from({length: 12}, (_, i) => `Developed Java and Spring Boot services for transaction processing, implementing request validation, PostgreSQL persistence, Kafka event handling, unit tests and diagnostic logging for production troubleshooting and release support ${i + 1}.`), environment: ['Java', 'Spring Boot', 'PostgreSQL', 'Kafka'] })),
-      projects: [], education: profile.education, certifications: [],
+      projects: [], education: profile.education, certifications: profile.certifications.slice(0, 1).map(({ id, name, issuer, year }) => ({ id, name, issuer, year })),
     };
     await page.goto(process.env.TEST_BASE_URL || 'http://127.0.0.1:3001/');
     await page.locator('.jd-input').fill('Role: Java Backend Developer\nRequired: 4 years of experience. Java, Spring Boot, PostgreSQL, Kafka. Develop backend services for financial applications.');
@@ -42,6 +42,11 @@ import assert from 'node:assert/strict';
     });
     assert.equal(geometry.width,816); assert.equal(geometry.imageWidth,96); assert.match(geometry.font,/Times New Roman/);
     assert(geometry.logoBottom <= geometry.summaryTop, 'Header reserves enough room for the selected badge');
+    let confirmations = 0;
+    while (await page.getByRole('button', { name: 'Confirm this statement', exact: true }).count()) {
+      await page.getByRole('button', { name: 'Confirm this statement', exact: true }).first().click();
+      assert.ok(++confirmations < 500);
+    }
     const saved = [];
     for (const format of ['DOCX','PDF']) {
       const responsePromise = page.waitForResponse((response) => response.url().endsWith('/api/save-resume'));

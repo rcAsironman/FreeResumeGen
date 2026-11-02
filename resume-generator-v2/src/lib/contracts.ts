@@ -22,7 +22,7 @@ export const profileSchema = z.object({
   schemaVersion: z.literal(1), profileType: z.enum(["full-time", "c2c"]),
   personalInfo: z.object({ fullName: z.string(), email: z.string(), phone: z.string(), location: z.string(), portfolio: optionalText }).strict(),
   education: z.array(z.object({ id: z.string(), institution: z.string(), degree: z.string(), location: optionalText, graduationDate: optionalText }).strict()),
-  certifications: z.array(z.object({ id: z.string(), name: z.string(), issuer: optionalText, year: optionalText, credentialId: optionalText, verificationLink: optionalText, badgeId: optionalText, logo: optionalText, logoSize: z.number().int().min(24).max(140).optional(), logoPosition: z.object({ x: z.number(), y: z.number() }).strict().optional(), visible: z.boolean().optional() }).strict()),
+  certifications: z.array(z.object({ id: z.string(), name: z.string(), issuer: optionalText, year: optionalText, credentialId: optionalText, verificationStatus: z.enum(["confirmed", "unconfirmed"]).optional(), verificationLink: optionalText, badgeId: optionalText, logo: optionalText, logoSize: z.number().int().min(24).max(140).optional(), logoPosition: z.object({ x: z.number(), y: z.number() }).strict().optional(), visible: z.boolean().optional() }).strict()),
   companies: z.array(z.object({
     id: optionalText,
     companyName: z.string().min(1), clientName: z.string().default(""), industry: z.string().default(""), location: z.string().default(""), jobTitle: z.string().default(""),

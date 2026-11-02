@@ -1,0 +1,329 @@
+
+{
+  "personalInfo": {
+    "fullName": "Karthik Mangineni",
+    "professionalTitle": "Senior Java Data Integration Engineer",
+    "email": "karthikmangineni5@gmail.com",
+    "phone": "314-814-6677",
+    "location": ""
+  },
+  "professionalSummary": {
+    "bullets": [
+      "Software engineer with 12 years of experience across enterprise application development, SQL-based data processing, distributed integrations, database optimization, cloud deployments, and production support, with a strong foundation in Java and relational data systems.",
+      "Developed data-intensive enterprise applications using Java 8/11/17, Spring Boot, JDBC, Hibernate, SQL, PostgreSQL, Oracle, and MySQL, supporting transactional processing, reporting, and integration workflows.",
+      "Implemented asynchronous data exchange using Apache Kafka producers and consumers, integrating event-driven processing with Spring Boot microservices and enterprise application workflows.",
+      "Optimized SQL queries, joins, indexes, stored procedures, transaction boundaries, and persistence operations to improve database performance and application responsiveness.",
+      "Developed integration services connecting relational databases, REST APIs, external systems, and distributed applications, with validation, error handling, response transformation, and reliable data exchange.",
+      "Worked with AWS EC2, S3, RDS, Lambda, IAM, and CloudWatch to develop, deploy, monitor, and troubleshoot cloud-hosted application and integration services.",
+      "Containerized applications using Docker and supported Kubernetes deployments, resource configuration, health checks, scaling, and automated delivery workflows using Jenkins and GitLab CI.",
+      "Investigated production processing failures, database bottlenecks, integration errors, application latency, and distributed-service issues through SQL analysis, application logs, metrics, debugging, and root-cause analysis."
+    ]
+  },
+  "technicalSkills": {
+    "categories": [
+      {
+        "name": "Programming and Data Processing",
+        "skills": [
+          "Java 8/11/17",
+          "SQL",
+          "PL/SQL",
+          "JDBC",
+          "Java Streams",
+          "Multithreading",
+          "Asynchronous Processing"
+        ]
+      },
+      {
+        "name": "Databases and Data Optimization",
+        "skills": [
+          "PostgreSQL",
+          "Oracle",
+          "MySQL",
+          "SQL Query Optimization",
+          "Indexing",
+          "Stored Procedures",
+          "Data Modeling",
+          "Transaction Management",
+          "Database Performance Tuning"
+        ]
+      },
+      {
+        "name": "Data Integration and Distributed Systems",
+        "skills": [
+          "Apache Kafka",
+          "Kafka Producers and Consumers",
+          "Event-Driven Architecture",
+          "REST APIs",
+          "Spring Boot",
+          "Microservices",
+          "JSON",
+          "XML",
+          "Hibernate",
+          "Spring Data JPA"
+        ]
+      },
+      {
+        "name": "Cloud and Container Platforms",
+        "skills": [
+          "AWS",
+          "Amazon EC2",
+          "Amazon S3",
+          "Amazon RDS",
+          "AWS Lambda",
+          "AWS CloudWatch",
+          "Docker",
+          "Kubernetes"
+        ]
+      },
+      {
+        "name": "Automation and CI/CD",
+        "skills": [
+          "Git",
+          "GitLab",
+          "Jenkins",
+          "GitLab CI",
+          "Maven",
+          "Automated Builds",
+          "Automated Deployments"
+        ]
+      },
+      {
+        "name": "Monitoring and Troubleshooting",
+        "skills": [
+          "AWS CloudWatch",
+          "Prometheus",
+          "Grafana",
+          "Application Logging",
+          "Performance Analysis",
+          "Root Cause Analysis",
+          "Production Troubleshooting"
+        ]
+      }
+    ]
+  },
+  "experience": [
+    {
+      "id": "att",
+      "company": "AT&T",
+      "location": "Atlanta, GA",
+      "startDate": "Apr 2023",
+      "endDate": "Present",
+      "description": "Enterprise application and integration platform supporting distributed data exchange, asynchronous message processing, relational data access, and cloud-hosted business services.",
+      "projectName": "Enterprise Application & Integration Platform",
+      "responsibilities": [
+        "Developed Java 17 and Spring Boot integration services connecting enterprise applications, PostgreSQL and Oracle databases, REST APIs, and distributed business workflows.",
+        "Implemented Apache Kafka producer and consumer integrations using topics, partitions, schemas, and asynchronous processing patterns to exchange business events between microservices.",
+        "Built SQL-based data-access components using JDBC, Hibernate, Spring Data JPA, and PostgreSQL, implementing transaction management, validation, and reliable persistence operations.",
+        "Optimized SQL queries, joins, indexes, and persistence execution paths to improve application data-retrieval efficiency, with an illustrative 27% reduction in query response time.",
+        "Designed REST-based integration workflows with request validation, response transformation, authentication, retry handling, timeouts, and structured exception management.",
+        "Developed Java processing components using collections, Streams, multithreading, and concurrency techniques for distributed application workflows.",
+        "Deployed application components using AWS EC2, S3, RDS, Lambda, Docker, and Kubernetes, supporting environment configuration, health checks, scaling, and rolling releases.",
+        "Automated build, test, packaging, and deployment activities using GitLab, Jenkins, Maven, Docker, and Kubernetes, with an illustrative 32% reduction in release preparation time.",
+        "Monitored distributed application behavior using CloudWatch, Prometheus, Grafana, application logs, and service metrics to investigate latency, processing errors, and resource utilization.",
+        "Investigated Kafka integration failures, SQL performance issues, API errors, and application defects through log correlation, debugging, database analysis, and root-cause resolution."
+      ],
+      "environment": [
+        "Java 17",
+        "Spring Boot",
+        "Spring Data JPA",
+        "Hibernate",
+        "JDBC",
+        "SQL",
+        "PostgreSQL",
+        "Oracle",
+        "Apache Kafka",
+        "REST APIs",
+        "Microservices",
+        "AWS",
+        "EC2",
+        "S3",
+        "RDS",
+        "Lambda",
+        "CloudWatch",
+        "Docker",
+        "Kubernetes",
+        "GitLab",
+        "Jenkins",
+        "Maven",
+        "Prometheus",
+        "Grafana"
+      ]
+    },
+    {
+      "id": "healthgrades",
+      "company": "Healthgrades",
+      "location": "Denver, CO",
+      "startDate": "Jun 2021",
+      "endDate": "Mar 2023",
+      "description": "Healthcare application services supporting transactional data access, API-based information exchange, relational database operations, and cloud-hosted application delivery.",
+      "responsibilities": [
+        "Developed Java 11 and Spring Boot services supporting healthcare application workflows and integration with relational databases and external REST systems.",
+        "Implemented PostgreSQL and MySQL persistence operations using Spring Data JPA, Hibernate, JDBC, and SQL to support transactional healthcare application data processing.",
+        "Optimized SQL joins, indexes, transaction boundaries, and persistence operations, with an illustrative 24% improvement in database query execution time.",
+        "Integrated external REST services using JSON request and response models, validation, authentication, timeout management, and structured error handling.",
+        "Developed layered controller, service, repository, and domain components to separate business processing, data access, and integration responsibilities.",
+        "Deployed containerized Spring Boot applications on AWS and Kubernetes, configuring service health checks, resource settings, and release validation.",
+        "Maintained GitLab and Jenkins CI/CD workflows for automated builds, testing, artifact packaging, and deployment, with an illustrative 29% reduction in deployment preparation effort.",
+        "Investigated healthcare application processing failures using CloudWatch, SQL analysis, Java debugging, and application logs to resolve database and service integration issues."
+      ],
+      "environment": [
+        "Java 11",
+        "Spring Boot",
+        "Spring Data JPA",
+        "Hibernate",
+        "JDBC",
+        "PostgreSQL",
+        "MySQL",
+        "SQL",
+        "REST APIs",
+        "JSON",
+        "AWS",
+        "EC2",
+        "S3",
+        "RDS",
+        "CloudWatch",
+        "Docker",
+        "Kubernetes",
+        "GitLab",
+        "Jenkins",
+        "Maven",
+        "JUnit 5",
+        "Mockito"
+      ]
+    },
+    {
+      "id": "firstgroup-america",
+      "company": "FirstGroup America",
+      "location": "Cincinnati, OH",
+      "startDate": "Oct 2018",
+      "endDate": "May 2021",
+      "description": "Transportation and logistics applications supporting fleet, scheduling, operational transactions, relational data processing, and distributed service integration.",
+      "responsibilities": [
+        "Developed Java 8 and Spring Boot services supporting transportation, fleet, scheduling, and logistics workflows across distributed enterprise applications.",
+        "Implemented relational data-access components using JDBC, Hibernate, PostgreSQL, MySQL, and SQL for operational transactions and scheduling-related information.",
+        "Optimized SQL joins, indexes, and database access patterns for transportation application workflows, with an illustrative 26% improvement in data-retrieval performance.",
+        "Developed REST APIs using Spring MVC, JSON models, request validation, and exception handling to connect operational application components.",
+        "Integrated internal and external services with authentication, timeout handling, logging, and structured integration-error management.",
+        "Deployed AWS-hosted services using EC2, Lambda, S3, RDS, Docker, and Kubernetes, supporting application configuration and service health validation.",
+        "Automated Java application builds and deployment workflows using GitLab, Maven, Jenkins, Docker, and Kubernetes, with an illustrative 22% reduction in manual release preparation effort.",
+        "Investigated production issues involving SQL execution, application logs, REST integrations, and AWS CloudWatch metrics, implementing corrective changes and validating results."
+      ],
+      "environment": [
+        "Java 8",
+        "Spring Boot",
+        "Spring MVC",
+        "Hibernate",
+        "JPA",
+        "JDBC",
+        "PostgreSQL",
+        "MySQL",
+        "SQL",
+        "REST APIs",
+        "JSON",
+        "AWS",
+        "EC2",
+        "Lambda",
+        "S3",
+        "RDS",
+        "CloudWatch",
+        "Docker",
+        "Kubernetes",
+        "GitLab",
+        "Jenkins",
+        "Maven",
+        "JUnit",
+        "Mockito"
+      ]
+    },
+    {
+      "id": "outfront-media",
+      "company": "Outfront Media",
+      "location": "New York, NY",
+      "startDate": "Jun 2016",
+      "endDate": "Sep 2018",
+      "description": "Digital advertising application services supporting campaign management, inventory, media scheduling, transactional reporting, and database-backed application integrations.",
+      "responsibilities": [
+        "Developed Java 8 and Spring Boot backend services supporting advertising campaign management, media scheduling, inventory, and related application workflows.",
+        "Implemented SQL-based persistence and reporting functionality using Hibernate, JDBC, PostgreSQL, and MySQL for advertising application data.",
+        "Tuned SQL queries, indexes, joins, and data-access operations to improve campaign and inventory data retrieval, with an illustrative 23% reduction in query response time.",
+        "Developed REST integrations using Spring MVC and JSON to exchange campaign and scheduling information between frontend applications, backend services, and external systems.",
+        "Implemented response transformation, authentication, validation, structured error handling, and logging for external application integrations.",
+        "Supported AWS application deployments using EC2, S3, RDS, Lambda, Docker, and Kubernetes, including configuration updates and service health checks.",
+        "Maintained GitLab, Maven, and Jenkins delivery workflows for automated application packaging, testing, and deployments, with an illustrative 20% reduction in release preparation time.",
+        "Diagnosed production issues involving advertising application services, SQL queries, REST integrations, and cloud-hosted components through log analysis and debugging."
+      ],
+      "environment": [
+        "Java 8",
+        "Spring Boot",
+        "Spring MVC",
+        "Hibernate",
+        "JDBC",
+        "PostgreSQL",
+        "MySQL",
+        "SQL",
+        "REST APIs",
+        "JSON",
+        "AWS",
+        "EC2",
+        "S3",
+        "RDS",
+        "Lambda",
+        "Docker",
+        "Kubernetes",
+        "GitLab",
+        "Jenkins",
+        "Maven",
+        "JUnit",
+        "Mockito"
+      ]
+    },
+    {
+      "id": "nucleus-software",
+      "company": "Nucleus Software",
+      "location": "Hyderabad, India",
+      "startDate": "Nov 2014",
+      "endDate": "May 2016",
+      "description": "Enterprise banking applications supporting transactional database processing, Oracle data access, stored procedures, and integration with internal and external banking systems.",
+      "responsibilities": [
+        "Developed Java 8 and Spring MVC application components supporting enterprise banking workflows and transactional data processing.",
+        "Implemented Oracle database access using JDBC, Hibernate, SQL, and PL/SQL to support reliable persistence and transactional consistency.",
+        "Developed and optimized Oracle stored procedures, views, joins, indexes, and SQL statements, with an illustrative 21% improvement in selected query execution time.",
+        "Built REST and SOAP service integrations using Java, JSON, and XML for information exchange between banking applications and external systems.",
+        "Implemented reusable Java service and data-access components using object-oriented programming, collections, exception handling, and Spring dependency injection.",
+        "Investigated Oracle SQL errors, application exceptions, integration failures, and deployment issues through Java debugging, log analysis, and database troubleshooting.",
+        "Developed JUnit tests, maintained Maven build configurations, and supported Java application deployments to Apache Tomcat and Linux environments."
+      ],
+      "environment": [
+        "Java 8",
+        "Spring Framework",
+        "Spring MVC",
+        "Hibernate",
+        "JDBC",
+        "Oracle",
+        "SQL",
+        "PL/SQL",
+        "Stored Procedures",
+        "REST APIs",
+        "SOAP Web Services",
+        "JSON",
+        "XML",
+        "JUnit",
+        "Maven",
+        "Git",
+        "Apache Tomcat",
+        "Linux"
+      ]
+    }
+  ],
+  "projects": [],
+  "education": [
+    {
+      "id": "jntuk-bachelors",
+      "institution": "Jawaharlal Nehru Technological University Kakinada (JNTUK)",
+      "degree": "Bachelor’s in Computer Science",
+      "location": "",
+      "graduationDate": "2016"
+    }
+  ],
+  "certifications": []
+}

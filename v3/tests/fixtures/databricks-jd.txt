@@ -1,0 +1,28 @@
+Job title : Data Engineer - Databricks, Scala
+Location : Quincy, MA - Locals Only
+Job Type : Contract/LongTerm
+Job Description
+Key Responsibilities
+Databricks, Scala- Data Engineer
+Must have at least 8+ years of extensive Data engineering experience in Databricks, ETL/ELT using data pipelines, SQL/Procesurr experience
+Must have 8 years of hands on development proficiency in implementing Databricks solutions using Scala and spark with data frames and notebooks/sql
+Must have 8+ years of hands on development and performance tuning/ enhancement experience in Scala/pyspark and sql
+Must have strong experience with Databricks, including developing and optimizing spark jobs, data transformations, and data processing workflows
+Must have experience and a good understanding on the below topics
+Databricks delta lake storage
+Unity catalog
+Autoloader
+Lakehouse architecture
+Medallion architecture
+Databricks serverless options
+Dataset and data frame
+Databricks clusters configuration and sizing
+Databricks job orchestration
+Spark structured streaming
+Must have experience with complex and large volume data streaming and data transformations using Azure Databricks
+Must have extensive experience in Datawarehouse / data lake house implementation
+Must have experience with monitoring, debugging, and resolving issues in Databricks jobs
+Must have strong hands on expertise in troubleshooting Devops pipelines, azure , and AKS services
+The candidate should be able to provide data ingestion, streaming and transformations solutions and do development work
+Experience with Apache big data implementation with programming proficiency like pyspark, R or Java prior to Databricks is advantageous
+Good to have experience with containerization technologies such as docker and Kubernetes.

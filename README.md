@@ -86,3 +86,6 @@ Public Kofax/Tungsten customer references are saved in `data/reference/technolog
 ## Resume formats
 
 In the editor, use **Resume format** to choose **Original format (default)** or **Aditya reference format**. The original remains the initial selection. The reference format uses a centered header, thin rules under headings, a paragraph summary followed by key qualifications, role/date rows, and education last. Both PDF and Word downloads follow the selected format. The first summary point becomes the paragraph; the remaining points become qualifications, without duplicating or dropping text. Environments are retained in resume data but are not displayed in the reference format, matching the source document. Existing optional experience descriptions and responsibility-group headings are supported. Word output reuses the source package styles and numbering; changing the font or text can change pagination.
+
+## Version 3
+The current independent application is in v3/. Run npm ci and npm run dev from that folder. Its development URL is http://127.0.0.1:3021. Earlier versions remain in their existing locations.

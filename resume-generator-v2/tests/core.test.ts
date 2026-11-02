@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { resumeSchema, profileSchema } from "../src/lib/contracts";
 import { analyzeJD, cleanTargetRole, companyId, targetExperienceWindow } from "../src/lib/jd";
 import { applyProposedTimelineDates, proposeJDTimeline, reviewEmploymentDates } from "../src/lib/timeline";
-import { buildPrompt, findResumeMetaLanguage, findHeadlineOnlyMatch, isDraftGenerationReady, scopePriorStatements } from "../src/lib/prompt";
+import { buildPrompt, findResumeMetaLanguage, isDraftGenerationReady, scopePriorStatements } from "../src/lib/prompt";
 import { claimsFromResume, finalizeResume } from "../src/lib/claims";
 import { createResumeDocx } from "../src/lib/docx-export";
 import { matchExperienceToJD, scoreAlignment } from "../src/lib/alignment";
@@ -37,16 +37,6 @@ test("C2C confirmation memory does not carry Kafka history or generated titles i
   assert.ok(prompt.includes("CURRENT REQUEST IS SELF-CONTAINED"));
 });
 
-test("detects a Salesforce headline over Kafka responsibilities without treating historical titles as errors", () => {
-  const resume = structuredClone(validResume);
-  resume.personalInfo.professionalTitle = "Salesforce Developer";
-  resume.experience = [{ id: "att", company: "AT&T", role: "Kafka Engineer", location: "", startDate: "2024", endDate: "Present", responsibilities: ["Administered Kafka brokers and consumer groups."], environment: ["Kafka"] }];
-  const analysis = analyzeJD("Role: Salesforce Developer\nRequired: Salesforce, Apex, Lightning Web Components.");
-  assert.match(findHeadlineOnlyMatch(resume, analysis) ?? "", /Role alignment warning/);
-  resume.experience[0].responsibilities.push("Built Salesforce Apex integrations for customer case workflows.");
-  assert.equal(findHeadlineOnlyMatch(resume, analysis), null);
-  assert.equal(resume.experience[0].role, "Kafka Engineer");
-});
 
 test("both profile prompts explicitly prevent previous-role stack leakage", () => {
   const jd = "Role: Salesforce Developer\nRequired: Salesforce and Apex. 6 years experience.";
@@ -112,9 +102,9 @@ test("JD role extraction removes hiring banners and location labels from the res
   assert.equal(cleanTargetRole("Full Stack Developer - Minneapolis, MN - Onsite Contract"), "Full Stack Developer");
 });
 
-test("JD analysis infers a usable role headline when the posting omits its title", () => {
+test("JD analysis does not invent a profession from technology mentions without a title", () => {
   const jd = "Finance and banking background required\nExperience required 4 years\nMandatory Skills\nJava 8/11/17, Spring Boot, Microservices, GCP, BigQuery, Python, Kafka\nKey Responsibilities\nBuild APIs and deploy cloud-native applications. Build and enhance microservices using Java and Spring Boot. Develop data-intensive solutions leveraging BigQuery.";
-  assert.equal(analyzeJD(jd).targetRole, "Java Backend Developer");
+  assert.ok(!/Java Backend Developer|Kafka Engineer/.test(analyzeJD(jd).targetRole));
 });
 
 test("decorated qualification headings are not scored as JD requirements", () => {
@@ -197,21 +187,22 @@ test("JD timeline starts from the current month, spreads backward, and prioritiz
   assert.equal(profile.companies[0]?.startDate, "Jan 2018");
   const noYearsJD = analyzeJD("Role: Cloud Engineer");
   const prompt = buildPrompt("Role: Cloud Engineer", noYearsJD, profile, [], new Date(2026, 9, 29));
-  assert.match(prompt, /When no numeric experience duration appears in the JD, use the configured employment dates/);
+  assert.match(prompt, /preserve identity, employer names, client\/location, actual dates/);
   assert.match(prompt, /Match each JD requirement against each employer's recorded facts/);
   assert.match(prompt, /Every string inside the returned "resume" object is resume copy intended to appear on the page/);
   assert.match(prompt, /syntheticAchievementDraft/);
   const fourYearPrompt = buildPrompt("Role: Java Developer\nMinimum 4 years of experience", fourYearJD, profile, [], new Date(2026, 9, 29));
-  assert.match(fourYearPrompt, /The supplied resumeTimeline represents exactly 4 years/);
-  assert.match(fourYearPrompt, /Nov 2022/);
-  assert.match(fourYearPrompt, /When resumeTimeline.dateSchedule contains a company, use that company's startDate and endDate exactly/);
+  assert.match(fourYearPrompt, /Never compress dates, extend experience/);
+  assert.ok(fourYearPrompt.includes(profile.companies[1].startDate));
+  assert.doesNotMatch(fourYearPrompt, /Nov 2022/);
+  assert.match(fourYearPrompt, /actual employment periods/);
   assert.doesNotMatch(fourYearPrompt, /Nov 2017/);
   assert.doesNotMatch(fourYearPrompt, /Proposed profile for a .* experience requirement/i);
-  assert.match(fourYearPrompt, /Build a role-specific technical evidence map from the JD/);
+  assert.match(fourYearPrompt, /EMPLOYER-SPECIFIC EVIDENCE AND UNCONFIRMED DRAFTING BRIEFS/);
   assert.match(fourYearPrompt, /These are proposed claims, not evidence/);
-  assert.match(fourYearPrompt, /RECRUITER QUALITY PASS/);
-  assert.match(fourYearPrompt, /Write 4–6 professional summary bullets/);
-  assert.match(fourYearPrompt, /Populate each Environment list only with technologies actually recorded/);
+  assert.match(fourYearPrompt, /SILENT QUALITY CHECK/);
+  assert.match(fourYearPrompt, /Write 4–6 distinct summary bullets/);
+  assert.match(fourYearPrompt, /Never turn a discussion, observation, or limited contribution/);
 });
 
 test("draft generation is allowed when employers have metadata but no work facts", () => {
@@ -221,9 +212,9 @@ test("draft generation is allowed when employers have metadata but no work facts
   assert.equal(isDraftGenerationReady(analysis, profile), true);
   assert.equal(isDraftGenerationReady(null, profile), false);
   const prompt = buildPrompt("Role: Data Integration Developer\nRequired Skills\n- SQL\n- ETL", analysis, profile);
-  assert.match(prompt, /If source work facts are sparse or absent, create technically specific, role-relevant draft options for candidate review/);
+  assert.match(prompt, /JD-driven draft suggestions/);
   assert.match(prompt, /Never turn a discussion, observation, or limited contribution into ownership or implementation/);
-  assert.match(prompt, /When no numeric experience duration appears in the JD, use the configured employment dates/);
+  assert.match(prompt, /preserve identity, employer names, client\/location, actual dates/);
 });
 
 test("resume-strength estimate flags generic writing and scores a detailed role-specific draft", () => {
@@ -264,7 +255,7 @@ test("universal prompt adapts its writing checklist to representative IT job fam
     const prompt = buildPrompt(jd, analysis, emptyProfile("full-time"));
     assert.ok(prompt.includes(role), `prompt lost target role ${role}`);
     assert.ok(prompt.includes(requirement), `prompt lost role requirement ${requirement}`);
-    assert.match(prompt, /derive the equivalent hands-on dimensions from their actual requirements/);
+    assert.match(prompt, /[Dd]erive the equivalent hands-on dimensions from their actual requirements/);
     assert.match(prompt, /These are proposed claims, not evidence/);
   }
 });
