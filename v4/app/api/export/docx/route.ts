@@ -1,0 +1,176 @@
+import { reviewResumeContent } from "@/engine/resume-review/content-review";
+import { assertLocalResumeSave, saveDailyResume } from "@/engine/export-engine/save-daily-resume";
+import { createArchitectResumeDocx } from "@/templates/architect-resume/docx-renderer";
+import { RESUME_LAYOUTS, DEFAULT_RESUME_LAYOUT } from "@/types/resume-layout";
+import { z } from "zod";
+
+import { createResumeDocx } from "@/engine/export-engine/create-resume-docx";
+import { generatedResumeSchema } from "@/engine/validation/resume.schema";
+import {
+  DEFAULT_RESUME_FONT,
+} from "@/types/resume-font";
+
+export const runtime = "nodejs";
+
+const requestSchema = z.object({
+  resume: generatedResumeSchema,
+  saveToFolder: z.boolean().optional().default(false),
+  templateId: z.enum(RESUME_LAYOUTS).optional().default(DEFAULT_RESUME_LAYOUT),
+
+  technicalSkills: z.array(
+    z.string(),
+  ),
+
+  selectedSections: z.array(
+    z.string(),
+  ),
+
+  fontFamily: z
+    .enum([
+      "Times New Roman",
+      "Arial",
+      "Calibri",
+      "Cambria",
+      "Georgia",
+    ])
+    .optional()
+    .default(DEFAULT_RESUME_FONT),
+  showCertificationLogos: z.boolean().optional().default(false),
+  selectedCertificationBadges: z.array(z.enum(["aws-saa", "aws-developer", "aws-devops", "azure-admin", "azure-devops", "azure-architect", "gcp-architect", "gcp-developer", "gcp-devops", "confluent-admin", "confluent-developer", "confluent-operator"])).optional().default([]),
+  certificationBadgePosition: z.object({ x: z.number().finite().min(-1200).max(1200), y: z.number().finite().min(-2400).max(2400) }).optional().default({ x: 0, y: 0 }),
+  certificationBadgeSize: z.number().int().min(36).max(110).optional().default(72),
+});
+
+export async function POST(
+  request: Request,
+) {
+  try {
+    /*
+     * Read the request body sent from:
+     *
+     * app/generated-preview/page.tsx
+     */
+
+    const body: unknown =
+      await request.json();
+
+    /*
+     * Validate the complete request.
+     *
+     * If fontFamily is missing,
+     * Times New Roman is automatically used.
+     */
+
+    const {
+      resume,
+      saveToFolder,
+      templateId,
+      technicalSkills,
+      selectedSections,
+      fontFamily,
+      showCertificationLogos,
+      selectedCertificationBadges,
+      certificationBadgePosition,
+      certificationBadgeSize,
+    } = requestSchema.parse(body);
+
+    const contentErrors = reviewResumeContent(resume).filter(issue => issue.severity === "error");
+    if (contentErrors.length) return Response.json({ success: false, error: contentErrors.map(issue => issue.message).join(" ") }, { status: 400 });
+    if (saveToFolder) assertLocalResumeSave(request);
+
+    /*
+     * Generate the DOCX using the
+     * user-selected font.
+     */
+
+    const docxBuffer = await (templateId === "architect-resume" ? createArchitectResumeDocx : createResumeDocx)({
+        resume,
+        technicalSkills,
+        selectedSections,
+        fontFamily,
+        showCertificationLogos,
+        selectedCertificationBadges,
+        certificationBadgePosition,
+        certificationBadgeSize,
+      });
+
+    /*
+     * Convert the Node.js Buffer into
+     * a web-compatible Uint8Array.
+     */
+
+    if (saveToFolder) {
+      const saved = await saveDailyResume(docxBuffer, resume.personalInfo.fullName, "docx");
+      return Response.json(saved, { headers: { "Cache-Control": "no-store" } });
+    }
+
+    const docxBytes =
+      new Uint8Array(docxBuffer);
+
+    /*
+     * Return the generated Word document.
+     */
+
+    return new Response(
+      docxBytes,
+      {
+        status: 200,
+
+        headers: {
+          "Content-Type":
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+          "Content-Disposition":
+            'attachment; filename="Karthik_Mangineni_Resume.docx"',
+
+          "Cache-Control":
+            "no-store",
+        },
+      },
+    );
+  } catch (error) {
+    console.error(
+      "DOCX generation error:",
+      error,
+    );
+
+    /*
+     * Zod validation error
+     */
+
+    if (error instanceof z.ZodError) {
+      return Response.json(
+        {
+          success: false,
+
+          error:
+            "Invalid DOCX export data.",
+
+          details:
+            error.flatten(),
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    /*
+     * General DOCX generation error
+     */
+
+    return Response.json(
+      {
+        success: false,
+
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to generate DOCX.",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+}

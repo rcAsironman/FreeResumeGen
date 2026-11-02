@@ -1,0 +1,263 @@
+import { reviewResumeContent } from "@/engine/resume-review/content-review";
+import { assertLocalResumeSave, saveDailyResume } from "@/engine/export-engine/save-daily-resume";
+import { RESUME_LAYOUTS, DEFAULT_RESUME_LAYOUT } from "@/types/resume-layout";
+import { chromium } from "playwright";
+import { z } from "zod";
+
+import { generatedResumeSchema } from "@/engine/validation/resume.schema";
+import {
+  DEFAULT_RESUME_FONT,
+} from "@/types/resume-font";
+
+export const runtime = "nodejs";
+
+const requestSchema = z.object({
+  resume: generatedResumeSchema,
+  saveToFolder: z.boolean().optional().default(false),
+  templateId: z.enum(RESUME_LAYOUTS).optional().default(DEFAULT_RESUME_LAYOUT),
+
+  technicalSkills: z.array(
+    z.string(),
+  ),
+
+  selectedSections: z.array(
+    z.string(),
+  ),
+
+  documentHtml: z.string().max(2_000_000).optional(),
+  showCertificationLogos: z.boolean().optional().default(false),
+  selectedCertificationBadges: z.array(z.enum(["aws-saa", "aws-developer", "aws-devops", "azure-admin", "azure-devops", "azure-architect", "gcp-architect", "gcp-developer", "gcp-devops", "confluent-admin", "confluent-developer", "confluent-operator"])).optional().default([]),
+  certificationBadgePosition: z.object({ x: z.number().finite().min(-1200).max(1200), y: z.number().finite().min(-2400).max(2400) }).optional().default({ x: 0, y: 0 }),
+  certificationBadgeSize: z.number().int().min(36).max(110).optional().default(72),
+
+  fontFamily: z
+    .enum([
+      "Times New Roman",
+      "Arial",
+      "Calibri",
+      "Cambria",
+      "Georgia",
+    ])
+    .optional()
+    .default(DEFAULT_RESUME_FONT),
+});
+
+export async function POST(
+  request: Request,
+) {
+  let browser;
+
+  try {
+    const body: unknown =
+      await request.json();
+
+    const {
+      resume,
+      saveToFolder,
+      templateId,
+      technicalSkills,
+      selectedSections,
+      fontFamily,
+      documentHtml,
+      showCertificationLogos,
+      selectedCertificationBadges,
+      certificationBadgePosition,
+      certificationBadgeSize,
+    } = requestSchema.parse(body);
+
+    const contentErrors = reviewResumeContent(resume).filter(issue => issue.severity === "error");
+    if (contentErrors.length) return Response.json({ success: false, error: contentErrors.map(issue => issue.message).join(" ") }, { status: 400 });
+    if (saveToFolder) assertLocalResumeSave(request);
+
+    // A TLS-terminating tunnel may produce https://localhost even though Next
+    // listens locally over HTTP. Render internally, not through tunnel TLS.
+    const renderOrigin=new URL(request.url);
+    if(["localhost","127.0.0.1","[::1]"].includes(renderOrigin.hostname))renderOrigin.protocol='http:';
+    const baseUrl = process.env.APP_BASE_URL ?? renderOrigin.origin;
+
+    browser = await chromium.launch({
+      headless: true,
+    });
+
+    const page =
+      await browser.newPage();
+
+    /*
+     * Open the app origin first so
+     * sessionStorage is available.
+     */
+
+    await page.goto(
+      baseUrl,
+      {
+        waitUntil:
+          "domcontentloaded",
+      },
+    );
+
+    /*
+     * Store all resume-rendering data,
+     * including the selected font.
+     */
+
+    await page.evaluate(
+      (payload) => {
+        sessionStorage.setItem(
+          "pdfResumeData",
+          JSON.stringify(payload),
+        );
+      },
+      {
+        resume,
+        templateId,
+        technicalSkills,
+        selectedSections,
+        fontFamily,
+        documentHtml,
+        showCertificationLogos,
+        selectedCertificationBadges,
+        certificationBadgePosition,
+        certificationBadgeSize,
+      },
+    );
+
+    /*
+     * Open the dedicated PDF render page.
+     */
+
+    await page.goto(
+      `${baseUrl}/pdf-render`,
+      {
+        waitUntil:
+          "domcontentloaded",
+      },
+    );
+
+    /*
+     * Wait until React has rendered
+     * the complete resume.
+     */
+
+    await page.waitForSelector(
+      '[data-pdf-ready="true"]',
+      {
+        state: "visible",
+        timeout: 30000,
+      },
+    );
+
+    await page.waitForFunction(
+      () => Array.from(document.images).every((image) => image.complete && image.naturalWidth > 0),
+      { timeout: 10000 },
+    );
+
+    /*
+     * Use print CSS.
+     */
+
+    await page.emulateMedia({
+      media: "print",
+    });
+
+    /*
+     * Generate a real 8.5 × 11
+     * US Letter PDF.
+     */
+
+    if (templateId === "architect-resume") {
+      await page.addStyleTag({ content: "@page { size: Letter; margin: 0in 0.132639in 0in 0.197222in; }" });
+    }
+    const pdf = await page.pdf({
+      format: "Letter",
+
+      printBackground: true,
+
+      /*
+       * Playwright controls the physical
+       * Letter page size.
+       */
+      preferCSSPageSize: false,
+
+      margin: {
+        top: templateId === "architect-resume" ? "0in" : "0.42in",
+        right: templateId === "architect-resume" ? "0.132639in" : "0.5in",
+        bottom: templateId === "architect-resume" ? "0in" : "0.42in",
+        left: templateId === "architect-resume" ? "0.197222in" : "0.5in",
+      },
+    });
+
+    /*
+     * Convert Node Buffer into
+     * a Response-compatible body.
+     */
+
+    if (saveToFolder) {
+      const saved = await saveDailyResume(pdf, resume.personalInfo.fullName, "pdf");
+      return Response.json(saved, { headers: { "Cache-Control": "no-store" } });
+    }
+
+    const pdfBytes =
+      new Uint8Array(pdf);
+
+    return new Response(
+      pdfBytes,
+      {
+        status: 200,
+
+        headers: {
+          "Content-Type":
+            "application/pdf",
+
+          "Content-Disposition":
+            'inline; filename="Karthik_Mangineni_Resume.pdf"',
+
+          "Cache-Control":
+            "no-store",
+        },
+      },
+    );
+  } catch (error) {
+    console.error(
+      "PDF generation error:",
+      error,
+    );
+
+    if (
+      error instanceof
+      z.ZodError
+    ) {
+      return Response.json(
+        {
+          success: false,
+
+          error:
+            "Invalid PDF export data.",
+
+          details:
+            error.flatten(),
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    return Response.json(
+      {
+        success: false,
+
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to generate PDF.",
+      },
+      {
+        status: 500,
+      },
+    );
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
+}

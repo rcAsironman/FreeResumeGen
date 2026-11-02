@@ -1,0 +1,18 @@
+# Architect format execution contract
+
+Reference: C:\Users\karth\Downloads\Aditya_Software_Architect_Resume (1).docx
+SHA256: 4a295fb210d3bed2d1365822bac537f2962c0c84d5fe7eee3071b1280d0e0984
+Reference is unchanged; retained copy: templates/architect-resume/reference.docx.
+Reference rendered using native Microsoft Word PDF export because packaged render_docx.py failed: LibreOffice unavailable. Three pages inspected in generated/template-qa/reference-1.png through reference-3.png.
+
+Page: Letter 12240 x 15840 twips. Margins top/bottom 0, left 284, right 191 twips. Header/footer 708 twips; no actual headers/footers. One section, no tables, drawings, controls or fields. Numbering numId 2, abstractNumId 1: bullet, 300 twips left, 220 hanging.
+
+Typography: Times New Roman throughout. Name: centered uppercase, 12 pt bold, #404040, 1.5 pt character spacing; after 2 pt. Title: centered 12 pt #595959, after 1.5 pt. Contact: centered 12 pt, after 3 pt. Heading: 11 pt bold #404040, 1 pt character spacing; before 10 pt, after 4.5 pt; bottom rule #BFBFBF 0.75 pt, space 2 pt. Summary: 10 pt justified, line multiplier 274/240, after 2 pt. Bullets: 10 pt, same line multiplier, after 3.5 pt, keepLines. Skill rows: 10 pt, after 2.5 pt, bold label and plain values. Role: 11 pt bold #404040, right tab at 10224 twips; first role before 3 pt, later roles before 10 pt, after 0.5 pt. Employer: 11 pt bold, after 3 pt. Optional role description: 10 pt after 3.5 pt, keepNext. Optional subhead: 10 pt bold, before 3 pt after 2 pt. Education: 10 pt, date aligned to source spacing pattern.
+
+Flow: header; professional summary paragraph; key qualifications bullets; technical skills rows; professional experience (role/date, employer/location, optional description and subheads, bullets); education.
+Slots: word/document.xml body paragraph patterns stored in slots.json. Name/title/contact and all body content are replaceable. Source first summary bullet maps to summary paragraph; remaining bullets map to qualifications with no repeated text. Existing optional experience description/projectName retained if present; no invented achievements or reference-person content. Qualifications and responsibility counts may grow using cloned patterns. Experience environment remains data but is not rendered in this format because reference has no environment lines. Education dates separated from degree/institution. Reference-only content must not leak.
+
+Preserve-only: all package parts other than document.xml and docProps/core.xml remain byte-identical. Document body and core metadata are rewritten; section geometry stays identical. Numbering, themes, fonts, settings and relationships are preserved. Header text, bullets and tables must not be clipped. Paragraph count and page count may vary with candidate content; fonts, margins, spacing and components must remain source-derived.
+
+
+Verification adjustments: browser body line-height 1.314 reproduces Word's 274-auto line spacing (Word single-line metrics differ from CSS font-size). Role/company/subhead/education use normal line height. Education's literal source whitespace is implemented as a right tab at 9680 twips for stable dates. Paragraph IDs are regenerated to avoid duplicated list/paragraph identities. These are formatting-equivalent implementation changes, not content changes. Source Word rebuilt with identical content retains three pages; candidate fixture uses four pages due to its longer content. Preserve-only package parts are checked byte-for-byte. Browser and Word may wrap a few words differently due to renderer text metrics.
