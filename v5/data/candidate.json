@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 1,
+  "profileType": "full-time",
+  "personalInfo": {
+    "fullName": "Kusuma naga anjali Raparthi",
+    "email": "kusuma.raparthi123@gmail.com",
+    "phone": "+91 9989348841",
+    "location": ""
+  },
+  "education": [
+    {
+      "id": "slu-ms",
+      "institution": "Universal college of Engineering and Technology",
+      "degree": "BTech in Electronics and communication Engineering",
+      "location": "Guntur, Andra Pradesh",
+      "graduationDate": "2023"
+    }
+  ],
+  "certifications": [
+    {
+      "id": "aws-saa",
+      "name": "AWS Certified Solutions Architect – Associate",
+      "badgeId": "aws-saa",
+      "logo": "/certification-badges/aws-solutions-architect-associate.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "aws-developer",
+      "name": "AWS Certified Developer – Associate",
+      "badgeId": "aws-developer",
+      "logo": "/certification-badges/aws-developer-associate.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "aws-devops",
+      "name": "AWS Certified DevOps Engineer – Professional",
+      "badgeId": "aws-devops",
+      "logo": "/certification-badges/aws-devops-engineer-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "azure-admin",
+      "name": "Microsoft Certified: Azure Administrator Associate (AZ-104)",
+      "badgeId": "azure-admin",
+      "logo": "/certification-badges/azure-administrator-associate.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "azure-devops",
+      "name": "Microsoft Certified: DevOps Engineer Expert (AZ-400)",
+      "badgeId": "azure-devops",
+      "logo": "/certification-badges/azure-devops-engineer-expert.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "azure-architect",
+      "name": "Microsoft Certified: Azure Solutions Architect Expert (AZ-305)",
+      "badgeId": "azure-architect",
+      "logo": "/certification-badges/azure-solutions-architect-expert.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "gcp-architect",
+      "name": "Google Cloud Professional Cloud Architect",
+      "badgeId": "gcp-architect",
+      "logo": "/certification-badges/gcp-cloud-architect-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "gcp-developer",
+      "name": "Google Cloud Professional Cloud Developer",
+      "badgeId": "gcp-developer",
+      "logo": "/certification-badges/gcp-cloud-developer-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "gcp-devops",
+      "name": "Google Cloud Professional Cloud DevOps Engineer",
+      "badgeId": "gcp-devops",
+      "logo": "/certification-badges/gcp-cloud-devops-professional.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "confluent-admin",
+      "name": "Confluent Certified Administrator for Apache Kafka (CCAAK)",
+      "badgeId": "confluent-admin",
+      "logo": "/certification-badges/confluent-administrator-kafka.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "confluent-developer",
+      "name": "Confluent Certified Developer for Apache Kafka (CCDAK)",
+      "badgeId": "confluent-developer",
+      "logo": "/certification-badges/confluent-developer-kafka.png",
+      "logoSize": 72,
+      "visible": false
+    },
+    {
+      "id": "confluent-operator",
+      "name": "Confluent Cloud Certified Operator (CCAC)",
+      "badgeId": "confluent-operator",
+      "logo": "/certification-badges/confluent-cloud-operator.png",
+      "logoSize": 72,
+      "visible": false
+    }
+  ],
+  "companies": [
+    {
+      "id": "fidelity-investments",
+      "companyName": "Sparity soft technologies",
+      "clientName": "",
+      "industry": "",
+      "location": "Madhapur, Hyderabad, Telangana",
+      "jobTitle": "Software engineer",
+      "startDate": "Nov 2023",
+      "endDate": "Present",
+      "isCurrent": true,
+      "technologies": [
+        "Java 8",
+        "Spring Boot",
+        "Spring MVC",
+        "Spring Security",
+        "Spring Data JPA",
+        "Hibernate ORM",
+        "JDBC",
+        "Microservices",
+        "RESTful APIs",
+        "PostgreSQL",
+        "AWS (EC2, S3, IAM)",
+        "Azure Devops",
+        "Jira",
+        "python",
+        "prompt engineering",
+        "LLM integrations",
+        "AI tools (GitHub Copilot, Cursor, Claude Code)",
+        "Docker",
+        "Git",
+        "GitLab",
+        "Maven",
+        "Jenkins",
+        "JUnit 5",
+        "Postman",
+        "Swagger (OpenAPI)",
+        "Linux",
+        "Agile Scrum"
+      ],
+      "responsibilities": [
+        "Designed and developed microservices using Java 8 or Java 11, Spring Boot, Spring MVC, and RESTful APIs.",
+        "Built backend services using Spring Data JPA, Hibernate ORM, and JDBC, with PostgreSQL for data storage.",
+        "Developed responsive user interfaces using React, TypeScript, and JavaScript, integrating them with backend APIs.",
+        "Used Spring Security to support secure access to application features and APIs.",
+        "Worked with AWS EC2, S3, and IAM to support cloud-based application deployment and access management.",
+        "Supported application build and delivery workflows using Docker, Azure DevOps, Jenkins, Git, GitLab, and Maven.",
+        "Wrote unit tests using JUnit 5 and validated APIs using Postman and Swagger (OpenAPI).",
+        "Used prompt engineering, LLM integrations, and AI tools such as GitHub Copilot, Cursor, and Claude Code to assist with development, review, and debugging.",
+        "Contributed to Agile Scrum delivery, including sprint planning, task tracking in Jira, and collaboration with the engineering team."
+      ],
+      "projects": []
+    },
+    {
+      "id": "pine-labs",
+      "companyName": "TechEFolks",
+      "clientName": "",
+      "industry": "",
+      "location": "Madhapur, Hyderabad, Telangana",
+      "jobTitle": "Software engineer",
+      "startDate": "Dec 2022",
+      "endDate": "Nov 2023",
+      "isCurrent": false,
+      "technologies": [
+        "Java 8",
+        "Core Java",
+        "Spring Framework",
+        "Spring Boot",
+        "Spring MVC",
+        "Spring Security",
+        "Spring Data JPA",
+        "Hibernate ORM",
+        "JDBC",
+        "RESTful APIs",
+        "JSON",
+        "XML",
+        "HTML",
+        "CSS",
+        "PostgreSQL",
+        "SQL",
+        "AWS (EC2, s3)",
+        "Git",
+        "GitLab",
+        "Maven",
+        "Postman",
+        "Swagger (OpenAPI)",
+        "Jira",
+        "Agile Scrum"
+      ],
+      "responsibilities": [
+        "Developed and maintained Java 8 applications using Core Java, Spring Framework, and Spring Boot.",
+        "Built backend components and RESTful APIs using Spring MVC, integrating services through JSON and XML.",
+        "Implemented data access using Spring Data JPA, Hibernate ORM, and JDBC with PostgreSQL and SQL.",
+        "Applied Spring Security to help secure application components and API access.",
+        "Created and maintained web page components using HTML and CSS.",
+        "Supported application deployment and storage needs using AWS EC2 and S3.",
+        "Managed source code using Git and GitLab and supported project builds with Maven.",
+        "Validated RESTful APIs using Postman and Swagger (OpenAPI).",
+        "Tracked work and collaborated with the team using Jira and Agile Scrum practices."
+      ],
+      "projects": []
+    }
+  ],
+  "preferences": {
+    "maxExperienceYears": 4,
+    "summaryBullets": 2,
+    "latestCompanyBullets": 4,
+    "otherCompanyBullets": 3
+  }
+}

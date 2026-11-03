@@ -1,0 +1,288 @@
+
+{
+  "personalInfo": {
+    "fullName": "Karthik Mangineni",
+    "professionalTitle": "Data Engineer - Databricks, Scala",
+    "email": "karthikmangineni5@gmail.com",
+    "phone": "314-814-6677",
+    "location": ""
+  },
+  "professionalSummary": {
+    "bullets": [
+      "Data Engineer with approximately 12 years of experience across enterprise data integration, SQL development, ETL/ELT processing, distributed data engineering, and analytical data platforms, with a focus on Scala, Apache Spark, PySpark, and Azure Databricks.",
+      "Skilled in designing Databricks data pipelines using Scala, Spark DataFrames, Datasets, notebooks, and Spark SQL for large-volume batch processing, incremental ingestion, and complex transformations.",
+      "Experienced in lakehouse architecture, Delta Lake storage, Bronze/Silver/Gold Medallion processing, schema evolution, data validation, and data warehouse integration.",
+      "Developed streaming ingestion solutions using Spark Structured Streaming, Databricks Auto Loader, checkpoint management, watermarking, and incremental Delta table operations.",
+      "Implemented Unity Catalog governance workflows covering catalogs, schemas, table-level privileges, controlled data access, and centralized management of analytical data assets.",
+      "Optimized Spark applications using execution-plan analysis, partition pruning, broadcast joins, shuffle reduction, caching, Adaptive Query Execution, and Databricks cluster sizing.",
+      "Built and maintained Databricks job orchestration workflows with parameterized notebooks, task dependencies, scheduling, retries, and monitoring of failed or delayed processing tasks.",
+      "Supported Azure data engineering operations through CI/CD troubleshooting, Azure DevOps pipelines, Databricks serverless compute evaluation, and integration with Docker, Kubernetes, and Azure Kubernetes Service."
+    ]
+  },
+  "technicalSkills": {
+    "categories": [
+      {
+        "name": "Data Engineering and Databricks",
+        "skills": [
+          "Azure Databricks",
+          "Apache Spark",
+          "Delta Lake",
+          "Unity Catalog",
+          "Databricks Auto Loader",
+          "Databricks Workflows",
+          "Databricks SQL",
+          "Databricks Notebooks",
+          "Databricks Serverless",
+          "Databricks Cluster Configuration",
+          "Cluster Sizing"
+        ]
+      },
+      {
+        "name": "Programming Languages",
+        "skills": [
+          "Scala",
+          "PySpark",
+          "Python",
+          "SQL",
+          "Java"
+        ]
+      },
+      {
+        "name": "Distributed Data Processing",
+        "skills": [
+          "Spark SQL",
+          "Spark DataFrames",
+          "Spark Datasets",
+          "Spark Structured Streaming",
+          "Batch Processing",
+          "Incremental Processing",
+          "Streaming Transformations",
+          "Checkpointing",
+          "Watermarking",
+          "Spark Performance Tuning"
+        ]
+      },
+      {
+        "name": "Data Architecture",
+        "skills": [
+          "ETL",
+          "ELT",
+          "Lakehouse Architecture",
+          "Medallion Architecture",
+          "Data Warehousing",
+          "Data Lakes",
+          "Data Modeling",
+          "Data Ingestion",
+          "Data Quality",
+          "Schema Evolution",
+          "Data Transformation",
+          "Delta MERGE"
+        ]
+      },
+      {
+        "name": "Azure and DevOps",
+        "skills": [
+          "Microsoft Azure",
+          "Azure Data Lake Storage Gen2",
+          "Azure DevOps",
+          "Azure DevOps Pipelines",
+          "Azure Kubernetes Service",
+          "CI/CD",
+          "Git",
+          "Docker",
+          "Kubernetes"
+        ]
+      },
+      {
+        "name": "Performance and Monitoring",
+        "skills": [
+          "Spark UI",
+          "Query Optimization",
+          "Partition Management",
+          "Adaptive Query Execution",
+          "Broadcast Joins",
+          "Shuffle Optimization",
+          "Caching",
+          "Job Monitoring",
+          "Pipeline Debugging",
+          "Root Cause Analysis",
+          "Cluster Resource Optimization"
+        ]
+      }
+    ]
+  },
+  "experience": [
+    {
+      "id": "att",
+      "company": "AT&T",
+      "location": "Atlanta, GA",
+      "startDate": "Apr 2023",
+      "endDate": "Present",
+      "role": "Data Engineer - Databricks, Scala",
+      "projectName": "Enterprise Application & Integration Platform",
+      "description": "Enterprise data integration and analytical processing platform involving Azure Databricks, large-volume data ingestion, distributed Spark transformations, governed Delta Lake storage, and operational data pipeline orchestration.",
+      "responsibilities": [
+        "Developed Azure Databricks ETL/ELT pipelines using Scala, PySpark, Spark SQL, and DataFrames to process large-volume enterprise operational datasets and publish curated analytical tables.",
+        "Designed Delta Lake Bronze, Silver, and Gold processing layers with schema validation, deduplication, incremental merge operations, and reusable transformation notebooks.",
+        "Implemented Databricks Auto Loader pipelines against Azure Data Lake Storage Gen2 with schema tracking, checkpoint persistence, rescued-data handling, and restartable ingestion workflows.",
+        "Built Spark Structured Streaming applications using Scala and PySpark, incorporating watermarks, stateful aggregations, checkpoint directories, and Delta Lake streaming sinks.",
+        "Optimized expensive Spark joins and aggregation stages through broadcast join selection, repartitioning, skew analysis, and Adaptive Query Execution; evaluate processing-time reductions against recorded job-run baselines.",
+        "Configured Databricks job clusters using workload-specific worker sizing, autoscaling settings, executor memory analysis, and compute policies; compared serverless execution with traditional job-cluster configurations.",
+        "Configured Unity Catalog catalogs, schemas, and table grants to organize governed data assets and apply controlled access across ingestion and analytical processing layers.",
+        "Created Databricks Workflows with parameterized notebooks, dependent tasks, retry policies, scheduling, and alerting to coordinate ingestion, cleansing, enrichment, and publishing operations.",
+        "Diagnosed failed Spark stages, executor out-of-memory conditions, shuffle spills, schema mismatches, and Structured Streaming checkpoint failures using Spark UI, driver logs, and task execution details.",
+        "Troubleshot Azure DevOps pipeline failures, deployment variables, service connections, and containerized application dependencies involving Docker, Kubernetes, and AKS, coordinating corrections across platform and engineering teams."
+      ],
+      "environment": [
+        "Azure Databricks",
+        "Scala",
+        "PySpark",
+        "Apache Spark",
+        "Spark SQL",
+        "Spark DataFrames",
+        "Spark Structured Streaming",
+        "Delta Lake",
+        "Unity Catalog",
+        "Auto Loader",
+        "Databricks Workflows",
+        "Databricks Serverless",
+        "Azure Data Lake Storage Gen2",
+        "Azure DevOps",
+        "AKS",
+        "Docker",
+        "Kubernetes",
+        "Git",
+        "Spark UI"
+      ]
+    },
+    {
+      "id": "healthgrades",
+      "company": "Healthgrades",
+      "location": "Denver, CO",
+      "startDate": "Jun 2021",
+      "endDate": "Mar 2023",
+      "role": "Data Engineer - Databricks, Scala",
+      "description": "Healthcare data integration and analytical processing workflows involving provider records, operational datasets, distributed transformations, and curated reporting structures.",
+      "responsibilities": [
+        "Developed Databricks notebooks using Scala, PySpark, and Spark SQL to integrate structured provider and operational datasets into standardized analytical processing layers.",
+        "Created Spark DataFrame transformations for provider identifier reconciliation, attribute normalization, duplicate detection, and preparation of curated reporting datasets.",
+        "Implemented Delta Lake tables with incremental loading, merge-based updates, schema enforcement, and historical data processing for downstream analytical consumption.",
+        "Built validation routines comparing source and target record counts, required-field completeness, and duplicate-key distributions; defined data quality indicators for release acceptance.",
+        "Optimized complex Spark SQL transformations through partition pruning, selective caching, join strategy improvements, and inspection of physical execution plans.",
+        "Organized Databricks notebook workflows with reusable processing functions, configurable parameters, scheduled execution, and recovery procedures for failed processing stages.",
+        "Investigated inconsistent source schemas, failed Spark tasks, invalid records, and SQL performance issues using notebook logs, execution plans, and data reconciliation queries.",
+        "Worked with reporting and application stakeholders to translate healthcare analytical requirements into dimensional datasets, transformation rules, and data validation procedures."
+      ],
+      "environment": [
+        "Databricks",
+        "Scala",
+        "PySpark",
+        "Apache Spark",
+        "Spark SQL",
+        "Spark DataFrames",
+        "Delta Lake",
+        "SQL",
+        "ETL/ELT",
+        "Data Warehousing",
+        "Data Modeling",
+        "Git"
+      ]
+    },
+    {
+      "id": "firstgroup-america",
+      "company": "FirstGroup America",
+      "location": "Cincinnati, OH",
+      "startDate": "Oct 2018",
+      "endDate": "May 2021",
+      "role": "Data Engineer - Scala and Spark",
+      "description": "Transportation operations data engineering workflows supporting batch ingestion, distributed data processing, operational reporting, and historical analytical datasets.",
+      "responsibilities": [
+        "Developed Scala-based Apache Spark applications to ingest transportation operations records from structured files and relational source systems.",
+        "Implemented Spark DataFrame and Dataset transformations for operational event consolidation, service activity aggregation, and standardized reporting outputs.",
+        "Created SQL-based ETL processing routines to cleanse source data, validate business identifiers, and load curated datasets into reporting structures.",
+        "Developed incremental processing logic using source update timestamps and persisted processing checkpoints to limit unnecessary full-data reloads.",
+        "Analyzed Spark execution stages and shuffle behavior to identify skewed partitions, excessive intermediate data movement, and inefficient joins.",
+        "Refactored transformation logic using appropriate partition counts, projection pushdown, broadcast joins, and reusable Scala processing components.",
+        "Troubleshot failed batch processing tasks, malformed source records, schema changes, and memory-related execution issues using application logs and Spark diagnostics."
+      ],
+      "environment": [
+        "Scala",
+        "Apache Spark",
+        "Spark SQL",
+        "Spark DataFrames",
+        "Spark Datasets",
+        "SQL",
+        "ETL",
+        "Data Warehousing",
+        "Batch Processing",
+        "Git"
+      ]
+    },
+    {
+      "id": "outfront-media",
+      "company": "Outfront Media",
+      "location": "New York, NY",
+      "startDate": "Jun 2016",
+      "endDate": "Sep 2018",
+      "role": "Data Engineer - Big Data and SQL",
+      "description": "Advertising campaign data processing and reporting integration involving structured data ingestion, SQL transformations, distributed batch processing, and analytical data preparation.",
+      "responsibilities": [
+        "Developed SQL ETL routines to consolidate advertising campaign, placement, and operational reporting data from multiple structured sources.",
+        "Implemented Scala and Apache Spark batch transformations for larger campaign datasets, including joins, filtering, normalization, and aggregated reporting outputs.",
+        "Created source-to-target reconciliation checks to identify missing campaign records, duplicate identifiers, inconsistent attribute mappings, and mismatched reporting totals.",
+        "Designed staging tables and analytical data structures supporting historical campaign reporting and dimensional aggregations.",
+        "Optimized SQL transformations by reviewing execution plans, refining filtering conditions, and reducing repeated processing of unchanged source records.",
+        "Improved operational recovery procedures through validation checkpoints, exception logging, restartable batch steps, and documented data mapping rules."
+      ],
+      "environment": [
+        "Scala",
+        "Apache Spark",
+        "SQL",
+        "ETL",
+        "Data Integration",
+        "Data Warehousing",
+        "Batch Processing",
+        "Data Modeling",
+        "Git"
+      ]
+    },
+    {
+      "id": "nucleus-software",
+      "company": "Nucleus Software",
+      "location": "Hyderabad, India",
+      "startDate": "Nov 2014",
+      "endDate": "May 2016",
+      "role": "Data Engineer - SQL and ETL",
+      "description": "Financial application data integration workflows involving relational database processing, SQL transformations, data validation, and structured reporting pipelines.",
+      "responsibilities": [
+        "Developed SQL queries and database procedures to extract, transform, and prepare structured financial application records for downstream reporting systems.",
+        "Implemented scheduled ETL processing routines to populate staging tables and reporting datasets from transactional and reference data sources.",
+        "Created validation queries to identify duplicate transaction records, missing values, referential integrity violations, and source-to-target discrepancies.",
+        "Reviewed SQL execution plans and query filtering patterns to address inefficient joins, repeated scans, and unnecessary intermediate processing.",
+        "Investigated failed data loads and inconsistent records using database error messages, processing logs, and targeted reconciliation queries.",
+        "Documented transformation specifications, source-to-target mappings, processing dependencies, and operational recovery procedures."
+      ],
+      "environment": [
+        "SQL",
+        "ETL",
+        "Relational Databases",
+        "Stored Procedures",
+        "Data Validation",
+        "Data Warehousing",
+        "Batch Processing",
+        "Query Optimization"
+      ]
+    }
+  ],
+  "projects": [],
+  "education": [
+    {
+      "id": "jntuk-bachelors",
+      "institution": "Jawaharlal Nehru Technological University Kakinada (JNTUK)",
+      "degree": "Bachelor’s in Computer Science",
+      "location": "",
+      "graduationDate": "2016"
+    }
+  ],
+  "certifications": []
+}

@@ -1,0 +1,295 @@
+{
+  "personalInfo": {
+    "fullName": "Karthik Mangineni",
+    "professionalTitle": ".NET Core Software Engineer 2",
+    "email": "karthikmangineni5@gmail.com",
+    "phone": "314-814-6677",
+    "location": ""
+  },
+  "professionalSummary": {
+    "bullets": [
+      "10+ years of software engineering experience developing, testing, debugging, deploying, and supporting enterprise applications, with responsibilities spanning backend services, Web APIs, relational data access, and production troubleshooting.",
+      "Developed C# application components using object-oriented design, dependency injection, exception handling, asynchronous operations, and reusable service interfaces to implement business workflows.",
+      "Implemented backend services with .NET Core and .NET 8, separating request handling, application logic, and persistence operations through maintainable application boundaries.",
+      "Designed and maintained RESTful Web APIs with ASP.NET Core, including request validation, response contracts, error handling, authentication integration, and downstream service calls.",
+      "Used Entity Framework Core for relational persistence, including query composition, entity mapping, transaction handling, migrations, and investigation of generated SQL.",
+      "Built Blazor components for application workflows, connecting forms and validation behavior to backend Web APIs and handling loading, error, and submission states.",
+      "Wrote and reviewed SQL queries for application data retrieval and updates, investigating joins, indexes, query plans, and transaction behavior during troubleshooting.",
+      "Debugged software defects by reproducing failures, inspecting C# execution paths, examining exceptions and logs, and validating corrective changes with regression tests.",
+      "Performed root cause analysis for application and integration issues, documenting findings and coordinating corrective actions across development, QA, and operations.",
+      "Used configuration management and build processes to maintain source changes, dependency versions, automated validation, and deployable application artifacts.",
+      "Participated in peer code reviews and technical discussions, reviewing implementation correctness, maintainability, error handling, and test coverage.",
+      "Estimated development effort by breaking requirements into implementation and testing tasks and comparing alternative technical solutions with the engineering team.",
+      "Researched development tools and implementation approaches, evaluating their compatibility with existing applications before recommending focused process improvements.",
+      "Mentored junior engineers through code reviews and debugging discussions, coordinated smaller delivery tasks, and supported application incident investigation during rotating on-call coverage."
+    ]
+  },
+  "technicalSkills": {
+    "categories": [
+      {
+        "name": "Programming",
+        "skills": [
+          "C#",
+          "Object-Oriented Programming",
+          "Asynchronous Programming"
+        ]
+      },
+      {
+        "name": ".NET and Backend",
+        "skills": [
+          ".NET Core",
+          ".NET 8",
+          "ASP.NET Core",
+          "Web APIs",
+          "REST APIs",
+          "Dependency Injection"
+        ]
+      },
+      {
+        "name": "Data Access",
+        "skills": [
+          "Entity Framework Core",
+          "SQL",
+          "SQL Queries",
+          "Relational Databases",
+          "Transactions"
+        ]
+      },
+      {
+        "name": "Frontend",
+        "skills": [
+          "Blazor",
+          "HTML",
+          "CSS",
+          "JavaScript"
+        ]
+      },
+      {
+        "name": "Development Tools",
+        "skills": [
+          "Git",
+          "Configuration Management",
+          "Build Processes",
+          ".NET CLI",
+          "MSBuild",
+          "NuGet",
+          "Visual Studio Debugger"
+        ]
+      },
+      {
+        "name": "Testing and Delivery",
+        "skills": [
+          "xUnit",
+          "Unit Testing",
+          "Integration Testing",
+          "CI/CD",
+          "Jenkins"
+        ]
+      },
+      {
+        "name": "Software Engineering",
+        "skills": [
+          "Software Design",
+          "Code Reviews",
+          "Debugging",
+          "Troubleshooting",
+          "Root Cause Analysis (RCA)",
+          "Corrective Actions",
+          "Effort Estimation",
+          "Technical Documentation"
+        ]
+      },
+      {
+        "name": "Team Delivery and Support",
+        "skills": [
+          "Technical Mentoring",
+          "Alternative Solution Evaluation",
+          "Development Process Improvement",
+          "Production Support",
+          "Rotating On-Call Support"
+        ]
+      }
+    ]
+  },
+  "experience": [
+    {
+      "id": "att",
+      "company": "AT&T",
+      "role": "Senior .NET Software Engineer",
+      "location": "Atlanta, GA",
+      "startDate": "Jul 2023",
+      "endDate": "Present",
+      "projectName": "Enterprise Application & Integration Platform",
+      "responsibilities": [
+        "Developed C# service components for enterprise application workflows, organizing validation, business rules, and persistence operations behind application interfaces.",
+        "Implemented ASP.NET Core Web APIs with explicit request models, response contracts, exception handling, and consistent validation responses for consuming applications.",
+        "Implemented application functionality on .NET 8 in later releases, using dependency injection and asynchronous operations to separate request handling from business processing.",
+        "Configured Entity Framework Core entity mappings and repository queries, reviewing generated SQL when diagnosing relational data-access behavior.",
+        "Implemented transaction boundaries around related database updates and reviewed failure paths to prevent incomplete application operations.",
+        "Developed Blazor forms and reusable UI components, connecting validation messages and submission states to the corresponding backend API responses.",
+        "Debugged C# application failures with breakpoints, exception inspection, request tracing, and application logs to identify the failing execution path.",
+        "Performed root cause analysis for API and data-processing incidents, documented the defect mechanism, and implemented corrective changes with regression coverage.",
+        "Reviewed SQL queries and execution plans during application troubleshooting, checking joins, filtering conditions, indexes, and transaction behavior.",
+        "Wrote xUnit tests for service logic and integration tests for API and persistence behavior, including invalid requests and downstream failure conditions.",
+        "Participated in peer code reviews, providing technical feedback on application boundaries, exception handling, asynchronous behavior, and test completeness.",
+        "Maintained Git-based configuration management practices for application changes, coordinating branches, pull requests, dependency updates, and release changes.",
+        "Updated .NET CLI build and test steps in Jenkins pipelines, checking restore, compilation, automated validation, and release artifact creation.",
+        "Estimated development effort by decomposing requested changes into service, API, data-access, UI, and testing tasks with the delivery team.",
+        "Evaluated alternative implementation approaches during design discussions, comparing compatibility, maintainability, testing needs, and operational support implications.",
+        "Researched development tooling and framework capabilities, documenting trial findings and recommending improvements appropriate to the existing application lifecycle.",
+        "Mentored junior engineers through C# implementation reviews, pair debugging, and discussions of API contracts, persistence behavior, and automated tests.",
+        "Coordinated smaller enhancement work and participated in rotating on-call support, investigating incidents, communicating findings, and validating corrective releases."
+      ],
+      "environment": [
+        "C#",
+        ".NET 8",
+        "ASP.NET Core",
+        "Entity Framework Core",
+        "Blazor",
+        "Web APIs",
+        "SQL",
+        "Git",
+        ".NET CLI",
+        "NuGet",
+        "Jenkins",
+        "xUnit",
+        "Visual Studio Debugger"
+      ]
+    },
+    {
+      "id": "healthgrades",
+      "company": "Healthgrades",
+      "role": "Senior .NET Software Engineer",
+      "location": "Denver, CO",
+      "startDate": "Feb 2022",
+      "endDate": "Jun 2023",
+      "responsibilities": [
+        "Implemented C# application services for healthcare software workflows, separating request validation, business processing, and database access into testable components.",
+        "Developed ASP.NET Core Web APIs with consistent response handling and clear integration contracts for application clients and dependent services.",
+        "Configured Entity Framework Core mappings and queries for application persistence, reviewing transaction boundaries and handling relational data-validation failures.",
+        "Wrote SQL queries to investigate application records and verify database changes during defect diagnosis and release testing.",
+        "Reproduced service failures using debugger inspection, application logs, and request traces to identify application logic and integration defects.",
+        "Performed root cause analysis for recurring application issues and added regression tests alongside corrective code changes.",
+        "Participated in peer code reviews covering request contracts, data-access logic, exception handling, and automated test cases.",
+        "Maintained source changes and dependency configuration with Git and NuGet, coordinating application builds and release preparation with delivery teams.",
+        "Updated .NET build and test steps in continuous integration workflows to validate changes before release preparation.",
+        "Estimated backend enhancements and discussed alternative service designs with engineers, QA, and product stakeholders.",
+        "Mentored developers during implementation reviews and debugging sessions, explaining application flow, database behavior, and test design.",
+        "Documented implementation decisions, troubleshooting findings, and release validation steps to support handoffs between development and operations."
+      ],
+      "environment": [
+        "C#",
+        ".NET 6",
+        "ASP.NET Core",
+        "Entity Framework Core",
+        "Web APIs",
+        "SQL",
+        "Git",
+        "NuGet",
+        "Jenkins",
+        "xUnit",
+        "Visual Studio Debugger"
+      ]
+    },
+    {
+      "id": "firstgroup-america",
+      "company": "FirstGroup America",
+      "role": ".NET Software Engineer",
+      "location": "Cincinnati, OH",
+      "startDate": "Oct 2019",
+      "endDate": "Jan 2022",
+      "responsibilities": [
+        "Developed C# service functionality for transportation and logistics application workflows, implementing business rules and validation within reusable application components.",
+        "Implemented ASP.NET Core API endpoints for application integrations, handling request parsing, response contracts, and exceptions consistently.",
+        "Used Entity Framework Core for relational data access, implementing query operations and application-level transaction handling.",
+        "Wrote SQL queries to inspect operational records and verify expected data changes during testing and issue investigation.",
+        "Debugged application defects using Visual Studio debugger inspection, logs, and API request reproduction to identify faulty execution paths.",
+        "Added unit and integration tests for business rules, persistence operations, and API error conditions identified during defect resolution.",
+        "Participated in peer code reviews and corrected implementation issues involving validation, error propagation, and maintainability.",
+        "Maintained source changes and build configuration using Git, NuGet, and .NET build tooling across development and testing environments.",
+        "Compared implementation alternatives and estimated enhancement tasks during requirements refinement and technical design discussions.",
+        "Supported release validation and production troubleshooting, documenting root causes and verifying corrective changes with QA and operations."
+      ],
+      "environment": [
+        "C#",
+        ".NET Core",
+        "ASP.NET Core",
+        "Entity Framework Core",
+        "Web APIs",
+        "SQL",
+        "Git",
+        "NuGet",
+        ".NET CLI",
+        "Unit Testing",
+        "Visual Studio Debugger"
+      ]
+    },
+    {
+      "id": "outfront-media",
+      "company": "Outfront Media",
+      "role": ".NET Application Developer",
+      "location": "New York, NY",
+      "startDate": "Oct 2017",
+      "endDate": "Sep 2019",
+      "responsibilities": [
+        "Developed C# application components for media business workflows, implementing input validation and business processing within existing application boundaries.",
+        "Maintained ASP.NET MVC application features and service integration code, following established request handling and error reporting conventions.",
+        "Implemented relational data-access operations with Entity Framework and SQL, checking application behavior during updates and transaction failures.",
+        "Investigated application defects by reproducing user-reported scenarios and inspecting execution paths with the Visual Studio debugger.",
+        "Wrote regression tests for corrected business logic and checked expected behavior across related application workflows.",
+        "Participated in code reviews, incorporating feedback on implementation clarity, exception handling, and database operations.",
+        "Maintained source changes and package configuration using Git and NuGet and supported MSBuild-based application builds.",
+        "Documented defect findings and release verification steps while coordinating application fixes with development and QA teams."
+      ],
+      "environment": [
+        "C#",
+        ".NET Framework",
+        "ASP.NET MVC",
+        "Entity Framework",
+        "SQL",
+        "Git",
+        "NuGet",
+        "MSBuild",
+        "Visual Studio Debugger"
+      ]
+    },
+    {
+      "id": "nucleus-software",
+      "company": "Nucleus Software",
+      "role": "Software Developer",
+      "location": "Hyderabad, India",
+      "startDate": "Aug 2016",
+      "endDate": "Sep 2017",
+      "responsibilities": [
+        "Implemented C# application enhancements within existing enterprise software modules, following established design conventions and review feedback.",
+        "Maintained application validation and business-processing logic, tracing defects through existing code before preparing corrective changes.",
+        "Wrote SQL queries to inspect application data and support verification of expected record updates during testing.",
+        "Debugged application issues with Visual Studio breakpoints, variable inspection, and exception analysis under guidance from senior engineers.",
+        "Added unit tests for corrected application logic and reproduced reported defects to confirm regression coverage.",
+        "Used source control and build tooling to maintain code changes, package dependencies, and application build configuration.",
+        "Participated in peer code reviews and technical discussions, incorporating feedback into implementation and test changes.",
+        "Documented development tasks, troubleshooting observations, and test results to support review and release handoffs."
+      ],
+      "environment": [
+        "C#",
+        ".NET Framework",
+        "SQL",
+        "Visual Studio Debugger",
+        "Source Control",
+        "Build Processes",
+        "Unit Testing"
+      ]
+    }
+  ],
+  "projects": [],
+  "education": [
+    {
+      "id": "jntuk-bachelors",
+      "institution": "Jawaharlal Nehru Technological University Kakinada (JNTUK)",
+      "degree": "Bachelor’s in Computer Science",
+      "location": "",
+      "graduationDate": "2016"
+    }
+  ],
+  "certifications": []
+}

@@ -1,0 +1,167 @@
+{
+  "personalInfo": {
+    "fullName": "Fictional Test Candidate",
+    "professionalTitle": "Senior Kafka Administrator",
+    "email": "candidate@example.com",
+    "phone": "",
+    "location": "St. Louis, MO"
+  },
+  "professionalSummary": {
+    "bullets": [
+      "Kafka administrator with 15+ years across software engineering, production support, and reliability, including six years with Kafka messaging.",
+      "Experienced supporting Confluent Platform, Kafka brokers, topics, partitions, replication, and consumer groups.",
+      "Supported platform availability through monitoring, troubleshooting, and production operations.",
+      "Collaborated with application and infrastructure teams on platform support and operational processes."
+    ]
+  },
+  "technicalSkills": {
+    "categories": [
+      {
+        "name": "Kafka and Messaging",
+        "skills": [
+          "Apache Kafka",
+          "Confluent Platform",
+          "Brokers",
+          "Topics",
+          "Partitions",
+          "Replication",
+          "Consumer Groups",
+          "Consumer Lag"
+        ]
+      },
+      {
+        "name": "Reliability and Operations",
+        "skills": [
+          "SRE",
+          "Incident Management",
+          "Root Cause Analysis (RCA)",
+          "Capacity Planning",
+          "Operational Readiness",
+          "Linux",
+          "Distributed Systems"
+        ]
+      },
+      {
+        "name": "Automation and Delivery",
+        "skills": [
+          "Python",
+          "Shell Scripting",
+          "CI/CD",
+          "Jenkins",
+          "Git"
+        ]
+      },
+      {
+        "name": "Monitoring and Alerting",
+        "skills": [
+          "Prometheus",
+          "Grafana",
+          "Application Logs",
+          "Monitoring",
+          "Alerting"
+        ]
+      }
+    ]
+  },
+  "experience": [
+    {
+      "id": "fictional-stream-2023",
+      "company": "Fictional Streaming Services Company",
+      "role": "Kafka Platform Engineer",
+      "location": "St. Louis, MO",
+      "startDate": "Jul 2023",
+      "endDate": "Present",
+      "responsibilities": [
+        "Supported Confluent Platform configuration and deployment checks, reviewing platform settings and service health during routine production changes.",
+        "Integrated Kafka configuration changes into Jenkins CI/CD pipelines, adding configuration checks, deployment gates, and post-change validation before handing services back to production support.",
+        "Investigated consumer lag, broker availability, partition replication, and rebalance incidents using Prometheus, Grafana, Linux logs, and Kafka utilities; documented root causes and corrective actions.",
+        "Collaborated with application teams to investigate Kafka processing errors and validate configuration changes in shared test environments.",
+        "Reviewed partition distribution, replication settings, throughput, consumer lag, and Linux resource utilization during capacity planning to identify constraints before planned workload changes.",
+        "Applied SRE practices through service-health monitoring, alert review, on-call incident response, and operational-readiness checks covering rollback steps, support ownership, and recovery procedures."
+      ],
+      "environment": [
+        "Confluent Platform",
+        "Kafka",
+        "Python",
+        "Shell",
+        "Jenkins",
+        "CI/CD",
+        "Linux",
+        "Prometheus",
+        "Grafana",
+        "Git"
+      ]
+    },
+    {
+      "id": "fictional-messaging-2020",
+      "company": "Fictional Logistics Systems Company",
+      "role": "Kafka Engineer",
+      "location": "Remote",
+      "startDate": "Jul 2020",
+      "endDate": "Jun 2023",
+      "responsibilities": [
+        "Supported Apache Kafka brokers, topics, partitions, replication, and consumer groups for distributed messaging applications, investigating delivery failures and consumer processing delays with application engineers.",
+        "Created Python and Shell checks for Kafka configuration, consumer lag, and Linux service health, integrating recurring validations into Jenkins deployment and support workflows.",
+        "Debugged Java producer-consumer integrations using application logs and targeted tests, investigating processing errors and configuration issues before validating fixes in shared test environments.",
+        "Participated in production incident response, root-cause analysis, and capacity reviews; maintained runbooks and deployment-readiness checklists for Kafka and dependent Linux services."
+      ],
+      "environment": [
+        "Apache Kafka",
+        "Java",
+        "Python",
+        "Shell",
+        "Jenkins",
+        "Linux",
+        "Git",
+        "JUnit",
+        "Monitoring",
+        "Application Logs"
+      ]
+    },
+    {
+      "id": "fictional-reliability-2015",
+      "company": "Fictional Enterprise Operations Company",
+      "role": "Production Reliability Engineer",
+      "location": "St. Louis, MO",
+      "startDate": "Jul 2015",
+      "endDate": "Jun 2020",
+      "responsibilities": [
+        "Supported Linux-hosted distributed services through log analysis, monitoring, production incident response, service restoration, and documented root-cause investigations.",
+        "Automated service-health checks and deployment validation with Python and Shell, maintaining Jenkins workflows and operational runbooks for recurring production-support tasks.",
+        "Collaborated with Java application teams to investigate runtime failures, review diagnostic logs, validate fixes, and prepare deployment and rollback procedures."
+      ],
+      "environment": [
+        "Linux",
+        "Java",
+        "Python",
+        "Shell",
+        "Jenkins",
+        "Git",
+        "Monitoring",
+        "Application Logs"
+      ]
+    },
+    {
+      "id": "fictional-java-2011",
+      "company": "Fictional Business Software Company",
+      "role": "Java Software Engineer",
+      "location": "St. Louis, MO",
+      "startDate": "Jul 2011",
+      "endDate": "Jun 2015",
+      "responsibilities": [
+        "Developed and debugged Java service components, writing JUnit tests and investigating application errors with QA and production-support teams.",
+        "Maintained Linux deployment scripts and release documentation, assisting with application log analysis, issue resolution, and post-deployment validation."
+      ],
+      "environment": [
+        "Java",
+        "JUnit",
+        "Linux",
+        "Shell",
+        "Git"
+      ]
+    }
+  ],
+  "projects": [],
+  "education": [],
+  "certifications": []
+}
