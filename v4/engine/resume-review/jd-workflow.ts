@@ -29,7 +29,7 @@ export function overallExperience(jd: string): number | null {
 }
 
 export function resolveTarget(jd: string, mode: EmploymentType, gc: boolean) {
-  if (mode === "c2c" && gc) return { years: 12, reason: "C2C + GC: your selected 12-year proposed timeline" };
+  if (mode === "c2c" && gc) return { years: null, reason: "C2C + GC: preserve company dates and calculate experience from this history; JD and dropdown cannot override it" };
   const years = overallExperience(jd);
   return { years, reason: years === null ? "No clear overall experience requirement; keeping source dates" : `JD overall experience: ${years} years (proposed timeline)` };
 }
@@ -49,8 +49,8 @@ export function analyzeLocally(jd: string): JobAnalysis {
 }
 
 // Vocabulary assists prose extraction; labeled unknown tools are also retained.
-const terms = ["Azure Databricks","Databricks","Scala","PySpark","Spark","SQL","ETL/ELT","Delta Lake","Unity Catalog","Auto Loader","Lakehouse architecture","Medallion architecture","serverless","DataFrame","notebooks","cluster configuration","cluster sizing","job orchestration","Structured Streaming","data warehouse","Azure","AKS","DevOps","Docker","Kubernetes","Java","Python","Salesforce","Apex","SOQL","Lightning Web Components","Spring Boot","Kafka","MongoDB","PostgreSQL","React",".NET","C#","SAP","ABAP","Terraform","Ansible","AWS","GCP","Informatica","Tableau"];
-const aliases: Record<string,string> = {"Auto Loader":"auto\\s*loader","DataFrame":"data\\s*frames?","ETL/ELT":"etl(?:\\s*[/&]\\s*elt)?|elt","cluster configuration":"clusters?\\s+configuration","cluster sizing":"(?:clusters?\\s+(?:configuration\\s+and\\s+)?)sizing","data warehouse":"data\\s*warehous(?:e|ing)","PostgreSQL":"postgres(?:ql)?"};
+const terms = ["Single Sign-On","project estimation","resource scheduling","root cause analysis","Azure Databricks","Databricks","Scala","PySpark","Spark","SQL","ETL/ELT","Delta Lake","Unity Catalog","Auto Loader","Lakehouse architecture","Medallion architecture","serverless","DataFrame","notebooks","cluster configuration","cluster sizing","job orchestration","Structured Streaming","data warehouse","Azure","AKS","DevOps","Docker","Kubernetes","Java","Python","Salesforce","Apex","SOQL","Lightning Web Components","Spring Boot","Kafka","MongoDB","PostgreSQL","React",".NET","C#","SAP","ABAP","Terraform","Ansible","AWS","GCP","Informatica","Tableau"];
+const aliases: Record<string,string> = {"Single Sign-On":"single[- ]sign[- ]on|sso","root cause analysis":"root[- ]cause analysis|rca","Auto Loader":"auto\\s*loader","DataFrame":"data\\s*frames?","ETL/ELT":"etl(?:\\s*[/&]\\s*elt)?|elt","cluster configuration":"clusters?\\s+configuration","cluster sizing":"(?:clusters?\\s+(?:configuration\\s+and\\s+)?)sizing","data warehouse":"data\\s*warehous(?:e|ing)","PostgreSQL":"postgres(?:ql)?"};
 export function hasTerm(text: string, term: string) {
   const expression = aliases[term] || term.replace(/[.*+?^${}()|[\]\\]/g,"\\$&").replace(/\s+/g,"\\s+");
   return new RegExp(`(?:^|[^a-z0-9])(?:${expression})(?=$|[^a-z0-9])`,"i").test(text);

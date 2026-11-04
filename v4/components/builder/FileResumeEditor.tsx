@@ -187,7 +187,7 @@ export function FileResumeEditor() {
       const current = readDirectTextEdits();
       const context = JSON.parse(sessionStorage.getItem("guidedResumeData") || localStorage.getItem("resume-clone-editor-v2") || "{}");
       const mode = context.employmentType === "c2c" ? "c2c" : "full-time";
-      const base = generalGenerationPrompt(currentJd, analyzeLocally(currentJd), sourceContext, selectedSections, mode, targetYears, context.studyDates);
+      const base = generalGenerationPrompt(currentJd, analyzeLocally(currentJd), sourceContext, selectedSections, mode, targetYears, context.studyDates, context.preserveSourceTimeline===true);
       const findings = reviewDraft(current, sourceContext, currentJd, targetYears);
       const correction = base + "\n\nCURRENT EDITABLE RESUME:\n" + JSON.stringify(current, null, 2) + "\n\nAPP REVIEW FINDINGS (heuristic feedback, not candidate facts):\n" + JSON.stringify(findings, null, 2) + "\nReturn the complete corrected resume JSON. Address role alignment, supported missing terms and repetitive wording. Retain existing numerical draft outcomes for candidate editing; do not silently remove or convert them into qualitative bullets. Do not treat these numbers as verified evidence or present new JD-driven draft responsibilities as verified work.";
       await navigator.clipboard.writeText(correction);

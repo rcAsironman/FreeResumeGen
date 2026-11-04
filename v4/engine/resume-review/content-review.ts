@@ -35,8 +35,11 @@ export function reviewResumeContent(resume: MasterResume): ResumeIssue[] {
     else if (value && typeof value === "object") Object.entries(value).forEach(([k,v]) => walk(v, path ? `${path}.${k}` : k));
   }
   walk(resume, "");
-  const meta = /\b(?:JD[- ]aligned draft|JD[- ]adapted draft|drafted specialization|drafted (?:backend|development) focus|senior[- ]level draft scope|candidate[- ]requested draft|not verified employment evidence)\b/i;
+  const meta = /\b(?:resume draft|draft resume|proposed profile|JD[- ]aligned draft|JD[- ]adapted draft|drafted specialization|drafted (?:backend|development) focus|senior[- ]level draft scope|candidate[- ]requested draft|not verified employment evidence)\b/i;
   for (const {path,text} of texts) if (meta.test(text)) issues.push({code:"draft-language",severity:"error",path,message:`Remove prompt/review wording from ${path}; write resume content only.`});
+  for (const [i,text] of resume.professionalSummary.bullets.entries()) {
+    if (/\b(?:application development scope covering|experience areas include|capabilities (?:covering|spanning)|scope includes)\b/i.test(text)) issues.push({code:"unnatural-summary",severity:"warning",path:`professionalSummary.bullets.${i}`,message:"Replace keyword-list phrasing with a direct account of specific work performed."});
+  }
   const repeated = new Map<string,string>();
   for (const {path,text} of texts.filter(t => /professionalSummary.bullets|responsibilities\.\d+$/.test(t.path))) {
     const key=text.toLowerCase().replace(/[^a-z0-9]+/g," ").trim();

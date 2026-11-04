@@ -18,6 +18,8 @@ export const ACHIEVEMENT_RULES = `ACHIEVEMENT DRAFTING
 - Action + technology + concrete implementation + outcome. Different employers need different implementation contexts and outcome types, not the same SQL/release bullets with changed percentages. Retain figures in the editable draft; do not silently replace numerical outcomes with qualitative text.`;
 
 export const JD_DRAFT_RULES = `JD-FIRST EDITABLE DRAFT — NOT VERIFIED EMPLOYMENT EVIDENCE
+- SUMMARY STYLE: Write a professional account of work, never a description of this document or its generation. The opening sentence uses the core role, timeline-consistent overall tenure and concrete work domains. Never say 'resume draft aligned with', 'aligned with N years', 'application development scope covering', 'experience areas include', 'capabilities covering', or 'capabilities spanning'. Subsequent bullets use direct verbs such as Developed, Integrated, Configured, Diagnosed and Delivered, with an implementation and purpose. Do not imply all career years were spent using every JD technology.
+- REQUIREMENT EVIDENCE: Check duties as well as tools: authentication/Single Sign-On, project estimation, resource scheduling and root cause analysis must not be satisfied by a skills list alone when the JD requires them. For supported work, place a concrete example under the correct employer: what was configured or planned, how it was implemented, and what it enabled or resolved. OAuth alone does not demonstrate SSO; attending Scrum does not demonstrate estimation or resource scheduling; generic production support does not demonstrate RCA. Use actual available work details; do not invent employer-specific incidents or ownership to close a gap. Keep unsupported requirements out of factual claims and report gaps through the app review.
 - Use a concise core role headline, not a copied posting title: 'Java Full-Stack Engineer With Kafka and MongoDB' becomes 'Java Full-Stack Engineer'. Put Kafka and MongoDB in skills and supported responsibilities. Remove hiring slogans, locations, visa restrictions, contract terms and technology lists from the headline; retain meaningful specialization, seniority and level such as '.NET Core Software Engineer 2'. Do not add seniority. Full-Stack requires both frontend and backend work in the resume; otherwise flag the scope mismatch outside the resume rather than inventing experience.
 - Historical employer titles are not the target headline. Preserve supplied actual titles; where only a functional draft label is available, keep it concise and specific to that employer's work and progression. Never copy the complete posting title into every company.
 - The current JD determines the headline, summary, functional employer role labels, technical skills, responsibilities and environments. Never fall back to Java/Kafka or another source specialty because the source lacks the requested technology.
@@ -39,11 +41,12 @@ export function generalDraftSource(master: MasterResume): MasterResume {
   return source;
 }
 
-export function generalGenerationPrompt(jd: string, analysis: JobAnalysis, master: MasterResume, sections: HighlightSection[], employmentType: "full-time" | "c2c" = "full-time", targetYears?: number | null, study?: StudyDates) {
+export function generalGenerationPrompt(jd: string, analysis: JobAnalysis, master: MasterResume, sections: HighlightSection[], employmentType: "full-time" | "c2c" = "full-time", targetYears?: number | null, study?: StudyDates, preserveSourceTimeline=false) {
   void sections;
   const source = generalDraftSource(master);
-  const timeline = targetYears == null ? null : proposeEmploymentTimeline(source.experience, targetYears, new Date(), employmentType==='full-time'?study:undefined);
-  if (targetYears != null && !timeline) throw new Error("Cannot allocate the selected timeline across source employers.");
+  const locked=employmentType==='c2c'&&preserveSourceTimeline;
+  const timeline = locked || targetYears == null ? null : proposeEmploymentTimeline(source.experience, targetYears, new Date(), employmentType==='full-time'?study:undefined);
+  if (!locked && targetYears != null && !timeline) throw new Error("Cannot allocate the selected timeline across source employers.");
   const experience = timeline?.experience ?? source.experience;
   // Deliberately exclude old summary/skills/roles/duties/environments from model context.
   // They were steering unrelated JDs back into the old Java/Kafka specialty.
@@ -59,7 +62,7 @@ export function generalGenerationPrompt(jd: string, analysis: JobAnalysis, maste
     personalInfo: {...source.personalInfo, professionalTitle: headline},
     professionalSummary: {bullets:["Replace with a complete JD-specific summary"]},
     technicalSkills: {categories:[{name:"JD core technologies",skills:["Replace with required JD technologies"]}]},
-    experience: experience.map(e => ({id:e.id,company:e.company,location:e.location,startDate:e.startDate,endDate:e.endDate,role:headline,...(e.projectName?{projectName:e.projectName}:{}),description:"Replace with employer-specific JD-aligned draft context",responsibilities:["Replace with detailed JD-aligned draft responsibilities"],environment:["Replace with tools used in these draft responsibilities"]})),
+    experience: experience.map(e => ({id:e.id,company:e.company,location:e.location,startDate:e.startDate,endDate:e.endDate,role:headline,...(e.projectName?{projectName:e.projectName}:{}),description:"",responsibilities:["Replace with concrete employer-specific responsibilities"],environment:["Replace with tools used in these responsibilities"]})),
     projects: source.projects,education:source.education,certifications:source.certifications,
   };
   return `UNIVERSAL JD-FIRST RESUME DRAFT v3
@@ -72,7 +75,7 @@ ${employmentTypePrompt(employmentType)}
 The JD-FIRST EDITABLE DRAFT contract controls narrative generation. Source employers and education constrain identity/history, NOT the draft technical specialty. Historical narrative below is context, not a technology whitelist.
 
 TIMELINE
-The user's selected experience target controls the resume total even when the JD asks for a different number. Do not add years to satisfy the JD. Preserve the exact employer dates below, including any study gap. Count only employment months, not calendar span across gaps.
+${locked?`C2C + GC — LOCKED SOURCE HISTORY: Preserve every company, start date and end date exactly. Keep Present as Present. Ignore JD experience requirements and the experience dropdown when calculating this candidate's tenure. Do not shorten, extend or redistribute employment. Career duration from these dates: ${JSON.stringify(careerDuration(source.experience))}. Use that duration for overall-experience statements (or its completed years followed by +), never the JD's requested years. The JD still controls role and skill priorities, not dates.`:"The user's selected experience target controls the resume total even when the JD asks for a different number. Do not add years to satisfy the JD. Preserve the exact employer dates below, including any study gap. Count only employment months, not calendar span across gaps."}
 ${employmentType==='full-time'&&study?`Master's period: ${study.start} through ${study.end}; candidate-specified CPT start: ${study.cpt||'none'}. No employment is allocated during the excluded pre-CPT study period. This is a drafting constraint, not a determination of work authorization.`:''}
 ${timeline?`Selected timeline: ${timeline.targetYears} years as of ${timeline.referenceDate}. Use the exact OUTPUT CONTRACT dates. They are candidate-directed proposed edits, not independently verified records.`:"Preserve source dates exactly."}
 Original duration for reference only: ${JSON.stringify(careerDuration(source.experience))}

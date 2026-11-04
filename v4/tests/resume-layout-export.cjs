@@ -14,6 +14,8 @@ function load(file) {
   const { DEFAULT_RESUME_LAYOUT } = load("types/resume-layout.ts");
   assert.equal(DEFAULT_RESUME_LAYOUT, "fixed-resume");
   const source = JSON.parse(fs.readFileSync(path.join(root, "data/general/master-resume-general.json"), "utf8"));
+  source.professionalSummary.bullets.push("Designed and tested production software components.");
+  source.technicalSkills.categories=[{category:"Languages",skills:["Java"]}];
   source.personalInfo.professionalTitle = "QA Software Engineer";
   source.experience.forEach(e => { e.role = "Software Engineer"; });
   const snapshot = JSON.stringify(source);
