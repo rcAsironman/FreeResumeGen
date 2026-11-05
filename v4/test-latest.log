@@ -1,0 +1,421 @@
+
+> resume-generator-json@0.1.0 test
+> node --test tests/jd-workflow.test.cjs tests/databricks.test.cjs tests/universal-quality.test.cjs tests/role-title.test.cjs tests/selected-years.test.cjs && node tests/prompt-contract.cjs && node tests/resume-content-review.cjs && node tests/daily-resume-downloads.cjs && node tests/resume-layout-export.cjs && node tests/ats-scoring.cjs
+
+TAP version 13
+# Subtest: Databricks JD selects 8 overall years or locked GC history
+ok 1 - Databricks JD selects 8 overall years or locked GC history
+  ---
+  duration_ms: 8.4283
+  type: 'test'
+  ...
+# Subtest: prose and bare requirement lines extracted, including aliases
+ok 2 - prose and bare requirement lines extracted, including aliases
+  ---
+  duration_ms: 12.0652
+  type: 'test'
+  ...
+# Subtest: old response exposes missing roles, platform gaps and label leakage
+ok 3 - old response exposes missing roles, platform gaps and label leakage
+  ---
+  duration_ms: 79.7191
+  type: 'test'
+  ...
+# Subtest: all generation entry points use one JD-first policy and complete contract
+ok 4 - all generation entry points use one JD-first policy and complete contract
+  ---
+  duration_ms: 117.9783
+  type: 'test'
+  ...
+# Subtest: retired profile entry points cannot reenter runtime
+ok 5 - retired profile entry points cannot reenter runtime
+  ---
+  duration_ms: 0.7208
+  type: 'test'
+  ...
+# Subtest: historical narrative never enters the new prompt source
+ok 6 - historical narrative never enters the new prompt source
+  ---
+  duration_ms: 2.2148
+  type: 'test'
+  ...
+# Subtest: GC keeps the new seven-company timeline despite selected/JD years
+ok 7 - GC keeps the new seven-company timeline despite selected/JD years
+  ---
+  duration_ms: 78.131
+  type: 'test'
+  ...
+# Subtest: overall tenure: 4 years of experience
+ok 8 - overall tenure: 4 years of experience
+  ---
+  duration_ms: 1.8445
+  type: 'test'
+  ...
+# Subtest: overall tenure: 5+ years of proven experience as a Software Engineer
+ok 9 - overall tenure: 5+ years of proven experience as a Software Engineer
+  ---
+  duration_ms: 0.2607
+  type: 'test'
+  ...
+# Subtest: overall tenure: 3–6 years of professional experience
+ok 10 - overall tenure: 3–6 years of professional experience
+  ---
+  duration_ms: 1.0255
+  type: 'test'
+  ...
+# Subtest: overall tenure: 3 years experience with Kafka\\n8 years of overall experience
+ok 11 - overall tenure: 3 years experience with Kafka\\n8 years of overall experience
+  ---
+  duration_ms: 0.4902
+  type: 'test'
+  ...
+# Subtest: overall tenure: 3 years experience with Kafka
+ok 12 - overall tenure: 3 years experience with Kafka
+  ---
+  duration_ms: 0.167
+  type: 'test'
+  ...
+# Subtest: overall tenure: Preferred: 12 years of experience\\n4 years of experience
+ok 13 - overall tenure: Preferred: 12 years of experience\\n4 years of experience
+  ---
+  duration_ms: 0.2087
+  type: 'test'
+  ...
+# Subtest: overall tenure: Software Engineer 2
+ok 14 - overall tenure: Software Engineer 2
+  ---
+  duration_ms: 0.1102
+  type: 'test'
+  ...
+# Subtest: mode/GC rule matrix and no extra year
+ok 15 - mode/GC rule matrix and no extra year
+  ---
+  duration_ms: 0.6393
+  type: 'test'
+  ...
+# Subtest: proposed timeline exact duration and source unchanged
+ok 16 - proposed timeline exact duration and source unchanged
+  ---
+  duration_ms: 5.1643
+  type: 'test'
+  ...
+# Subtest: universal current-JD prompt: Salesforce Developer
+ok 17 - universal current-JD prompt: Salesforce Developer
+  ---
+  duration_ms: 4.4421
+  type: 'test'
+  ...
+# Subtest: universal current-JD prompt: Java Developer
+ok 18 - universal current-JD prompt: Java Developer
+  ---
+  duration_ms: 1.2358
+  type: 'test'
+  ...
+# Subtest: universal current-JD prompt: .NET Engineer
+ok 19 - universal current-JD prompt: .NET Engineer
+  ---
+  duration_ms: 1.8408
+  type: 'test'
+  ...
+# Subtest: universal current-JD prompt: Kafka Administrator
+ok 20 - universal current-JD prompt: Kafka Administrator
+  ---
+  duration_ms: 1.211
+  type: 'test'
+  ...
+# Subtest: universal current-JD prompt: Data Integration Developer
+ok 21 - universal current-JD prompt: Data Integration Developer
+  ---
+  duration_ms: 1.0845
+  type: 'test'
+  ...
+# Subtest: universal current-JD prompt: SAP Consultant
+ok 22 - universal current-JD prompt: SAP Consultant
+  ---
+  duration_ms: 1.0027
+  type: 'test'
+  ...
+# Subtest: universal current-JD prompt: Python Developer
+ok 23 - universal current-JD prompt: Python Developer
+  ---
+  duration_ms: 1.009
+  type: 'test'
+  ...
+# Subtest: universal current-JD prompt: DevOps Engineer
+ok 24 - universal current-JD prompt: DevOps Engineer
+  ---
+  duration_ms: 1.1036
+  type: 'test'
+  ...
+# Subtest: universal current-JD prompt: Full-Stack Engineer
+ok 25 - universal current-JD prompt: Full-Stack Engineer
+  ---
+  duration_ms: 1.0952
+  type: 'test'
+  ...
+# Subtest: numerical draft preserved and marked unverified outside schema
+ok 26 - numerical draft preserved and marked unverified outside schema
+  ---
+  duration_ms: 3.4517
+  type: 'test'
+  ...
+# Subtest: documented numerical statement distinguished from newly introduced example
+ok 27 - documented numerical statement distinguished from newly introduced example
+  ---
+  duration_ms: 1.5565
+  type: 'test'
+  ...
+# Subtest: semantic duplicates and excess metrics warn without deleting content
+ok 28 - semantic duplicates and excess metrics warn without deleting content
+  ---
+  duration_ms: 2.1069
+  type: 'test'
+  ...
+# Subtest: fences, wrappers and literal escape preservation
+ok 29 - fences, wrappers and literal escape preservation
+  ---
+  duration_ms: 1.8244
+  type: 'test'
+  ...
+# Subtest: natural summary and employer evidence regression
+ok 30 - natural summary and employer evidence regression
+  ---
+  duration_ms: 6.3653
+  type: 'test'
+  ...
+# Subtest: clean headline: Java Full-Stack Engineer With Kafka and MongoDB
+ok 31 - clean headline: Java Full-Stack Engineer With Kafka and MongoDB
+  ---
+  duration_ms: 21.5426
+  type: 'test'
+  ...
+# Subtest: clean headline: Urgent Hiring: Java Developer - Remote - USC/GC
+ok 32 - clean headline: Urgent Hiring: Java Developer - Remote - USC/GC
+  ---
+  duration_ms: 1.4188
+  type: 'test'
+  ...
+# Subtest: clean headline: 🚀 WE’RE HIRING: Data Integration Developer (Remote)
+ok 33 - clean headline: 🚀 WE’RE HIRING: Data Integration Developer (Remote)
+  ---
+  duration_ms: 9.9004
+  type: 'test'
+  ...
+# Subtest: clean headline: Data Engineer - Databricks, Scala
+ok 34 - clean headline: Data Engineer - Databricks, Scala
+  ---
+  duration_ms: 0.8433
+  type: 'test'
+  ...
+# Subtest: clean headline: .NET Core Software Engineer 2
+ok 35 - clean headline: .NET Core Software Engineer 2
+  ---
+  duration_ms: 1.2297
+  type: 'test'
+  ...
+# Subtest: clean headline: Dot net Developer
+ok 36 - clean headline: Dot net Developer
+  ---
+  duration_ms: 0.5564
+  type: 'test'
+  ...
+# Subtest: clean headline: C\# Developer With Azure
+ok 37 - clean headline: C\# Developer With Azure
+  ---
+  duration_ms: 1.0595
+  type: 'test'
+  ...
+# Subtest: clean headline: Lead Software Engineer With Kafka
+ok 38 - clean headline: Lead Software Engineer With Kafka
+  ---
+  duration_ms: 0.54
+  type: 'test'
+  ...
+# Subtest: clean headline: Senior Salesforce Developer | Apex, LWC
+ok 39 - clean headline: Senior Salesforce Developer | Apex, LWC
+  ---
+  duration_ms: 2.0723
+  type: 'test'
+  ...
+# Subtest: clean headline: SAP S/4HANA Consultant
+ok 40 - clean headline: SAP S/4HANA Consultant
+  ---
+  duration_ms: 2.3677
+  type: 'test'
+  ...
+# Subtest: clean headline: Confluent Kafka Administrator
+ok 41 - clean headline: Confluent Kafka Administrator
+  ---
+  duration_ms: 0.98
+  type: 'test'
+  ...
+# Subtest: clean headline: Software Engineer II (Contract)
+ok 42 - clean headline: Software Engineer II (Contract)
+  ---
+  duration_ms: 0.5461
+  type: 'test'
+  ...
+# Subtest: clean headline: Research and Development Engineer
+ok 43 - clean headline: Research and Development Engineer
+  ---
+  duration_ms: 0.3443
+  type: 'test'
+  ...
+# Subtest: clean headline: Full Stack Engineer
+ok 44 - clean headline: Full Stack Engineer
+  ---
+  duration_ms: 0.2931
+  type: 'test'
+  ...
+# Subtest: headline cleanup does not discard JD technology requirements
+ok 45 - headline cleanup does not discard JD technology requirements
+  ---
+  duration_ms: 25.0531
+  type: 'test'
+  ...
+# Subtest: selected working years with pre-CPT gap: 1
+ok 46 - selected working years with pre-CPT gap: 1
+  ---
+  duration_ms: 103.3637
+  type: 'test'
+  ...
+# Subtest: selected working years with pre-CPT gap: 2
+ok 47 - selected working years with pre-CPT gap: 2
+  ---
+  duration_ms: 1.6974
+  type: 'test'
+  ...
+# Subtest: selected working years with pre-CPT gap: 3
+ok 48 - selected working years with pre-CPT gap: 3
+  ---
+  duration_ms: 2.198
+  type: 'test'
+  ...
+# Subtest: selected working years with pre-CPT gap: 4
+ok 49 - selected working years with pre-CPT gap: 4
+  ---
+  duration_ms: 1.3954
+  type: 'test'
+  ...
+# Subtest: selected working years with pre-CPT gap: 8
+ok 50 - selected working years with pre-CPT gap: 8
+  ---
+  duration_ms: 1.9074
+  type: 'test'
+  ...
+# Subtest: selected working years with pre-CPT gap: 12
+ok 51 - selected working years with pre-CPT gap: 12
+  ---
+  duration_ms: 1.6939
+  type: 'test'
+  ...
+# Subtest: selected working years with pre-CPT gap: 30
+ok 52 - selected working years with pre-CPT gap: 30
+  ---
+  duration_ms: 1.5185
+  type: 'test'
+  ...
+# Subtest: no CPT excludes full degree period
+ok 53 - no CPT excludes full degree period
+  ---
+  duration_ms: 1.2672
+  type: 'test'
+  ...
+# Subtest: rejects invalid study months and unsplittable single employer
+ok 54 - rejects invalid study months and unsplittable single employer
+  ---
+  duration_ms: 3.8651
+  type: 'test'
+  ...
+# Subtest: prompt uses selected years even when JD differs and includes study rule
+ok 55 - prompt uses selected years even when JD differs and includes study rule
+  ---
+  duration_ms: 21.3529
+  type: 'test'
+  ...
+# Subtest: latest Databricks draft varies relevant outcomes across employers
+ok 56 - latest Databricks draft varies relevant outcomes across employers
+  ---
+  duration_ms: 44.7687
+  type: 'test'
+  ...
+# Subtest: testing automation does not become deployment or scheduling performance
+ok 57 - testing automation does not become deployment or scheduling performance
+  ---
+  duration_ms: 1.9358
+  type: 'test'
+  ...
+# Subtest: replaces vague measurement aspiration without stacking duplicate outcomes
+ok 58 - replaces vague measurement aspiration without stacking duplicate outcomes
+  ---
+  duration_ms: 3.6225
+  type: 'test'
+  ...
+# Subtest: migration regenerates only untouched app-authored examples
+ok 59 - migration regenerates only untouched app-authored examples
+  ---
+  duration_ms: 4.586
+  type: 'test'
+  ...
+# Subtest: automatic draft metrics: java
+ok 60 - automatic draft metrics: java
+  ---
+  duration_ms: 3.6081
+  type: 'test'
+  ...
+# Subtest: automatic draft metrics: kafka
+ok 61 - automatic draft metrics: kafka
+  ---
+  duration_ms: 2.8589
+  type: 'test'
+  ...
+# Subtest: automatic draft metrics: salesforce
+ok 62 - automatic draft metrics: salesforce
+  ---
+  duration_ms: 3.8036
+  type: 'test'
+  ...
+# Subtest: automatic draft metrics: dotnet
+ok 63 - automatic draft metrics: dotnet
+  ---
+  duration_ms: 2.2452
+  type: 'test'
+  ...
+# Subtest: preserves existing measurements; no forced metric without an opportunity
+ok 64 - preserves existing measurements; no forced metric without an opportunity
+  ---
+  duration_ms: 8.7655
+  type: 'test'
+  ...
+# Subtest: tool tenure is non-overlapping text upper bound, not total career years
+ok 65 - tool tenure is non-overlapping text upper bound, not total career years
+  ---
+  duration_ms: 108.4604
+  type: 'test'
+  ...
+# Subtest: unknown tool tenure and alternative requirements
+ok 66 - unknown tool tenure and alternative requirements
+  ---
+  duration_ms: 9.0465
+  type: 'test'
+  ...
+# Subtest: title punctuation does not cause false mismatch
+ok 67 - title punctuation does not cause false mismatch
+  ---
+  duration_ms: 10.4512
+  type: 'test'
+  ...
+1..67
+# tests 67
+# suites 0
+# pass 67
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2212.1896
+PASS active universal prompt with general source: JD, timeline, metrics and immutable source
+PASS: dates, overlapping employment, unknown dates, draft language, duplicate skills, skills-only on-call, and clean Garmin draft.
+Passed: exact naming sequence, shared PDF/Word ordering, folder reuse, Chicago midnight rollover, existing-file protection, concurrent exports and local-request checks.
+Passed: original default, preserved source styles/numbering/page geometry, unique IDs, escaped content, complete bullet coverage, no reference-person leakage and unchanged candidate data.
+ATS tests passed: actual original scores, invalid scores, provider errors, length guards, redaction, keyword boundaries and evidence-based repair prompts.

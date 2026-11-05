@@ -13,6 +13,7 @@ export const runtime = "nodejs";
 
 const requestSchema = z.object({
   resume: generatedResumeSchema,
+  fileName: z.string().optional(),
   saveToFolder: z.boolean().optional().default(false),
   templateId: z.enum(RESUME_LAYOUTS).optional().default(DEFAULT_RESUME_LAYOUT),
 
@@ -54,6 +55,7 @@ export async function POST(
     const {
       resume,
       saveToFolder,
+      fileName,
       templateId,
       technicalSkills,
       selectedSections,
@@ -192,7 +194,7 @@ export async function POST(
      */
 
     if (saveToFolder) {
-      const saved = await saveDailyResume(pdf, resume.personalInfo.fullName, "pdf");
+      const saved = await saveDailyResume(pdf, resume.personalInfo.fullName, "pdf", { fileName });
       return Response.json(saved, { headers: { "Cache-Control": "no-store" } });
     }
 

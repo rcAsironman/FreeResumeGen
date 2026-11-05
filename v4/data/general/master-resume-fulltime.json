@@ -225,11 +225,11 @@
       }
     ]
   },
-  "experience": [
+ "experience": [
     {
-      "id": "fidelity-investments",
-      "company": "Fidelity Investments",
-      "location": "Westlake, Texas, USA (Remote)",
+      "id": "deloitte",
+      "company": "Deloitte",
+      "location": "Dallas, Texas, USA (Remote)",
       "startDate": "Nov 2024",
       "endDate": "Present",
       "responsibilities": [
@@ -278,8 +278,8 @@
       ]
     },
     {
-      "id": "pine-labs",
-      "company": "Pine Labs",
+      "id": "ntt-data",
+      "company": "NTT DATA",
       "location": "Bengaluru, Karnataka, India",
       "startDate": "Nov 2017",
       "endDate": "Nov 2023",

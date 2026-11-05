@@ -20,13 +20,13 @@ export async function chooseBrowserDownloadFolder():Promise<Directory|null> {
   }
 }
 
-export async function saveBrowserResume(blob:Blob,name:string,format:'pdf'|'docx'|'json',folder:Directory|null) {
+export async function saveBrowserResume(blob:Blob,name:string,format:'pdf'|'docx'|'json',folder:Directory|null,customStem?:string) {
   const dateFolder=dailyResumeFolder();
   const save=async()=>{
     if(folder) {
       const day=await folder.getDirectoryHandle(dateFolder,{create:true});
       for(let index=0;index<10000;index++) {
-        const stem=resumeFileStem(name,index);
+        const stem=resumeFileStem(name,index,customStem);
         let exists=false;
         for(const extension of ['pdf','docx','json']) {
           try {await day.getFileHandle(`${stem}.${extension}`);exists=true;break;}
@@ -40,13 +40,13 @@ export async function saveBrowserResume(blob:Blob,name:string,format:'pdf'|'docx
       }
       throw new Error('No unused resume filename is available in this folder.');
     }
-    const key=`resume-download-index:${dateFolder}:${name}`;
+    const key=`resume-download-index:${dateFolder}:${customStem ?? name}`;
     let index=0;try{index=Number(localStorage.getItem(key))||0;}catch{}
-    const filename=`${resumeFileStem(name,index)}.${format}`;
+    const filename=`${resumeFileStem(name,index,customStem)}.${format}`;
     const zip=new JSZip();zip.file(`${dateFolder}/${filename}`,await blob.arrayBuffer());
     const archive=await zip.generateAsync({type:'blob'});
     const url=URL.createObjectURL(archive);const link=document.createElement('a');
-    link.href=url;link.download=`${dateFolder}_${resumeFileStem(name,index)}.zip`;
+    link.href=url;link.download=`${dateFolder}_${resumeFileStem(name,index,customStem)}.zip`;
     document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
     try{localStorage.setItem(key,String(index+1));}catch{}
     return `Download started: ${link.download}. Extract it to get ${dateFolder}/${filename}. Your browser controls the download location.`;

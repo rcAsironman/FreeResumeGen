@@ -26,6 +26,17 @@ const { dailyResumeFolder, resumeFileStem, saveDailyResume, assertLocalResumeSav
     assert.equal(new Set(parallel.map((entry) => path.parse(entry.filename).name)).size, parallel.length);
     assert.equal(await fs.readFile(path.join(folder, "karthik_resume.docx"), "utf8"), "test-0");
     assert((await fs.readdir(folder)).every((name) => !name.endsWith(".reserve")));
+    const customOptions = { now, downloadsRoot: root, fileName: "Karthik Software Engineer.pdf" };
+    const custom = await Promise.all(["pdf", "docx", "json"].map(format =>
+      saveDailyResume(Buffer.from(format), "Karthik Mangineni", format, customOptions)));
+    assert.deepEqual(custom.map(entry => path.parse(entry.filename).name).sort(),
+      ["Karthik Software Engineer", "Karthik Software Engineer_2", "Karthik Software Engineer_3"]);
+    for (const entry of custom) {
+      assert.equal(await fs.readFile(entry.filePath, "utf8"), path.extname(entry.filename).slice(1));
+    }
+    for (const fileName of ["../outside", "C:\\outside", "CON", ".pdf"]) {
+      await assert.rejects(saveDailyResume(Buffer.from("unsafe"), "Karthik Mangineni", "pdf", { ...customOptions, fileName }));
+    }
     const tomorrow = await saveDailyResume(Buffer.from("day two"), "Karthik Mangineni", "pdf", { now: new Date("2026-10-22T18:00:00Z"), downloadsRoot: root });
     assert.equal(tomorrow.filename, "karthik_resume.pdf");
     assert.equal(tomorrow.folderName, "2026-10-22_resumes");

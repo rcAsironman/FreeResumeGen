@@ -2,7 +2,7 @@ import { mkdir, open, readdir, unlink } from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
 
-import { dailyResumeFolder, resumeFileStem } from "@/utils/resume-download-name";
+import { dailyResumeFolder, parseResumeFileStem, resumeFileStem } from "@/utils/resume-download-name";
 export { dailyResumeFolder, resumeFileStem } from "@/utils/resume-download-name";
 
 export function assertLocalResumeSave(request: Request): void {
@@ -18,12 +18,13 @@ export function assertLocalResumeSave(request: Request): void {
 }
 
 /** Reserve names across both file types and concurrent exports; never overwrite. */
-export async function saveDailyResume(bytes: Uint8Array, fullName: string, format: "pdf" | "docx" | "json", options: { now?: Date; downloadsRoot?: string } = {}) {
+export async function saveDailyResume(bytes: Uint8Array, fullName: string, format: "pdf" | "docx" | "json", options: { now?: Date; downloadsRoot?: string; fileName?: unknown } = {}) {
+  const customStem = parseResumeFileStem(options.fileName);
   const folderName = dailyResumeFolder(options.now);
   const directory = path.join(options.downloadsRoot ?? process.env.RESUME_DOWNLOAD_DIR ?? path.join(os.homedir(), "Downloads"), folderName);
   await mkdir(directory, { recursive: true });
   for (let index = 0; index < 10000; index++) {
-    const stem = resumeFileStem(fullName, index);
+    const stem = resumeFileStem(fullName, index, customStem);
     const reservation = path.join(directory, `.${stem}.reserve`);
     let reservationHandle;
     try { reservationHandle = await open(reservation, "wx"); }
