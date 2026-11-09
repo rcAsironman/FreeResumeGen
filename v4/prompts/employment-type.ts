@@ -2,6 +2,7 @@ import type { EmploymentType } from "@/types/employment-type";
 
 /** Adds the requested application arrangement without altering candidate history. */
 export function employmentTypePrompt(type: EmploymentType = "full-time") {
+  if(type === "data-center") return `EMPLOYMENT TYPE: DATA CENTER. Use only the selected Data Center source. Preserve candidate identity and education; use the exact application-calculated dates and study/CPT exclusions. The reference PDF supplies layout only, never candidate qualifications. Do not import companies from Full-Time or C2C.`;
   if (type === "c2c") {
     return `EMPLOYMENT TYPE FOR THIS APPLICATION: C2C (corp-to-corp)
 - Treat C2C as the target engagement preference for this application. Do not add C2C, a staffing supplier, client relationship, or contract dates to the candidate's work history unless the selected source explicitly records them.

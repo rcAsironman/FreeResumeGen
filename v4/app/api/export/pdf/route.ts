@@ -1,3 +1,4 @@
+import { validateDataCenterContent } from "@/templates/data-center/validate";
 import { reviewResumeContent } from "@/engine/resume-review/content-review";
 import { assertLocalResumeSave, saveDailyResume } from "@/engine/export-engine/save-daily-resume";
 import { RESUME_LAYOUTS, DEFAULT_RESUME_LAYOUT } from "@/types/resume-layout";
@@ -69,6 +70,7 @@ export async function POST(
 
     const contentErrors = reviewResumeContent(resume).filter(issue => issue.severity === "error");
     if (contentErrors.length) return Response.json({ success: false, error: contentErrors.map(issue => issue.message).join(" ") }, { status: 400 });
+    if(templateId === "data-center") validateDataCenterContent(resume);
     if (saveToFolder) assertLocalResumeSave(request);
 
     // A TLS-terminating tunnel may produce https://localhost even though Next
@@ -169,6 +171,11 @@ export async function POST(
     if (templateId === "architect-resume") {
       await page.addStyleTag({ content: "@page { size: Letter; margin: 0in 0.132639in 0in 0.197222in; }" });
     }
+    if(templateId === "data-center") {
+      await page.addStyleTag({content:"@page { size: Letter; margin: 0; }"});
+      const fits=await page.evaluate(()=>{const paper=document.querySelector('[data-data-center-resume]') as HTMLElement|null;return !!paper && paper.scrollHeight<=1057;});
+      if(!fits) throw new Error("Data Center content exceeds one page. Shorten the summary or responsibilities in the editor; content has not been clipped.");
+    }
     const pdf = await page.pdf({
       format: "Letter",
 
@@ -181,10 +188,10 @@ export async function POST(
       preferCSSPageSize: false,
 
       margin: {
-        top: templateId === "architect-resume" ? "0in" : "0.42in",
-        right: templateId === "architect-resume" ? "0.132639in" : "0.5in",
-        bottom: templateId === "architect-resume" ? "0in" : "0.42in",
-        left: templateId === "architect-resume" ? "0.197222in" : "0.5in",
+        top: templateId === "data-center" ? "0in" : templateId === "architect-resume" ? "0in" : "0.42in",
+        right: templateId === "data-center" ? "0in" : templateId === "architect-resume" ? "0.132639in" : "0.5in",
+        bottom: templateId === "data-center" ? "0in" : templateId === "architect-resume" ? "0in" : "0.42in",
+        left: templateId === "data-center" ? "0in" : templateId === "architect-resume" ? "0.197222in" : "0.5in",
       },
     });
 

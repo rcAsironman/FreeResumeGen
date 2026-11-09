@@ -3,6 +3,8 @@ import { FULL_TIME_MASTER_FILES, type EmploymentType } from "@/types/employment-
 import type { ResumeProfile } from "@/types/resume-profile";
 
 export function sourceMatchesEmploymentType(profile: ResumeProfile, file: string, source: MasterResume, employmentType: EmploymentType) {
+  if(employmentType === "data-center") return file === "master-resume-data-center.json";
+  if(file === "master-resume-data-center.json") return false;
   const degrees = source.education.map((item) => item.degree);
   const hasBachelor = degrees.some((degree) => /\bbachelor(?:'s|’s)?\b/i.test(degree));
   const hasMasters = degrees.some((degree) => /\bmaster(?:'s|’s)?\b/i.test(degree));

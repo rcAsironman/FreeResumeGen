@@ -1,3 +1,4 @@
+import { responsibilityFingerprint, similarResponsibilities } from "@/engine/resume-review/responsibility-similarity";
 import type { JobAnalysis } from "@/types/job-analysis";
 import type { MasterResume } from "@/types/resume";
 import type { EmploymentType } from "@/types/employment-type";
@@ -67,7 +68,7 @@ export const numericOutcome = /\b\d+(?:\.\d+)?\s*(?:%|percent\b|milliseconds?\b|
 function words(text: string) { return new Set(text.toLowerCase().replace(/[^a-z0-9+#.]+/g," ").split(/\s+/).filter(w => w.length > 2)); }
 export function reviewDraft(resume: MasterResume, source: MasterResume, jd: string, targetYears: number | null = null): DraftFinding[] {
   const findings: DraftFinding[] = [];
-  const seen: { text: string; words: Set<string> }[] = [];
+  const seen: { text: string; words: Set<string>; fingerprint: Set<string>; company: string }[] = [];
   for (const employer of resume.experience) {
     const original = source.experience.find(e => e.id === employer.id && e.company === employer.company);
     let count = 0;
@@ -78,7 +79,10 @@ export function reviewDraft(resume: MasterResume, source: MasterResume, jd: stri
       }
       const set = words(text);
       if (set.size >= 8 && seen.some(other => [...set].filter(w => other.words.has(w)).length / new Set([...set,...other.words]).size > .72)) findings.push({kind:"duplicate",company:employer.company,text});
-      seen.push({ text, words:set });
+      const fingerprint=responsibilityFingerprint(text);
+      const repeated=seen.find(other=>other.company!==employer.company&&similarResponsibilities(fingerprint,other.fingerprint));
+      if(repeated) findings.push({kind:"duplicate",company:employer.company,text:`Possible repeated work across employers: "${text}" resembles ${repeated.company}: "${repeated.text}". Changing verbs or figures is not a distinct responsibility. Keep genuine recurring work; use different supported implementation context where available.`});
+      seen.push({ text, words:set, fingerprint, company:employer.company });
     }
     if (count > 3) findings.push({kind:"coverage",company:employer.company,text:`${count} quantified bullets: review the 2–3 per employer target. No bullets were removed.`});
     if (count === 0) findings.push({kind:"coverage",company:employer.company,text:"No quantified achievements. Use recorded measurements or clearly tracked editable draft examples for relevant technical outcomes."});

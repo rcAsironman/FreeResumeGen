@@ -1,3 +1,5 @@
+import { validateDataCenterContent } from "@/templates/data-center/validate";
+import { createDataCenterDocx } from "@/templates/data-center/docx-renderer";
 import { reviewResumeContent } from "@/engine/resume-review/content-review";
 import { assertLocalResumeSave, saveDailyResume } from "@/engine/export-engine/save-daily-resume";
 import { createArchitectResumeDocx } from "@/templates/architect-resume/docx-renderer";
@@ -78,6 +80,7 @@ export async function POST(
 
     const contentErrors = reviewResumeContent(resume).filter(issue => issue.severity === "error");
     if (contentErrors.length) return Response.json({ success: false, error: contentErrors.map(issue => issue.message).join(" ") }, { status: 400 });
+    if(templateId === "data-center") validateDataCenterContent(resume);
     if (saveToFolder) assertLocalResumeSave(request);
 
     /*
@@ -85,7 +88,7 @@ export async function POST(
      * user-selected font.
      */
 
-    const docxBuffer = await (templateId === "architect-resume" ? createArchitectResumeDocx : createResumeDocx)({
+    const docxBuffer = await (templateId === "data-center" ? createDataCenterDocx : templateId === "architect-resume" ? createArchitectResumeDocx : createResumeDocx)({
         resume,
         technicalSkills,
         selectedSections,

@@ -1,0 +1,50 @@
+{
+  "personalInfo": {
+    "fullName": "Karthik Mangineni",
+    "email": "karthikmangineni77@gmail.com",
+    "phone": "+1(314)814-6677",
+    "location": "St. Louis, MO",
+    "linkedIn": ""
+  },
+  "professionalSummary": {
+    "bullets": [
+      "Data Center career reference."
+    ]
+  },
+  "technicalSkills": {
+    "categories": []
+  },
+  "experience": [
+    {
+      "id": "tierpoint",
+      "company": "TierPoint",
+      "location": "St. Louis, MO",
+      "role": "",
+      "startDate": "Jan 2025",
+      "endDate": "Present",
+      "responsibilities": [],
+      "environment": []
+    },
+    {
+      "id": "ntt-global-data-centers",
+      "company": "NTT Global Data Centers",
+      "location": "Bengaluru",
+      "role": "",
+      "startDate": "Jan 2021",
+      "endDate": "Dec 2023",
+      "responsibilities": [],
+      "environment": []
+    }
+  ],
+  "projects": [],
+  "education": [
+    {
+      "id": "slu-ms",
+      "institution": "Saint Louis University",
+      "degree": "Master's in Computer Science",
+      "location": "St. Louis, Missouri, USA",
+      "graduationDate": "2025"
+    }
+  ],
+  "certifications": []
+}

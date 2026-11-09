@@ -51,3 +51,26 @@ test('preserves existing measurements; no forced metric without an opportunity',
 test('tool tenure is non-overlapping text upper bound, not total career years',()=>{const r=structuredClone(source);r.experience=[{...r.experience[0],startDate:'Jan 2024',endDate:'Dec 2024',responsibilities:['Implemented Salesforce workflows.']},{...r.experience[1],startDate:'Jan 2024',endDate:'Dec 2024',responsibilities:['Configured Salesforce automation.']}];const gap=technologyTenureGaps(r,'3 years of experience with Salesforce')[0];assert.equal(gap.maximumDocumentedMonths,12);assert.equal(gap.requiredYears,3);});
 test('unknown tool tenure and alternative requirements',()=>{const r=structuredClone(source);assert(technologyTenureGaps(r,'3 years of experience with Workday').some(g=>g.technology==='Workday'));assert.equal(technologyTenureGaps(r,'3 years of experience with Java or Python').length,0);});
 test('title punctuation does not cause false mismatch',()=>{const r=structuredClone(source);r.personalInfo.professionalTitle='Data Engineer | Databricks & Scala';assert(!reviewDraft(r,source,'Job title: Data Engineer - Databricks, Scala').some(f=>f.text.startsWith('JD headline')));});
+
+test('cross-employer review catches reworded work without changing candidate content',()=>{
+ const r=structuredClone(source);
+ r.experience[0].responsibilities=['Optimized PostgreSQL queries using indexing and execution plan analysis, reducing query latency by 35%.'];
+ r.experience[1].responsibilities=['Tuned PostgreSQL queries through indexes and execution plan analysis, cutting query response time by 22%.'];
+ const before=JSON.stringify(r);
+ assert(reviewDraft(r,source,'').some(f=>f.kind==='duplicate'&&f.text.includes('Possible repeated work across employers')));
+ assert.equal(JSON.stringify(r),before);
+ r.experience[1].responsibilities=['Implemented PostgreSQL audit tables and retention policies for historical account changes with restricted access.'];
+ assert(!reviewDraft(r,source,'').some(f=>f.text.includes('Possible repeated work across employers')));
+});
+test('universal prompt compares work rather than merely changing verbs',()=>{
+ const {generalGenerationPrompt}=load('prompts/general-resume.ts');
+ const {analyzeLocally}=load('engine/resume-review/jd-workflow.ts');
+ for(const role of ['Salesforce Developer','Data Engineer','Java Developer','Kafka Administrator']) {
+  const jd='Role: '+role;
+  const prompt=generalGenerationPrompt(jd,analyzeLocally(jd),source,['experience'],'c2c');
+  assert(prompt.includes('DISTINCT EMPLOYER WORK'));
+  assert(prompt.includes('cross-employer comparison'));
+  assert(prompt.includes('Do not invent work just to satisfy diversity'));
+  assert(prompt.includes('no repeated API-first, database-second, testing-third sequence'));
+ }
+});
