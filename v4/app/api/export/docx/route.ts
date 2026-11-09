@@ -1,3 +1,5 @@
+import { labelMetricDraftDocx } from "@/engine/export-engine/label-metric-draft";
+import { prepareMetricExport, metricExportFields } from "@/engine/resume-review/metric-review";
 import { validateDataCenterContent } from "@/templates/data-center/validate";
 import { createDataCenterDocx } from "@/templates/data-center/docx-renderer";
 import { reviewResumeContent } from "@/engine/resume-review/content-review";
@@ -15,6 +17,7 @@ import {
 export const runtime = "nodejs";
 
 const requestSchema = z.object({
+  ...metricExportFields,
   resume: generatedResumeSchema,
   fileName: z.string().optional(),
   saveToFolder: z.boolean().optional().default(false),
@@ -65,7 +68,8 @@ export async function POST(
      */
 
     const {
-      resume,
+      resume: importedResume,
+      exportMode, verifiedMetrics,
       saveToFolder,
       fileName,
       templateId,
@@ -78,6 +82,8 @@ export async function POST(
       certificationBadgeSize,
     } = requestSchema.parse(body);
 
+    const {resume,excluded}=prepareMetricExport(importedResume,exportMode,verifiedMetrics);
+    void excluded;
     const contentErrors = reviewResumeContent(resume).filter(issue => issue.severity === "error");
     if (contentErrors.length) return Response.json({ success: false, error: contentErrors.map(issue => issue.message).join(" ") }, { status: 400 });
     if(templateId === "data-center") validateDataCenterContent(resume);
@@ -88,7 +94,7 @@ export async function POST(
      * user-selected font.
      */
 
-    const docxBuffer = await (templateId === "data-center" ? createDataCenterDocx : templateId === "architect-resume" ? createArchitectResumeDocx : createResumeDocx)({
+    let docxBuffer = await (templateId === "data-center" ? createDataCenterDocx : templateId === "architect-resume" ? createArchitectResumeDocx : createResumeDocx)({
         resume,
         technicalSkills,
         selectedSections,
@@ -104,6 +110,7 @@ export async function POST(
      * a web-compatible Uint8Array.
      */
 
+    if(exportMode==='draft') docxBuffer=await labelMetricDraftDocx(docxBuffer);
     if (saveToFolder) {
       const saved = await saveDailyResume(docxBuffer, resume.personalInfo.fullName, "docx", { fileName });
       return Response.json(saved, { headers: { "Cache-Control": "no-store" } });

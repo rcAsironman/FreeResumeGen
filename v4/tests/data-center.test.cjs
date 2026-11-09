@@ -28,7 +28,7 @@ test('single-page prompt overrides generic long-resume and forced metric rules',
  const p=generalGenerationPrompt(jd,analyzeLocally(jd),source,['experience'],'data-center',3,study);
  assert(p.includes('DATA CENTER SINGLE-PAGE CONTRACT'));
  assert(p.includes('Education appears last'));
- assert(p.includes('Use real supplied measurements only'));
+ assert(p.includes('2–3 proposed quantitative suggestions'));assert(p.includes('PROPOSED — REQUIRES CANDIDATE VERIFICATION'));
  assert(!p.includes('Zero is not acceptable'));
  assert(p.includes('candidate-specified CPT start: 2025-01'));
 });

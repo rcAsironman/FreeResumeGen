@@ -1,10 +1,15 @@
+import { prepareMetricExport, verifiedMetricSchema } from "@/engine/resume-review/metric-review";
+import { z } from "zod";
 import { generatedResumeSchema } from "@/engine/validation/resume.schema";
 import { assertLocalResumeSave, saveDailyResume } from "@/engine/export-engine/save-daily-resume";
 export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const resume = generatedResumeSchema.parse(body.resume);
+    const imported = generatedResumeSchema.parse(body.resume);
+    // Raw resume JSON is always submission-safe; draft review records live separately.
+    const verified=z.array(verifiedMetricSchema).parse(body.verifiedMetrics??[]);
+    const {resume}=prepareMetricExport(imported,"submission",verified);
     if(body.saveToFolder===false)return new Response(JSON.stringify(resume,null,2),{headers:{'Content-Type':'application/json','Content-Disposition':'attachment; filename="resume.json"','Cache-Control':'no-store'}});
     assertLocalResumeSave(request);
     const saved = await saveDailyResume(Buffer.from(JSON.stringify(resume, null, 2)), resume.personalInfo.fullName, "json", { fileName: body.fileName });

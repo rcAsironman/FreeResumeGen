@@ -1,4 +1,6 @@
 "use client";
+import { MetricReviewPanel } from "@/components/builder/MetricReviewPanel";
+import { metricRecords, prepareMetricExport, verifiedMetricSchema, type MetricReviewRecord, type VerifiedMetric } from "@/engine/resume-review/metric-review";
 import { parseResumeFileStem, RESUME_FILENAME_LIMIT, resumeFileStem } from "@/utils/resume-download-name";
 import { chooseBrowserDownloadFolder, saveBrowserResume } from "@/utils/browser-resume-download";
 import { cleanRoleTitle } from "@/engine/resume-review/role-title";
@@ -34,6 +36,9 @@ const RESUME_FONT_STORAGE_KEY = "resume-font-v1";
 
 
 export function FileResumeEditor() {
+  const [exportMode,setExportMode]=useState<"draft"|"submission">("draft");
+  const [verifiedMetrics,setVerifiedMetrics]=useState<VerifiedMetric[]>([]);
+  const [metricReview,setMetricReview]=useState<MetricReviewRecord[]>([]);
   const [sourceContext, setSourceContext] = useState<MasterResume | null>(null);
   const [targetYears, setTargetYears] = useState<number | null>(null);
   const [currentJd, setCurrentJd] = useState("");
@@ -122,7 +127,7 @@ export function FileResumeEditor() {
     try {
       const guided = sessionStorage.getItem("guidedResumeData") || localStorage.getItem("resume-clone-editor-v2");
       if (guided) {
-        const data = JSON.parse(guided) as { employmentType?: string; templateId?: ResumeLayout; titleFormatVersion?: number; metricDraftVersion?: number; draftMetricEdits?: DraftMetricEdit[]; targetYears?: number | null; resume: MasterResume; technicalSkills: string[]; selectedSections: HighlightSection[]; targetRole?: string; jobDescription?: string; sourceResume?: MasterResume; profile?: string; validationRepairs?: string[]; timelineProposal?: Pick<ProposedTimeline, "targetYears" | "targetMonths" | "referenceDate" | "reference" | "changes"> | null };
+        const data = JSON.parse(guided) as { verifiedMetrics?: VerifiedMetric[]; employmentType?: string; templateId?: ResumeLayout; titleFormatVersion?: number; metricDraftVersion?: number; draftMetricEdits?: DraftMetricEdit[]; targetYears?: number | null; resume: MasterResume; technicalSkills: string[]; selectedSections: HighlightSection[]; targetRole?: string; jobDescription?: string; sourceResume?: MasterResume; profile?: string; validationRepairs?: string[]; timelineProposal?: Pick<ProposedTimeline, "targetYears" | "targetMonths" | "referenceDate" | "reference" | "changes"> | null };
         if(data.titleFormatVersion!==1) {
           const headline=cleanRoleTitle(data.resume.personalInfo.professionalTitle || "");
           if(headline && headline!==data.resume.personalInfo.professionalTitle) {
@@ -133,13 +138,15 @@ export function FileResumeEditor() {
           const saved=JSON.stringify(data); sessionStorage.setItem("guidedResumeData",saved); localStorage.setItem("resume-clone-editor-v2",saved);
         }
         if (data.draftMetricEdits?.length && data.metricDraftVersion !== METRIC_DRAFT_VERSION) {
-          const refreshed = refreshDraftMetrics(data.resume, data.draftMetricEdits);
+          const refreshed = refreshDraftMetrics(data.resume, data.draftMetricEdits.filter(edit=>!data.verifiedMetrics?.some(v=>v.text===edit.replacement&&verifiedMetricSchema.safeParse(v).success)));
           data.resume = refreshed.resume; data.draftMetricEdits = refreshed.edits; data.metricDraftVersion = METRIC_DRAFT_VERSION;
           data.validationRepairs = [...(data.validationRepairs ?? []), "Refreshed untouched app-generated metric examples with more varied outcomes. Existing user edits were preserved."];
           const saved = JSON.stringify(data); sessionStorage.setItem("guidedResumeData", saved); localStorage.setItem("resume-clone-editor-v2", saved);
         }
         if(data.employmentType==='data-center') {setTemplateId('data-center');setFont('Times New Roman');setShowCertificationLogos(false);}
         else if(localStorage.getItem(RESUME_LAYOUT_STORAGE_KEY)==='data-center')setTemplateId(DEFAULT_RESUME_LAYOUT);
+        const verified=(data.verifiedMetrics??[]).filter(v=>verifiedMetricSchema.safeParse(v).success);
+        setVerifiedMetrics(verified);setMetricReview(metricRecords(data.resume,verified));
         setSourceContext(data.sourceResume ?? null); setCurrentJd(data.jobDescription ?? ""); setTargetYears(data.targetYears ?? null);
         setResume(data.resume); setJsonText(JSON.stringify(data.resume, null, 2)); setTechnicalSkills(data.technicalSkills); setSelectedSections(data.selectedSections);
         if (data.validationRepairs?.length) setNotice(data.validationRepairs.join(" "));
@@ -150,6 +157,7 @@ export function FileResumeEditor() {
       const response = await fetch("/api/current-resume", { cache: "no-store" });
       const result = await response.json() as { success: boolean; resume?: MasterResume; error?: string; issues?: ResumeIssue[] };
       if (!response.ok || !result.resume) throw new Error(result.error ?? "Unable to load the resume file.");
+      setMetricReview(metricRecords(result.resume));
       setResume(result.resume);
       setJsonText(JSON.stringify(result.resume, null, 2));
       setTechnicalSkills(result.resume.technicalSkills.categories.flatMap((category) => category.skills));
@@ -158,12 +166,19 @@ export function FileResumeEditor() {
 
   useEffect(() => { void loadFile(); }, [loadFile]);
 
-  function persistDraft(next: MasterResume) {
+  function persistDraft(next: MasterResume, verifiedOverride=verifiedMetrics) {
     try {
       const previous = JSON.parse(sessionStorage.getItem("guidedResumeData") || localStorage.getItem("resume-clone-editor-v2") || "{}");
-      const saved = JSON.stringify({...previous, resume: next});
+      const review=metricRecords(next,verifiedOverride);setMetricReview(review);
+      const saved = JSON.stringify({...previous, resume: next,verifiedMetrics:verifiedOverride,metricReview:review});
       sessionStorage.setItem("guidedResumeData", saved); localStorage.setItem("resume-clone-editor-v2", saved);
     } catch { setError("Unable to save edits in browser storage. Download or copy your JSON before leaving."); }
+  }
+
+  function verifyMetric(value:VerifiedMetric) {
+    const next=readDirectTextEdits();
+    const verified=[...verifiedMetrics.filter(v=>!(v.employerId===value.employerId&&v.text===value.text)),value];
+    setVerifiedMetrics(verified);persistDraft(next,verified);setNotice('This specific numerical claim is recorded as candidate-verified. Other proposed values remain unverified.');
   }
 
   function update(next: MasterResume) {
@@ -234,16 +249,17 @@ export function FileResumeEditor() {
       persistDraft(editedResume);
       const contentErrors = reviewResumeContent(editedResume).filter(issue => issue.severity === "error");
       if (contentErrors.length) throw new Error(contentErrors.map(issue => issue.message).join(" "));
-      const response = await fetch(`/api/export/${format}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ resume: editedResume, saveToFolder: local, fileName: customStem, templateId, technicalSkills, selectedSections, fontFamily: font, showCertificationLogos, selectedCertificationBadges, certificationBadgePosition, certificationBadgeSize, documentHtml: format === "pdf" ? documentHtml : undefined }) });
+      const excluded=prepareMetricExport(editedResume,format==='json'?'submission':exportMode,verifiedMetrics).excluded;
+      const response = await fetch(`/api/export/${format}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ resume: editedResume, exportMode, verifiedMetrics, saveToFolder: local, fileName: customStem, templateId, technicalSkills, selectedSections, fontFamily: font, showCertificationLogos, selectedCertificationBadges, certificationBadgePosition, certificationBadgeSize, documentHtml: format === "pdf" ? documentHtml : undefined }) });
       if(!local) {
         if(!response.ok){const failure=await response.json();throw new Error(failure.error||'Download generation failed.');}
         const message=await saveBrowserResume(await response.blob(),editedResume.personalInfo.fullName,format,destination,customStem);
-        setLastSavedPath('');setNotice(message);return;
+        setLastSavedPath('');setNotice(message+(excluded?` ${excluded} unsupported numerical statements were excluded; the draft is unchanged.`:''));return;
       }
       const result = await response.json() as { success?: boolean; filePath?: string; error?: string };
       if (!response.ok || !result.success || !result.filePath) throw new Error(result.error ?? `Unable to save ${format.toUpperCase()}.`);
       setLastSavedPath(result.filePath);
-      setNotice(`Saved ${format.toUpperCase()} to ${result.filePath}`);
+      setNotice(`Saved ${format.toUpperCase()} to ${result.filePath}`+(excluded?` — ${excluded} unsupported numerical statements excluded; draft unchanged.`:''));
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Download failed."); }
     finally { setDownloading(""); }
   }
@@ -340,6 +356,8 @@ export function FileResumeEditor() {
       <button onClick={() => void download("pdf")} disabled={Boolean(downloading) || Boolean(timelineProposal && !timelineReviewConfirmed)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--app-primary)] px-4 py-2 font-semibold text-white disabled:opacity-50"><Download size={16}/>{downloading === "pdf" ? "Creating…" : "Download PDF"}</button><button onClick={() => void download("docx")} disabled={Boolean(downloading) || Boolean(timelineProposal && !timelineReviewConfirmed)} className="inline-flex items-center gap-2 rounded-xl bg-[var(--app-primary)] px-4 py-2 font-semibold text-white disabled:opacity-50"><FileText size={16}/>{downloading === "docx" ? "Creating…" : "Download DOCX"}</button><button onClick={() => void download("json")} disabled={Boolean(downloading) || Boolean(timelineProposal && !timelineReviewConfirmed)} className="rounded-xl bg-[var(--app-primary)] px-4 py-2 font-semibold text-white disabled:opacity-50">Download JSON</button></div></header>
     <p className="mt-2 text-xs text-[var(--app-muted)]">Certification logos appear only for matching credentials listed in the resume; skills alone never add a certification mark.</p>
     <p className="mt-3 break-all rounded-xl border border-[var(--app-border)] bg-[var(--app-surface)] px-4 py-3 text-sm text-[var(--app-muted)]" role="status">{lastSavedPath ? `Last saved: ${lastSavedPath}` : "Downloads are saved in Downloads/YYYY-MM-DD_resumes (Chicago date), with a different filename for each resume."}</p>
+    <MetricReviewPanel records={metricReview} onVerify={verifyMetric}/>
+    <label className="mt-3 block font-semibold">Download version<select aria-label="Download version" value={exportMode} onChange={e=>setExportMode(e.target.value as 'draft'|'submission')} className="ml-3 rounded border p-2"><option value="draft">Editable draft — proposed metrics, visibly labeled</option><option value="submission">Submission — supported numerical claims only</option></select></label>
     {timelineProposal && <aside aria-label="Proposed employment dates" className="mt-4 rounded-2xl border border-amber-400 bg-amber-50 p-4 text-amber-950">
       <h2 className="font-bold">Review proposed employment dates</h2>
       <p className="mt-1 text-sm">These dates were calculated at your direction for a {timelineProposal.targetMonths / 12}-year timeline ending {timelineProposal.referenceDate}. They are proposed edits, not independently verified records.</p>
@@ -352,7 +370,7 @@ export function FileResumeEditor() {
       <article className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] p-4 shadow-md"><div className="flex flex-wrap items-center justify-between gap-2"><div><h2 className="text-xl font-bold">Edit JSON and content</h2><p className="text-sm text-[var(--app-muted)]">All fields can be changed here. Validate before previewing.</p></div><button onClick={() => void copyJson()} className="rounded-lg border border-[var(--app-border)] px-3 py-2 text-sm font-semibold text-[var(--app-accent)]">Copy updated JSON</button></div><textarea value={jsonText} onChange={(event) => { setJsonText(event.target.value); if (timelineProposal) setTimelineReviewConfirmed(false); }} spellCheck={false} className="mt-4 h-[540px] w-full rounded-xl bg-[var(--app-input)] p-4 font-mono text-xs leading-5 text-[var(--app-code)]"/><button onClick={() => void applyJson()} className="mt-3 w-full rounded-xl bg-[var(--app-primary)] px-4 py-3 font-semibold text-white">Validate edits and update preview</button>
         <div className="mt-5 border-t pt-4"><div className="flex items-center justify-between"><h3 className="font-bold">Quick summary controls</h3><button onClick={() => update({ ...resume, professionalSummary: { bullets: [...resume.professionalSummary.bullets, "Add new summary text here."] } })} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--app-accent)]"><Plus size={15}/> Add text</button></div><div className="mt-3 max-h-96 overflow-auto space-y-2">{resume.professionalSummary.bullets.map((bullet, index) => <div key={`${bullet}-${index}`} className="flex items-start gap-2 rounded-lg bg-[var(--app-surface-raised)] p-3"><span className="flex-1 text-xs leading-5">{bullet}</span><button disabled={resume.professionalSummary.bullets.length === 1} onClick={() => update({ ...resume, professionalSummary: { bullets: resume.professionalSummary.bullets.filter((_, itemIndex) => itemIndex !== index) } })} className="text-[var(--app-error)] disabled:opacity-30" aria-label="Remove summary text"><Trash2 size={16}/></button></div>)}</div></div>
       </article>
-      <article className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface-raised)] p-3 shadow-md"><div className="mb-3 flex items-center justify-between gap-2"><div><h2 className="font-bold">Edit directly on the resume</h2><p className="text-xs text-[var(--app-muted)]">Click text, select it, type, delete, or use the formatting toolbar. Direct edits are included in both downloads.</p></div><button type="button" onClick={openFullPreview} className="inline-flex items-center gap-2 rounded-lg bg-[var(--app-primary)] px-3 py-2 text-sm font-semibold text-white"><Eye size={16}/> Full preview</button></div><RichTextToolbar editorRef={editorRef}/><div className="mt-3 max-h-[900px] overflow-auto rounded-lg bg-[var(--app-preview)] p-3"><div ref={editorRef} contentEditable suppressContentEditableWarning spellCheck onInput={() => { persistDraft(readDirectTextEdits()); if (timelineProposal) setTimelineReviewConfirmed(false); }} className="mx-auto min-h-[1056px] w-[816px] max-w-full bg-white text-black shadow-xl outline-none focus:ring-4 focus:ring-[var(--app-accent)]" data-resume-paper style={{ colorScheme: "light", filter: "brightness(0.9)", padding: templateId === "data-center" ? "0" : templateId === "architect-resume" ? "0 12.733px 0 18.933px" : "32px", minWidth: templateId === "data-center" ? "816px" : templateId === "architect-resume" ? "816px" : undefined }}><ResumeTemplate templateId={templateId} resume={resume} technicalSkills={technicalSkills} selectedSections={selectedSections} fontFamily={font} showCertificationLogos={showCertificationLogos} selectedCertificationBadges={selectedCertificationBadges} certificationBadgePosition={certificationBadgePosition} certificationBadgeSize={certificationBadgeSize} onCertificationBadgePositionChange={setCertificationBadgePosition}/></div></div></article>
+      <article className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface-raised)] p-3 shadow-md"><div className="mb-3 flex items-center justify-between gap-2"><div><h2 className="font-bold">Editable draft — proposed metrics require verification</h2><p className="text-xs text-[var(--app-muted)]">Click text, select it, type, delete, or use the formatting toolbar. Direct edits are included in both downloads.</p></div><button type="button" onClick={openFullPreview} className="inline-flex items-center gap-2 rounded-lg bg-[var(--app-primary)] px-3 py-2 text-sm font-semibold text-white"><Eye size={16}/> Full preview</button></div><RichTextToolbar editorRef={editorRef}/><div className="mt-3 max-h-[900px] overflow-auto rounded-lg bg-[var(--app-preview)] p-3"><div ref={editorRef} contentEditable suppressContentEditableWarning spellCheck onInput={() => { persistDraft(readDirectTextEdits()); if (timelineProposal) setTimelineReviewConfirmed(false); }} className="mx-auto min-h-[1056px] w-[816px] max-w-full bg-white text-black shadow-xl outline-none focus:ring-4 focus:ring-[var(--app-accent)]" data-resume-paper style={{ colorScheme: "light", filter: "brightness(0.9)", padding: templateId === "data-center" ? "0" : templateId === "architect-resume" ? "0 12.733px 0 18.933px" : "32px", minWidth: templateId === "data-center" ? "816px" : templateId === "architect-resume" ? "816px" : undefined }}><ResumeTemplate templateId={templateId} resume={resume} technicalSkills={technicalSkills} selectedSections={selectedSections} fontFamily={font} showCertificationLogos={showCertificationLogos} selectedCertificationBadges={selectedCertificationBadges} certificationBadgePosition={certificationBadgePosition} certificationBadgeSize={certificationBadgeSize} onCertificationBadgePositionChange={setCertificationBadgePosition}/></div></div></article>
     </section>
     {fullPreview && <div className="fixed inset-0 z-50 bg-black/75 p-3 sm:p-6"><div className="mx-auto flex h-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[var(--app-surface-raised)]"><div className="flex items-center justify-between bg-[var(--app-surface)] p-3"><strong>Resume preview</strong><div className="flex flex-wrap gap-2"><Link href="/" className="inline-flex items-center gap-1 rounded-lg border px-3 py-1"><Home size={16}/> Home</Link><button type="button" onClick={() => setFullPreview(false)} className="inline-flex items-center gap-1 rounded-lg border px-3 py-1"><ArrowLeft size={16}/> Back to editor</button></div></div><div className="flex-1 overflow-auto"><div className="mx-auto w-[816px] max-w-full bg-white text-black shadow-xl" data-resume-paper style={{ colorScheme: "light", filter: "brightness(0.9)", padding: templateId === "data-center" ? "0" : templateId === "architect-resume" ? "0 12.733px 0 18.933px" : "32px", minWidth: templateId === "data-center" ? "816px" : templateId === "architect-resume" ? "816px" : undefined }} dangerouslySetInnerHTML={{ __html: previewHtml }}/></div></div></div>}
   </div>;

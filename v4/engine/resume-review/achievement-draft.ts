@@ -1,10 +1,17 @@
 import type { MasterResume } from "@/types/resume";
-import { numericOutcome } from "@/engine/resume-review/jd-workflow";
+import { hasMetric, PROPOSED_METRIC_STATUS } from "@/engine/resume-review/metric-review";
 
-export const METRIC_DRAFT_VERSION = 3;
-export type DraftMetricEdit = {employerId:string;index:number;original:string;replacement:string;outcome?:string;status:"unverified generated example"};
+export const METRIC_DRAFT_VERSION = 4;
+export type DraftMetricEdit = {employerId:string;index:number;original:string;replacement:string;outcome?:string;status:typeof PROPOSED_METRIC_STATUS|"unverified generated example"};
 // Select actual outcome categories across the whole resume, not synonyms for one result.
-const opportunities = [
+type Opportunity={family:string;test:RegExp;outcome:string;value?:number;unit?:string};
+const opportunities:Opportunity[] = [
+ {family:"server-install",test:/\b(?:install|deploy)\w*\b.*\bservers?\b|\bservers?\b.*\b(?:install|deploy)\w*/i,outcome:"server installations",value:6,unit:"servers per month"},
+ {family:"rack",test:/\bcommission\w*\b.*\bracks?\b/i,outcome:"rack commissioning",value:2,unit:"racks per month"},
+ {family:"cabling",test:/\b(?:install|terminat|rout|patch)\w*\b.*\b(?:fiber|copper|cabl)/i,outcome:"cabling work",value:12,unit:"connections per month"},
+ {family:"inventory",test:/\b(?:reconcil|inspect|record|inventor)\w*\b.*\b(?:assets?|equipment|serial|deliver)/i,outcome:"equipment inventory",value:20,unit:"assets per month"},
+ {family:"hardware",test:/\b(?:replac|repair)\w*\b.*\b(?:memory|power suppl|hardware|modules?|components?|fans?|disks?)\b/i,outcome:"hardware maintenance",value:8,unit:"devices per month"},
+
   {family:"query",test:/\b(?:sql|quer(?:y|ies)|index(?:es|ing)?)\b.*\b(?:optim|tun|execution.plan)|\b(?:optim|tun)\w*\b.*\b(?:sql|quer(?:y|ies))\b/i, outcome:"query execution time"},
   {family:"compute",test:/\b(?:spark|job|dataframe)\b.*\b(?:optim|tun|partition|caching)|\b(?:optim|tun)\w*\b.*\b(?:spark|job|dataframe)/i, outcome:"processing runtime"},
   {family:"shuffle",test:/\b(?:reduc|refactor|optim|tun|broadcast)\w*\b.*\b(?:shuffle|join)|\b(?:shuffle|join)\b.*\b(?:reduc|refactor|optim|tun)/i,outcome:"shuffle data volume"},
@@ -33,27 +40,31 @@ export function strengthenDraftMetrics(input: MasterResume) {
   const edits: DraftMetricEdit[]=[];
   const usage=new Map<string,number>();
   // Include pre-existing outcome language when choosing new examples, but never edit it.
-  for(const text of resume.experience.flatMap(e=>e.responsibilities).filter(t=>numericOutcome.test(t))) {
+  for(const text of resume.experience.flatMap(e=>e.responsibilities).filter(t=>hasMetric(t))) {
     for(const rule of opportunities)if(text.toLowerCase().includes(rule.outcome))usage.set(rule.family,(usage.get(rule.family)||0)+1);
   }
-  resume.experience.forEach((employer,employerIndex)=>{
-    let count=employer.responsibilities.filter(t=>numericOutcome.test(t)).length;
+  resume.experience.forEach((employer)=>{
+    let count=employer.responsibilities.filter(t=>hasMetric(t)).length;
     const used=new Set<string>();
     while(count<2) {
-      const candidates=employer.responsibilities.flatMap((original,index)=>numericOutcome.test(original)?[]:opportunities.flatMap((rule,order)=>!used.has(rule.family)&&rule.test.test(rule.family==="query"?original.replace(/Adaptive Query Execution/gi,""):original)?[{original,index,rule,order}]:[]));
+      const candidates=employer.responsibilities.flatMap((original,index)=>hasMetric(original)?[]:opportunities.flatMap((rule,order)=>!used.has(rule.family)&&rule.test.test(rule.family==="query"?original.replace(/Adaptive Query Execution/gi,""):original)?[{original,index,rule,order}]:[]));
       candidates.sort((a,b)=>(usage.get(a.rule.family)||0)-(usage.get(b.rule.family)||0)||a.order-b.order||a.index-b.index);
       const choice=candidates[0];
       if(!choice)break;
       const {original,index,rule}=choice;
       used.add(rule.family);usage.set(rule.family,(usage.get(rule.family)||0)+1);
-      const percent=18+((employerIndex*7+index*3)%17);
+      // Conservative task-specific drafting assumptions, not measured results or
+      // industry benchmarks. No index-based pseudo-performance calculation.
+      const percent=({query:15,compute:12,shuffle:10,tests:15,release:20,orchestration:10,reconciliation:15,validation:10,duplicates:12,recovery:10,incremental:15,diagnosis:10,latency:12} as Record<string,number>)[rule.family]??10;
       // Remove a trailing drafting instruction, not candidate-authored work history.
       const action=original
         .replace(/;\s*evaluate\s+[^.;]*\b(?:reductions|improvements)\s+against\s+recorded\s+[^.;]*baselines\.?\s*$/i,"")
         .replace(/,\s*focusing on measurable (?:reductions|improvements) in [^.;]+\.?\s*$/i,"");
-      const replacement=achievementText(action,rule.outcome,percent,edits.length%3);
+      const replacement=rule.unit
+        ? action.trim().replace(/[.;]+$/, '')+', covering '+rule.value+' '+rule.unit+'.'
+        : achievementText(action,rule.outcome,percent,edits.length%3);
       employer.responsibilities[index]=replacement;count++;
-      edits.push({employerId:employer.id,index,original,replacement,outcome:rule.outcome,status:"unverified generated example"});
+      edits.push({employerId:employer.id,index,original,replacement,outcome:rule.outcome,status:PROPOSED_METRIC_STATUS});
     }
   });
   return {resume,edits};
@@ -63,7 +74,7 @@ export function strengthenDraftMetrics(input: MasterResume) {
 export function refreshDraftMetrics(input: MasterResume, previous: DraftMetricEdit[]) {
   const original=structuredClone(input);
   for(const edit of previous) {
-    if(edit.status!=="unverified generated example")continue;
+    if(edit.status!=="unverified generated example" && edit.status!==PROPOSED_METRIC_STATUS)continue;
     const employer=original.experience.find(e=>e.id===edit.employerId);
     if(employer?.responsibilities[edit.index]===edit.replacement)employer.responsibilities[edit.index]=edit.original;
   }

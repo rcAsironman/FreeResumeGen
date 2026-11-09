@@ -1,0 +1,2 @@
+components/builder/GuidedResumeWorkflow.tsx(137,143): error TS2322: Type 'string | number | null' is not assignable to type 'string | number | readonly string[] | undefined'.
+  Type 'null' is not assignable to type 'string | number | readonly string[] | undefined'.

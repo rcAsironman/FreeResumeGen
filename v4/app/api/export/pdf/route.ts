@@ -1,3 +1,4 @@
+import { prepareMetricExport, metricExportFields } from "@/engine/resume-review/metric-review";
 import { validateDataCenterContent } from "@/templates/data-center/validate";
 import { reviewResumeContent } from "@/engine/resume-review/content-review";
 import { assertLocalResumeSave, saveDailyResume } from "@/engine/export-engine/save-daily-resume";
@@ -13,6 +14,7 @@ import {
 export const runtime = "nodejs";
 
 const requestSchema = z.object({
+  ...metricExportFields,
   resume: generatedResumeSchema,
   fileName: z.string().optional(),
   saveToFolder: z.boolean().optional().default(false),
@@ -54,7 +56,8 @@ export async function POST(
       await request.json();
 
     const {
-      resume,
+      resume: importedResume,
+      exportMode, verifiedMetrics,
       saveToFolder,
       fileName,
       templateId,
@@ -68,6 +71,8 @@ export async function POST(
       certificationBadgeSize,
     } = requestSchema.parse(body);
 
+    const {resume,excluded}=prepareMetricExport(importedResume,exportMode,verifiedMetrics);
+    void excluded;
     const contentErrors = reviewResumeContent(resume).filter(issue => issue.severity === "error");
     if (contentErrors.length) return Response.json({ success: false, error: contentErrors.map(issue => issue.message).join(" ") }, { status: 400 });
     if(templateId === "data-center") validateDataCenterContent(resume);
@@ -117,7 +122,7 @@ export async function POST(
         technicalSkills,
         selectedSections,
         fontFamily,
-        documentHtml,
+        documentHtml: exportMode==='draft'?documentHtml:undefined,
         showCertificationLogos,
         selectedCertificationBadges,
         certificationBadgePosition,
@@ -176,6 +181,10 @@ export async function POST(
       const fits=await page.evaluate(()=>{const paper=document.querySelector('[data-data-center-resume]') as HTMLElement|null;return !!paper && paper.scrollHeight<=1057;});
       if(!fits) throw new Error("Data Center content exceeds one page. Shorten the summary or responsibilities in the editor; content has not been clipped.");
     }
+    if(exportMode==='draft') await page.evaluate(()=>{
+      const label=document.createElement('div');label.textContent='DRAFT — Proposed metrics require candidate verification; not for submission';
+      label.style.cssText='position:fixed;bottom:3pt;left:0;right:0;text-align:center;font:7pt Arial;color:#9c2727;background:white;z-index:9999';document.body.appendChild(label);
+    });
     const pdf = await page.pdf({
       format: "Letter",
 

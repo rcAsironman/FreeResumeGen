@@ -1,4 +1,5 @@
 "use client";
+import { metricRecords } from "@/engine/resume-review/metric-review";
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -112,7 +113,7 @@ export function GuidedResumeWorkflow() {
       const data=await result.json();
       if(current!==revision.current)return;
       if(!result.ok || !data.resume)throw new Error(data.error||"Unable to validate resume");
-      const enriched=mode==='data-center'?{resume:data.resume as MasterResume,edits:[]}:strengthenDraftMetrics(data.resume as MasterResume);
+      const enriched=strengthenDraftMetrics(data.resume as MasterResume);
       const draft=enriched.resume;
       if(mode==='data-center'&&timeline) draft.experience=preserveEmploymentTimeline(draft.experience,timeline.experience);
       if(locked) draft.experience=preserveEmploymentTimeline(draft.experience,source.experience);
@@ -123,7 +124,7 @@ export function GuidedResumeWorkflow() {
       const findings=reviewDraft(draft,source,jd,target.years);
       // Keep the imported resume intact. The source is reference data, never an import identity restriction.
       const proposal=timeline && draft.experience.length===timeline.experience.length && draft.experience.every((e,i)=>e.id===timeline.experience[i].id && e.company===timeline.experience[i].company && e.startDate===timeline.experience[i].startDate && e.endDate===timeline.experience[i].endDate)?timeline:null;
-      const context={resume:draft,technicalSkills:analysis.allTechnicalSkills,selectedSections:["professionalSummary","experience"],targetRole:analysis.targetRole,jobDescription:jd,sourceResume:source,profile,employmentType:mode,templateId:mode==='data-center'?'data-center':undefined,preserveSourceTimeline:locked,studyDates:study,validationRepairs:[...(data.repairs||[]),...(enriched.edits.length?[`Added ${enriched.edits.length} unverified numerical draft examples. Review and replace with actual results before professional use.`]:[])],draftMetricEdits:enriched.edits,metricDraftVersion:METRIC_DRAFT_VERSION,timelineProposal:proposal,targetYears:target.years,draftFindings:findings};
+      const context={resume:draft,metricReview:metricRecords(draft),verifiedMetrics:[],technicalSkills:analysis.allTechnicalSkills,selectedSections:["professionalSummary","experience"],targetRole:analysis.targetRole,jobDescription:jd,sourceResume:source,profile,employmentType:mode,templateId:mode==='data-center'?'data-center':undefined,preserveSourceTimeline:locked,studyDates:study,validationRepairs:[...(data.repairs||[]),...(enriched.edits.length?[`Added ${enriched.edits.length} unverified numerical draft examples. Review and replace with actual results before professional use.`]:[])],draftMetricEdits:enriched.edits,metricDraftVersion:METRIC_DRAFT_VERSION,timelineProposal:proposal,targetYears:target.years,draftFindings:findings};
       sessionStorage.setItem("guidedResumeData",JSON.stringify(context));
       localStorage.setItem("resume-clone-editor-v2",JSON.stringify(context));
       router.push("/editor");
