@@ -1,4 +1,3 @@
-import { labelMetricDraftDocx } from "@/engine/export-engine/label-metric-draft";
 import { prepareMetricExport, metricExportFields } from "@/engine/resume-review/metric-review";
 import { validateDataCenterContent } from "@/templates/data-center/validate";
 import { createDataCenterDocx } from "@/templates/data-center/docx-renderer";
@@ -94,7 +93,7 @@ export async function POST(
      * user-selected font.
      */
 
-    let docxBuffer = await (templateId === "data-center" ? createDataCenterDocx : templateId === "architect-resume" ? createArchitectResumeDocx : createResumeDocx)({
+    const docxBuffer = await (templateId === "data-center" ? createDataCenterDocx : templateId === "architect-resume" ? createArchitectResumeDocx : createResumeDocx)({
         resume,
         technicalSkills,
         selectedSections,
@@ -110,7 +109,6 @@ export async function POST(
      * a web-compatible Uint8Array.
      */
 
-    if(exportMode==='draft') docxBuffer=await labelMetricDraftDocx(docxBuffer);
     if (saveToFolder) {
       const saved = await saveDailyResume(docxBuffer, resume.personalInfo.fullName, "docx", { fileName });
       return Response.json(saved, { headers: { "Cache-Control": "no-store" } });

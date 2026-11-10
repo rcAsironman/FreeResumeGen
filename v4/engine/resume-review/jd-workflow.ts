@@ -1,4 +1,4 @@
-import { responsibilityFingerprint, similarResponsibilities } from "@/engine/resume-review/responsibility-similarity";
+import { responsibilityFingerprint, similarResponsibilities, employerResponsibilityOverlap } from "@/engine/resume-review/responsibility-similarity";
 import type { JobAnalysis } from "@/types/job-analysis";
 import type { MasterResume } from "@/types/resume";
 import type { EmploymentType } from "@/types/employment-type";
@@ -87,6 +87,7 @@ export function reviewDraft(resume: MasterResume, source: MasterResume, jd: stri
     if (count > 3) findings.push({kind:"coverage",company:employer.company,text:`${count} quantified bullets: review the 2–3 per employer target. No bullets were removed.`});
     if (count === 0) findings.push({kind:"coverage",company:employer.company,text:"No quantified achievements. Use recorded measurements or clearly tracked editable draft examples for relevant technical outcomes."});
   }
+  for(const overlap of employerResponsibilityOverlap(resume.experience))if(overlap.exceedsTarget)findings.push({kind:'duplicate',company:overlap.left,text:`Cross-employer responsibility overlap estimate: ${overlap.left} ${overlap.leftPercent}% / ${overlap.right} ${overlap.rightPercent}% (${overlap.matched} matched bullets). Target: at most 20% for either employer. This text heuristic may miss paraphrases; use distinct supported work, not changed verbs or figures.`});
   const analysis = analyzeLocally(jd);
   const duration = careerDuration(resume.experience);
   if (targetYears !== null && duration && duration.totalMonths !== Math.round(targetYears * 12)) findings.push({kind:"coverage",text:`Selected target is ${targetYears} years, but imported dates total ${duration.years} years ${duration.remainingMonths} months. Dates have not been silently changed.`});

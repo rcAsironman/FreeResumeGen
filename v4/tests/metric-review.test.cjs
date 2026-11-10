@@ -35,3 +35,12 @@ test('all mode prompts share proposed metric and submission separation rules',()
  const {generalGenerationPrompt}=load('prompts/general-resume.ts'),{analyzeLocally}=load('engine/resume-review/jd-workflow.ts');
  for(const mode of ['full-time','c2c','data-center']){const p=generalGenerationPrompt('Data Center Technician',analyzeLocally('Data Center Technician'),source,[],mode);assert(p.includes('ACHIEVEMENT DRAFTING — ALL MODES'));assert(p.includes('PROPOSED — REQUIRES CANDIDATE VERIFICATION'));assert(!p.includes('Zero is not acceptable'));}
 });
+
+test('data center wording variants and improvement percentages are recognized',()=>{
+ const r=fixture();r.experience[0].responsibilities=['Performed rack-and-stack operations following approved layouts.','Reduced cabling rework through standardized labeling checks.'];r.experience[1].responsibilities=['Tested fiber connections using optical test equipment.','Improved hardware repair turnaround using documented fault isolation procedures.'];
+ const out=strengthenDraftMetrics(r);
+ assert(out.resume.experience.every(e=>e.responsibilities.filter(hasMetric).length===2));
+ assert(out.edits.some(e=>e.outcome==='cabling rework'&&e.replacement.includes('10%')));
+ assert(out.edits.some(e=>e.outcome==='hardware repair turnaround time'&&e.replacement.includes('12%')));
+ assert(out.edits.every(e=>e.status===PROPOSED_METRIC_STATUS));
+});

@@ -7,9 +7,9 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const imported = generatedResumeSchema.parse(body.resume);
-    // Raw resume JSON is always submission-safe; draft review records live separately.
+    // Review records remain outside the unchanged resume JSON schema.
     const verified=z.array(verifiedMetricSchema).parse(body.verifiedMetrics??[]);
-    const {resume}=prepareMetricExport(imported,"submission",verified);
+    const {resume}=prepareMetricExport(imported,body.exportMode==='draft'?'draft':'submission',verified);
     if(body.saveToFolder===false)return new Response(JSON.stringify(resume,null,2),{headers:{'Content-Type':'application/json','Content-Disposition':'attachment; filename="resume.json"','Cache-Control':'no-store'}});
     assertLocalResumeSave(request);
     const saved = await saveDailyResume(Buffer.from(JSON.stringify(resume, null, 2)), resume.personalInfo.fullName, "json", { fileName: body.fileName });

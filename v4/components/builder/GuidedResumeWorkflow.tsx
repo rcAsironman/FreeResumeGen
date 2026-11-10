@@ -1,4 +1,6 @@
 "use client";
+import { ResumeCompanyOverrides } from "@/components/builder/ResumeCompanyOverrides";
+import { companyScope, withResumeCompanies, type ResumeCompanyEdit } from "@/engine/resume-review/resume-company-overrides";
 import { metricRecords } from "@/engine/resume-review/metric-review";
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -31,7 +33,7 @@ export function GuidedResumeWorkflow() {
   const profile = "general" as const;
   const [file,setFile] = useState(PROFILE_DEFAULT_FILES.general);
   const [files,setFiles] = useState<string[]>([]);
-  const [source,setSource] = useState<MasterResume|null>(null);
+  const [savedSource,setSource] = useState<MasterResume|null>(null);
   const [custom,setCustom] = useState<Partial<Record<EmploymentType,MasterResume>>>({});
   const [settingsText,setSettingsText] = useState("");
   const [jd,setJd] = useState("");
@@ -42,6 +44,10 @@ export function GuidedResumeWorkflow() {
   const [notice,setNotice] = useState("");
   const [reload,setReload] = useState(0);
   const [loading,setLoading] = useState(true);
+  const [companyOverride,setCompanyOverride]=useState<{mode:EmploymentType;scope:string;rows:ResumeCompanyEdit[]}|null>(null);
+  const scope=savedSource?companyScope(savedSource):'';
+  const activeCompanies=companyOverride?.mode===mode&&companyOverride.scope===scope?companyOverride.rows:null;
+  const source=useMemo(()=>{if(!savedSource)return null;try{return activeCompanies?withResumeCompanies(savedSource,activeCompanies):savedSource;}catch{return savedSource;}},[savedSource,activeCompanies]);
   const revision = useRef(0);
   useEffect(() => {
     try {
@@ -68,6 +74,7 @@ export function GuidedResumeWorkflow() {
       try { const raw = localStorage.getItem(KEY); if (raw) localStorage.setItem(KEY + ":recovery:" + Date.now(), raw); } catch { /* Existing settings are not deleted explicitly. */ }
       setError("Saved settings could not be read. A recovery copy was attempted in browser storage; keep your source JSON backup before replacing settings.");
     }
+    try {const stored=JSON.parse(sessionStorage.getItem(KEY+':resume-companies')||'null');if(stored&&typeof stored.scope==='string'&&Array.isArray(stored.rows))setCompanyOverride(stored);}catch{/* No temporary edits to restore. */}
     setReady(true);
   },[]);
   useEffect(() => {
@@ -88,6 +95,16 @@ export function GuidedResumeWorkflow() {
       .catch(e=>{if(!controller.signal.aborted){setLoading(false);setError(String(e.message||e));}});
     return ()=>controller.abort();
   },[ready,mode,profile,file,custom,reload]);
+  useEffect(()=>{
+    if(!ready)return;
+    if(companyOverride&&(companyOverride.mode!==mode||(savedSource&&companyOverride.scope!==scope))){setCompanyOverride(null);sessionStorage.removeItem(KEY+':resume-companies');}
+  },[ready,mode,savedSource,scope,companyOverride]);
+  function applyResumeCompanies(rows:ResumeCompanyEdit[]) {
+    if(!savedSource)return;
+    const value={mode,scope,rows};withResumeCompanies(savedSource,rows);
+    setCompanyOverride(value);sessionStorage.setItem(KEY+':resume-companies',JSON.stringify(value));invalidate();setNotice('Companies updated for this resume only. Generate a fresh prompt; saved company settings are unchanged.');
+  }
+  function resetResumeCompanies(){setCompanyOverride(null);sessionStorage.removeItem(KEY+':resume-companies');invalidate();setNotice('Saved companies restored for this resume.');}
   const locked=mode==='c2c'&&gc;
   const duration=source?careerDuration(source.experience):null;
   const target = useMemo(()=>mode==='data-center'?{years:Math.min(4,Math.max(1,years??resolveTarget(jd,mode,false).years??1)),reason:"Data Center: 1–4 working years, calculated backward from today with the study/CPT exclusion"}:mode==='c2c'&&gc?resolveTarget(jd,mode,gc):years?{years,reason:'Your selected experience overrides the JD'}:resolveTarget(jd,mode,gc),[jd,mode,gc,years]);
@@ -138,7 +155,8 @@ export function GuidedResumeWorkflow() {
       <label className="mt-4 block font-semibold">Experience years<select aria-label="Experience years" disabled={locked} className={control} value={mode==='data-center'?(target.years??1):years??'auto'} onChange={e=>{invalidate();setYears(e.target.value==='auto'?null:Number(e.target.value));}}>{mode!=='data-center'&&<option value="auto">Automatic (JD; GC preserves history)</option>}{Array.from({length:mode==='data-center'?4:30},(_,i)=>i+1).map(n=><option key={n} value={n}>{n} {n===1?'year':'years'}</option>)}</select></label>
       {mode!=='c2c'&&<fieldset className="mt-4 rounded-xl border border-[var(--app-border)] p-3"><legend>Master’s study / CPT timeline</legend><div className="grid gap-3 sm:grid-cols-3">{([{key:'start',label:'Master’s start'},{key:'end',label:'Master’s end'},{key:'cpt',label:'CPT start (blank if none)'}] as const).map(f=><label key={f.key}>{f.label}<input aria-label={f.label} type="month" className={control} value={study[f.key]} onChange={e=>{invalidate();setStudy(old=>({...old,[f.key]:e.target.value}));}}/></label>)}</div><p className="mt-2 text-sm">Employment excludes the study period before your CPT start. Without CPT, the entire study period is excluded. Earlier employment may precede your master’s. Selected years count working months only.</p>{timelineResult.error&&<p role="alert">{timelineResult.error}</p>}</fieldset>}
       <p className="mt-4 text-sm">{loading?"Loading source…":source?source.experience.map(e=>e.company).join(" · "):"No source loaded"}</p>
-      <details className="mt-4"><summary className="cursor-pointer font-semibold">Company settings and source history</summary><div className="mt-3 grid gap-3 sm:grid-cols-2"><div><p className="font-semibold">Universal JD-first generation</p><p className="mt-2 text-sm">Full-Time and C2C have separate company settings. There are no Java/Kafka source profiles.</p></div><label>Source file<select className={control} disabled={mode!=="c2c" || Boolean(custom[mode])} value={mode==="data-center"?"master-resume-data-center.json":mode==="full-time"?FULL_TIME_MASTER_FILES[profile]||"":file} onChange={e=>{invalidate();setFile(e.target.value);}}>{files.map(f=><option key={f}>{f}</option>)}</select></label></div><p className="my-3 text-sm">Saved history supplies identity and company context, not a technology whitelist for the editable draft. Import complete source JSON separately for each employment type. Include actual work and measured outcomes when available.</p><button className={button} disabled={!source} onClick={()=>setSettingsText(JSON.stringify(source,null,2))}>Edit current source JSON</button><textarea aria-label="Company settings JSON" className={control+" h-52 font-mono"} value={settingsText} onChange={e=>setSettingsText(e.target.value)} placeholder="Paste or edit source resume JSON"/><div className="mt-3 flex gap-3"><button className={button} disabled={!settingsText.trim()} onClick={saveSettings}>Save company settings</button><button className={button} onClick={()=>{invalidate();setCustom(old=>{const next={...old};delete next[mode];return next;});setReload(v=>v+1);}}>Reload file source</button></div></details>
+      {savedSource&&<ResumeCompanyOverrides key={mode+scope} source={savedSource} active={activeCompanies} onApply={applyResumeCompanies} onReset={resetResumeCompanies}/>}
+      <details className="mt-4"><summary className="cursor-pointer font-semibold">Company settings and source history</summary><div className="mt-3 grid gap-3 sm:grid-cols-2"><div><p className="font-semibold">Universal JD-first generation</p><p className="mt-2 text-sm">Full-Time and C2C have separate company settings. There are no Java/Kafka source profiles.</p></div><label>Source file<select className={control} disabled={mode!=="c2c" || Boolean(custom[mode])} value={mode==="data-center"?"master-resume-data-center.json":mode==="full-time"?FULL_TIME_MASTER_FILES[profile]||"":file} onChange={e=>{invalidate();setFile(e.target.value);}}>{files.map(f=><option key={f}>{f}</option>)}</select></label></div><p className="my-3 text-sm">Saved history supplies identity and company context, not a technology whitelist for the editable draft. Import complete source JSON separately for each employment type. Include actual work and measured outcomes when available.</p><button className={button} disabled={!source} onClick={()=>setSettingsText(JSON.stringify(savedSource,null,2))}>Edit current source JSON</button><textarea aria-label="Company settings JSON" className={control+" h-52 font-mono"} value={settingsText} onChange={e=>setSettingsText(e.target.value)} placeholder="Paste or edit source resume JSON"/><div className="mt-3 flex gap-3"><button className={button} disabled={!settingsText.trim()} onClick={saveSettings}>Save company settings</button><button className={button} onClick={()=>{invalidate();setCustom(old=>{const next={...old};delete next[mode];return next;});setReload(v=>v+1);}}>Reload file source</button></div></details>
     </section>
     <section className={panel} id="job-description"><h2 className="text-xl font-bold">1. Job description → complete prompt</h2><textarea aria-label="Job description" className={control+" h-64"} value={jd} onChange={e=>{invalidate();setJd(e.target.value);}} placeholder="Paste the complete JD"/><p className="my-3 text-sm">Detected headline: {analysis.targetRole||"ChatGPT will identify the target title from the full JD"}. {target.years?"Dates will be calculated as a proposal; original history remains in settings.":"Dates remain unchanged."}</p><div className="flex gap-3"><button className={button} disabled={loading||!source||jd.trim().length<20} onClick={buildPrompt}>Generate prompt</button><button className={button} disabled={!prompt} onClick={()=>void copy()}>Copy prompt</button></div>{prompt&&<details className="mt-4"><summary>View complete prompt</summary><textarea aria-label="Complete prompt" className={control+" h-64 font-mono"} value={prompt} readOnly/></details>}
     {timeline&&<details className="mt-4"><summary>Review proposed employer dates</summary><ul className="mt-2 space-y-2 text-sm">{timeline.changes.map(c=><li key={c.id}>{c.company}: {c.originalStartDate}–{c.originalEndDate} → {c.proposedStartDate}–{c.proposedEndDate}</li>)}</ul></details>}</section>

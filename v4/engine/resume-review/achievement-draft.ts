@@ -1,16 +1,21 @@
 import type { MasterResume } from "@/types/resume";
 import { hasMetric, PROPOSED_METRIC_STATUS } from "@/engine/resume-review/metric-review";
 
-export const METRIC_DRAFT_VERSION = 4;
+export const METRIC_DRAFT_VERSION = 5;
 export type DraftMetricEdit = {employerId:string;index:number;original:string;replacement:string;outcome?:string;status:typeof PROPOSED_METRIC_STATUS|"unverified generated example"};
 // Select actual outcome categories across the whole resume, not synonyms for one result.
 type Opportunity={family:string;test:RegExp;outcome:string;value?:number;unit?:string};
 const opportunities:Opportunity[] = [
+ {family:"dc-rework",test:/\b(?:reduc|improv|prevent|correct)\w*\b.*\b(?:cabling errors|cabling rework|cable labeling errors)|\b(?:cabling errors|cabling rework)\b.*\b(?:reduc|prevent)\w*/i,outcome:"cabling rework"},
+ {family:"dc-repair",test:/\b(?:streamlin|improv|reduc|standardiz)\w*\b.*\b(?:hardware repair|repair turnaround|hardware troubleshooting)/i,outcome:"hardware repair turnaround time"},
+ {family:"rack-stack",test:/\brack[- ](?:and[- ]|&[- ]?)stack\b|\brack[- ]mount(?:ed|ing)?\b.*\b(?:install|deploy)\w*/i,outcome:"rack deployment work",value:2,unit:"racks per month"},
+ {family:"fiber-test",test:/\b(?:test|inspect|check|validat)\w*\b.*\b(?:fiber|copper|patch panel|cabl)|\b(?:fiber|copper|cabl)\w*\b.*\b(?:test|inspect|validat)\w*/i,outcome:"physical connectivity checks",value:12,unit:"connections per month"},
+ {family:"hardware-tickets",test:/\b(?:resolv|clos|handl)\w*\b.*\b(?:hardware|data center)\b.*\btickets?\b/i,outcome:"hardware ticket resolution",value:10,unit:"tickets per month"},
  {family:"server-install",test:/\b(?:install|deploy)\w*\b.*\bservers?\b|\bservers?\b.*\b(?:install|deploy)\w*/i,outcome:"server installations",value:6,unit:"servers per month"},
  {family:"rack",test:/\bcommission\w*\b.*\bracks?\b/i,outcome:"rack commissioning",value:2,unit:"racks per month"},
  {family:"cabling",test:/\b(?:install|terminat|rout|patch)\w*\b.*\b(?:fiber|copper|cabl)/i,outcome:"cabling work",value:12,unit:"connections per month"},
  {family:"inventory",test:/\b(?:reconcil|inspect|record|inventor)\w*\b.*\b(?:assets?|equipment|serial|deliver)/i,outcome:"equipment inventory",value:20,unit:"assets per month"},
- {family:"hardware",test:/\b(?:replac|repair)\w*\b.*\b(?:memory|power suppl|hardware|modules?|components?|fans?|disks?)\b/i,outcome:"hardware maintenance",value:8,unit:"devices per month"},
+ {family:"hardware",test:/\b(?:replac|repair)\w*\b.*\b(?:memory|power suppl\w*|hardware|modules?|components?|fans?|disks?)\b/i,outcome:"hardware maintenance",value:8,unit:"devices per month"},
 
   {family:"query",test:/\b(?:sql|quer(?:y|ies)|index(?:es|ing)?)\b.*\b(?:optim|tun|execution.plan)|\b(?:optim|tun)\w*\b.*\b(?:sql|quer(?:y|ies))\b/i, outcome:"query execution time"},
   {family:"compute",test:/\b(?:spark|job|dataframe)\b.*\b(?:optim|tun|partition|caching)|\b(?:optim|tun)\w*\b.*\b(?:spark|job|dataframe)/i, outcome:"processing runtime"},
@@ -55,7 +60,7 @@ export function strengthenDraftMetrics(input: MasterResume) {
       used.add(rule.family);usage.set(rule.family,(usage.get(rule.family)||0)+1);
       // Conservative task-specific drafting assumptions, not measured results or
       // industry benchmarks. No index-based pseudo-performance calculation.
-      const percent=({query:15,compute:12,shuffle:10,tests:15,release:20,orchestration:10,reconciliation:15,validation:10,duplicates:12,recovery:10,incremental:15,diagnosis:10,latency:12} as Record<string,number>)[rule.family]??10;
+      const percent=({"dc-rework":10,"dc-repair":12,query:15,compute:12,shuffle:10,tests:15,release:20,orchestration:10,reconciliation:15,validation:10,duplicates:12,recovery:10,incremental:15,diagnosis:10,latency:12} as Record<string,number>)[rule.family]??10;
       // Remove a trailing drafting instruction, not candidate-authored work history.
       const action=original
         .replace(/;\s*evaluate\s+[^.;]*\b(?:reductions|improvements)\s+against\s+recorded\s+[^.;]*baselines\.?\s*$/i,"")
